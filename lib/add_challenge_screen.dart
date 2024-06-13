@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_iconpicker/flutter_iconpicker.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -25,6 +28,118 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   DateTime? _startDate;
   DateTime? _endDate;
   CalendarFormat _calendarFormat = CalendarFormat.month;
+  Color selectedColor = Colors.orange;
+  final List<Color> predefinedColors = [
+    Colors.orange,
+    Colors.green,
+    Colors.blue,
+    Colors.purple,
+    Colors.red,
+  ];
+
+  IconData icon_selected = FontAwesomeIcons.glassMartiniAlt;
+  void _openColorPicker() async {
+    Color? pickedColor = await showDialog(
+      context: context,
+      builder: (context) {
+        Color tempSelectedColor = selectedColor;
+        IconData selectedIcon = icon_selected;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Pick a color and icon'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      IconData? newIcon = await showIconPicker(
+                          context,
+                          iconPackModes: [IconPack.fontAwesomeIcons]
+                        // iconPackMode: IconPack.fontAwesomeIcons,
+                      );
+
+                      if (newIcon != null) {
+                        setState(() {
+                          selectedIcon = newIcon;
+                          icon_selected = newIcon;
+                        });
+                      }
+                    },
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: tempSelectedColor,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(color: Colors.grey, width: 2),
+                      ),
+                      child: Icon(selectedIcon, color: Colors.black),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: predefinedColors.map((color) {
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            tempSelectedColor = color;
+                          });
+                        },
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 20),
+
+                  SingleChildScrollView(
+                    child: ColorPicker(
+                      pickerColor: tempSelectedColor,
+                      onColorChanged: (color) {
+                        setState(() {
+                          tempSelectedColor = color;
+                        });
+                      },
+                      showLabel: false,
+                      enableAlpha: false,
+                      pickerAreaHeightPercent: 0.8,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  child: const Text('Select'),
+                  onPressed: () {
+                    Navigator.of(context).pop(tempSelectedColor);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (pickedColor != null) {
+      setState(() {
+        selectedColor = pickedColor;
+      });
+    }
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,18 +178,46 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                   ),
                 ],
               ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Habit Title'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _title = value!;
-                },
-              ),
+
+
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: _openColorPicker,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: selectedColor,
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: Colors.grey, width: 2),
+                          ),
+                          child: Icon(icon_selected, color: Colors.black),
+                        ),
+                      ),
+
+                      SizedBox(width: 10,),
+
+
+                      SizedBox(
+                        width: 250,
+                        child: TextFormField(
+                          decoration:  InputDecoration(
+                              labelText: 'Habit Title'),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter a title';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _title = value!;
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+
               TextFormField(
                 readOnly: true,
                 decoration: const InputDecoration(labelText: 'Notification Time'),
