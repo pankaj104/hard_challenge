@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hard_challenge/statistics_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'add_challenge_screen.dart';
@@ -42,8 +43,7 @@ class _MainScreenState extends State<MainScreen> {
                 _selectedDate = selectedDay;
               });
             },
-          ),
-          // Display habits for the selected date
+          ),  // Display habits for the selected date
           Expanded(
             child: Consumer<HabitProvider>(
               builder: (context, habitProvider, child) {
@@ -53,18 +53,55 @@ class _MainScreenState extends State<MainScreen> {
                   itemBuilder: (context, index) {
                     Habit habit = habitsForSelectedDate[index];
                     double progress = habit.progress[_selectedDate] ?? 0.0;
-                    return ListTile(
-                      title: Text(habit.title),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    return SizedBox(
+                      height: 60,
+                      width: 300,
+                      child: Row(
                         children: [
-                          Text('${habit.category} - ${habit.notificationTime.format(context)}'),
-                          LinearProgressIndicator(value: progress),
+                          GestureDetector(
+                            onTap: (){
+                    Navigator.push(
+                    context,
+                    MaterialPageRoute(gt
+                    builder: (context) => StatisticsScreen(habit: habit),),);
+                    },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(habit.title),
+                               Text('${habit.category} - ${habit.notificationTime.format(context)}'),
+                                SizedBox(
+                                  height: 10,
+                                    width: 250,
+                                    child: LinearProgressIndicator(value: progress)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 20,),
+                          GestureDetector(
+                              onTap: () => _handleHabitTap(context, habit),
+                              child: Container(
+                                  height: 40,
+                                  width: 40,
+                                  color:Colors.blue,
+                                  child: _buildTrailingWidget(context, habit, progress))),
                         ],
                       ),
-                      trailing: _buildTrailingWidget(context, habit, progress),
-                      onTap: () => _handleHabitTap(context, habit),
                     );
+
+                    //   ListTile(
+                    //   title: Text(habit.title),
+                    //   subtitle: Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       Text('${habit.category} - ${habit.notificationTime.format(context)}'),
+                    //       LinearProgressIndicator(value: progress),
+                    //     ],
+                    //   ),
+                    //   trailing: _buildTrailingWidget(context, habit, progress),
+                    //   onTap: () => _handleHabitTap(context, habit),
+                    // );
                   },
                 );
               },
@@ -124,6 +161,7 @@ class _MainScreenState extends State<MainScreen> {
           Provider.of<HabitProvider>(context, listen: false)
               .updateHabitProgress(habit, _selectedDate, newProgress);
         });
+
         break;
     }
   }
