@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => HabitProvider(),
       child: MaterialApp(
-        title: 'Custom Challenge App',
+        title: 'Hard Challenge',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
