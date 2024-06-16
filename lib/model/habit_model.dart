@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
@@ -43,6 +44,33 @@ class Habit {
     this.startDate,
     this.endDate,
   });
+
+  double getCompletionPercentage() {
+    int totalDays = 0;
+    int completedDays = progress.values.where((progress) => progress == 1.0).length;
+
+    if (repeatType == RepeatType.daily) {
+
+      totalDays = endDate!.difference(startDate!).inDays;     // totalDays = progress.length;
+
+    } else if (repeatType == RepeatType.selectDays) {
+      // Calculate for habits with selected days
+
+
+
+
+      // totalDays = days?.length ?? 1;
+    } else if (repeatType == RepeatType.selectedDate) {
+      // Calculate for habits with specific dates
+      totalDays = selectedDates?.length ?? 1;
+    }
+
+    return totalDays > 0 ? (completedDays / totalDays) * 100 : 0.0;
+  }
+
+
+
+}
 
 //   Map<String, dynamic> toMap() {
 //     return {
@@ -92,4 +120,4 @@ class Habit {
 //   }
 // }
 
-}
+
