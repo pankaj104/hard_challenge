@@ -56,6 +56,17 @@ class Habit {
     } else if (repeatType == RepeatType.selectDays) {
       // Calculate for habits with selected days
 
+      DateTime? loopDate = startDate!;
+
+      while (loopDate!.isBefore(endDate!) || loopDate.isAtSameMomentAs(endDate!)) {
+        // Check if the current day matches any selected day
+        if (days!.contains(loopDate.weekday % 7)) { // % 7 to handle Sunday being 7 in DateTime
+          totalDays++;
+        }
+        // Move to the next day
+        loopDate = loopDate.add(Duration(days: 1));
+      }
+
 
 
 
