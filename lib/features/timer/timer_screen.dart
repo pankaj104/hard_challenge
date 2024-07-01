@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../model/habit_model.dart';
-import '../provider/habit_provider.dart';
+import '../../../model/habit_model.dart';
+import '../../../provider/habit_provider.dart';
 
 class TimerScreen extends StatefulWidget {
   final Habit habit;

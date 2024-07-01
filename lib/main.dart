@@ -1,9 +1,10 @@
 // main.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'main_screen.dart';
+import 'features/mainScreen/main_screen.dart';
 
 
 void main() {
@@ -15,12 +16,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => HabitProvider(),
-      child: MaterialApp(
-        title: 'Custom Challenge App',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
+      child: ScreenUtilInit(
+        designSize: const Size(375, 812),
+        child: MaterialApp(
+          title: 'Custom Challenge App',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: MainScreen(),
         ),
-        home: MainScreen(),
       ),
     );
   }

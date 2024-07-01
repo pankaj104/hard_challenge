@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'model/habit_model.dart';
+import '../../model/habit_model.dart';
 
 class StatisticsScreen extends StatelessWidget {
   final Habit habit;
