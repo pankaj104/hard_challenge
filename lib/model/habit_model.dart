@@ -45,6 +45,11 @@ class Habit {
     this.endDate,
   });
 
+  @override
+  String toString() {
+    return 'Habit(title: $title, category: $category, notificationTime: $notificationTime, taskType: $taskType, repeatType: $repeatType, timer: $timer, value: $value, progress: $progress, days: $days, startDate: $startDate, endDate: $endDate, selectedDates: $selectedDates)';
+  }
+
   double getCompletionPercentage() {
     int totalDays = 0;
     int completedDays = progress.values.where((progress) => progress == 1.0).length;
