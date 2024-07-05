@@ -6,5 +6,6 @@ class ImageResource{
   static const String eventIcon = 'assets/images/event.png';
   static const String calenderIcon = 'assets/images/calenderIcon.svg';
   static const String closeIcon = 'assets/images/closeIcon.svg';
+  static const String backIcon = 'assets/images/back_icon.svg';
 
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../model/habit_model.dart';
 import '../../provider/habit_provider.dart';
+import '../../widgets/icon_button_widget.dart';
 
 class AddChallengeScreen extends StatefulWidget {
   @override
@@ -28,16 +31,17 @@ class AddChallengeScreen extends StatefulWidget {
 class _AddChallengeScreenState extends State<AddChallengeScreen> {
 
   final _formKey = GlobalKey<FormState>();
+  DateTime today = DateTime.now();
   String _selectedCategory = 'General';
-  String _title = '';
+  String _title = 'Test';
   TimeOfDay _selectedTime = TimeOfDay.now();
   TaskType _taskType = TaskType.normal;
   RepeatType _repeatType = RepeatType.daily;
   Duration _timerDuration = const Duration(minutes: 1); // default 00:01:00
   int _taskValue = 5; // default value 5
 
-  DateTime? _startDate;
-  DateTime? _endDate;
+  DateTime _startDate = DateTime.now();
+  DateTime _endDate = DateTime.now().add(Duration(days: 8));
   CalendarFormat _calendarFormat = CalendarFormat.month;
   Color selectedColor = Colors.orange;
 
@@ -163,19 +167,11 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
               children: [
                 Row(
                   children: [
-                    Container(
-                        height: 42.h,
-                        width: 42.w,
-                        decoration: BoxDecoration(
-                          color: ColorStrings.lightSkyBlue,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: SvgPicture.asset(ImageResource.closeIcon,
-                          color: ColorStrings.blackColor,
-                          width: 18.w,
-                          height: 18.h,
-                        )
-                    ),
+                    IconButtonWidget(icon: ImageResource.closeIcon,
+                        onPressed: (){
+                      Navigator.pop(context);
+            } ),
+
                     Expanded(
                       child: Center(
                         child: HeadingH2Widget("New Habit"),
@@ -227,7 +223,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                   items: categories
                                       .map((category) => DropdownMenuItem<String>(
                                     value: category,
-                                    child: Text(category,style: TextStyle(color: ColorStrings.whiteColor,
+                                    child: Text(category,style: const TextStyle(color: ColorStrings.whiteColor,
                                         fontSize: 15, fontWeight: FontWeight.w600), ),
                                   ))
                                       .toList(),
@@ -411,62 +407,62 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 // ),
                 
                 //Pankaj's code
-                //     Row(
-                //       children: [
-                //         GestureDetector(
-                //           onTap: _openColorPicker,
-                //           child: Container(
-                //             width: 40,
-                //             height: 40,
-                //             decoration: BoxDecoration(
-                //               color: selectedColor,
-                //               borderRadius: BorderRadius.circular(15),
-                //               border: Border.all(color: Colors.grey, width: 2),
-                //             ),
-                //             child: Icon(icon_selected, color: Colors.black),
-                //           ),
-                //         ),
-                //
-                //         SizedBox(width: 10,),
-                //
-                //
-                //         SizedBox(
-                //           width: 250,
-                //           child: TextFormField(
-                //             decoration:  InputDecoration(
-                //                 labelText: 'Habit Title'),
-                //             validator: (value) {
-                //               if (value!.isEmpty) {
-                //                 return 'Please enter a title';
-                //               }
-                //               return null;
-                //             },
-                //             onSaved: (value) {
-                //               _title = value!;
-                //             },
-                //           ),
-                //         ),
-                //       ],
-                //     ),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: _openColorPicker,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: selectedColor,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(color: Colors.grey, width: 2),
+                            ),
+                            child: Icon(icon_selected, color: Colors.black),
+                          ),
+                        ),
 
-                // TextFormField(
-                //   readOnly: true,
-                //   decoration: const InputDecoration(labelText: 'Notification Time'),
-                //   onTap: () async {
-                //     TimeOfDay? picked = await showTimePicker(
-                //       context: context,
-                //       initialTime: TimeOfDay.now(),
-                //     );
-                //     if (picked != null) {
-                //       setState(() {
-                //         _selectedTime = picked;
-                //       });
-                //     }
-                //   },
-                //   controller: TextEditingController(
-                //     text: _selectedTime.format(context),
-                //   ),
-                // ),
+                        SizedBox(width: 10,),
+
+
+                        SizedBox(
+                          width: 250,
+                          child: TextFormField(
+                            decoration:  InputDecoration(
+                                labelText: 'Habit Title'),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter a title';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _title = value!;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+
+                TextFormField(
+                  readOnly: true,
+                  decoration: const InputDecoration(labelText: 'Notification Time'),
+                  onTap: () async {
+                    TimeOfDay? picked = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                    );
+                    if (picked != null) {
+                      setState(() {
+                        _selectedTime = picked;
+                      });
+                    }
+                  },
+                  controller: TextEditingController(
+                    text: _selectedTime.format(context),
+                  ),
+                ),
                 Align(
                   alignment: Alignment.centerLeft,
                     child: Padding(
@@ -807,6 +803,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         selectedDates:
         _repeatType == RepeatType.selectedDate ? selectedDates : null,
       );
+      log('All Saved Habbit Data $newHabit');
       Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
       Navigator.of(context).pop();
     }
