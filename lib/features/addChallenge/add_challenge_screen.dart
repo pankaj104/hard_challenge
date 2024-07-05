@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../model/habit_model.dart';
 import '../../provider/habit_provider.dart';
+import '../../widgets/icon_button_widget.dart';
 
 class AddChallengeScreen extends StatefulWidget {
   @override
@@ -28,6 +31,7 @@ class AddChallengeScreen extends StatefulWidget {
 class _AddChallengeScreenState extends State<AddChallengeScreen> {
 
   final _formKey = GlobalKey<FormState>();
+  DateTime today = DateTime.now();
   String _selectedCategory = 'General';
   String _title = '';
   TimeOfDay _selectedTime = TimeOfDay.now();
@@ -36,8 +40,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   Duration _timerDuration = const Duration(minutes: 1); // default 00:01:00
   int _taskValue = 5; // default value 5
 
-  DateTime? _startDate;
-  DateTime? _endDate;
+  DateTime _startDate = DateTime.now();
+  DateTime _endDate = DateTime.now().add(Duration(days: 8));
   CalendarFormat _calendarFormat = CalendarFormat.month;
   Color selectedColor = Colors.orange;
 
@@ -163,22 +167,11 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
               children: [
                 Row(
                   children: [
-                    Container(
-                        height: 46.h,
-                        width: 52.w,
-                        decoration: BoxDecoration(
-                          color: ColorStrings.lightSkyBlue,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: SvgPicture.asset(ImageResource.closeIcon,
-                            color: ColorStrings.blackColor,
-                            width: 18.w,
-                            height: 18.h,
-                          ),
-                        )
-                    ),
+                    IconButtonWidget(icon: ImageResource.closeIcon,
+                        onPressed: (){
+                      Navigator.pop(context);
+            } ),
+
                     Expanded(
                       child: Center(
                         child: HeadingH2Widget("New Habit"),
@@ -928,6 +921,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         selectedDates:
         _repeatType == RepeatType.selectedDate ? selectedDates : null,
       );
+      log('All Saved Habbit Data $newHabit');
       Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
       Navigator.of(context).pop();
     }
