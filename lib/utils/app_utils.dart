@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 // All constant in project.
 
+//Category List items
 final List<String> categories = ['General', 'Work', 'Health', 'Other'];
 
 final List<int> selectedDays = [];

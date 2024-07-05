@@ -164,16 +164,19 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 Row(
                   children: [
                     Container(
-                        height: 42.h,
-                        width: 42.w,
+                        height: 46.h,
+                        width: 52.w,
                         decoration: BoxDecoration(
                           color: ColorStrings.lightSkyBlue,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: SvgPicture.asset(ImageResource.closeIcon,
-                          color: ColorStrings.blackColor,
-                          width: 18.w,
-                          height: 18.h,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SvgPicture.asset(ImageResource.closeIcon,
+                            color: ColorStrings.blackColor,
+                            width: 18.w,
+                            height: 18.h,
+                          ),
                         )
                     ),
                     Expanded(
@@ -191,7 +194,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
-                        padding:  EdgeInsets.only(top: 14, bottom: 2),
+                        padding:  EdgeInsets.only(top: 22, bottom: 6),
                         child: Container(
                           height: 26,
                           width: double.infinity,
@@ -216,45 +219,51 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                           children: [
                             Expanded(
                               child:
-                              Container(
-                                height:58,
-                                width: 249,
-                                child: DropdownButtonFormField<String>(
-                                  itemHeight: 80,
-                                  padding: EdgeInsets.zero,
-                                  dropdownColor: ColorStrings.headingBlue,
-                                  value: _selectedCategory,
-                                  items: categories
-                                      .map((category) => DropdownMenuItem<String>(
-                                    value: category,
-                                    child: Text(category,style: TextStyle(color: ColorStrings.whiteColor,
-                                        fontSize: 15, fontWeight: FontWeight.w600), ),
-                                  ))
-                                      .toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedCategory = value!;
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(color: ColorStrings.whiteColor,width: 2),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(8.0),),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      borderSide:  BorderSide(color: ColorStrings.whiteColor,width: 2),
+                              Padding(
+                                padding: EdgeInsets.only(left: 7,top: 9,bottom: 5),
+                                child: Container(
+                                  height:66,
+                                  width: double.infinity,
+                                  child: DropdownButtonFormField<String>(
+                                    icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                                    iconSize: 25,
+                                    iconEnabledColor: ColorStrings.whiteColor,
+                                    itemHeight: 50,
+                                    dropdownColor: ColorStrings.headingBlue,
+                                    value: _selectedCategory,
+                                    items: categories
+                                        .map((category) => DropdownMenuItem<String>(
+                                      value: category,
+                                      child: Text(category,style: TextStyle(color: ColorStrings.whiteColor,
+                                          fontSize: 15, fontWeight: FontWeight.w600), ),
+                                    ))
+                                        .toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedCategory = value!;
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color: ColorStrings.whiteColor,width: 2),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0),),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide:  BorderSide(color: ColorStrings.whiteColor,width: 2),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(left: 40),
+                              padding: EdgeInsets.only(left: 22, right: 8, top: 5, bottom: 5),
                               child: Container(
-                                height: 58.h,
-                                width: 53.w,
+                                height: 40.h,
+                                width: 43.w,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(width: 2,color: ColorStrings.whiteColor)
@@ -277,7 +286,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
-                        padding:  EdgeInsets.only(top: 14, bottom: 2),
+                        padding:  EdgeInsets.only(top: 14, bottom: 6),
                         child: Container(
                           height: 26,
                           width: double.infinity,
@@ -306,20 +315,57 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Container(
-                              margin: EdgeInsets.only(left: 8),
-                              height: 40.h,
-                              width: 40.w,
-                              child: Center(child: Text("💧")),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: ColorStrings.havelockBlue
+                            // Container(
+                            //   margin: EdgeInsets.only(left: 8),
+                            //   height: 40.h,
+                            //   width: 40.w,
+                            //   child: Center(child: Text("💧")),
+                            //   decoration: BoxDecoration(
+                            //     borderRadius: BorderRadius.circular(8),
+                            //     color: ColorStrings.havelockBlue
+                            //   ),
+                            // ),
+                            GestureDetector(
+                              onTap: _openColorPicker,
+                              child: Container(
+                                margin: EdgeInsets.only(left: 8),
+                              width: 40.h,
+                                height: 40.w,
+                                decoration: BoxDecoration(
+                                  color: selectedColor,
+                                  borderRadius: BorderRadius.circular(8),
+                                  // border: Border.all(color: Colors.grey, width: 2),
+                                ),
+                                child: Icon(icon_selected, color: Colors.black),
                               ),
                             ),
+                            // Expanded(
+                            //   child: Padding(
+                            //     padding:  EdgeInsets.only(left: 8),
+                            //     child: ContainerLabelWidget("Water"),
+                            //   ),
+                            // ),
                             Expanded(
                               child: Padding(
-                                padding:  EdgeInsets.only(left: 8),
-                                child: ContainerLabelWidget("Water"),
+                                padding: EdgeInsets.only(left: 8),
+                                child: TextFormField(
+                                  decoration:   InputDecoration(
+                                      labelText: 'Habit Title',
+                                  labelStyle: GoogleFonts.poppins(fontSize: 15,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,),
+                                  border: InputBorder.none
+                                  ),
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Please enter a title';
+                                    }
+                                    return null;
+                                  },
+                                  onSaved: (value) {
+                                    _title = value!;
+                                  },
+                                ),
                               ),
                             ),
                           ],
@@ -449,58 +495,61 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 //       ],
                 //     ),
 
-                // TextFormField(
-                //   readOnly: true,
-                //   decoration: const InputDecoration(labelText: 'Notification Time'),
-                //   onTap: () async {
-                //     TimeOfDay? picked = await showTimePicker(
-                //       context: context,
-                //       initialTime: TimeOfDay.now(),
-                //     );
-                //     if (picked != null) {
-                //       setState(() {
-                //         _selectedTime = picked;
-                //       });
-                //     }
-                //   },
-                //   controller: TextEditingController(
-                //     text: _selectedTime.format(context),
-                //   ),
-                // ),
+                TextFormField(
+                  readOnly: true,
+                  decoration: const InputDecoration(labelText: 'Notification Time'),
+                  onTap: () async {
+                    TimeOfDay? picked = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                    );
+                    if (picked != null) {
+                      setState(() {
+                        _selectedTime = picked;
+                      });
+                    }
+                  },
+                  controller: TextEditingController(
+                    text: _selectedTime.format(context),
+                  ),
+                ),
                 Align(
                   alignment: Alignment.centerLeft,
                     child: Padding(
-                      padding:  EdgeInsets.only(top: 14, bottom: 4),
-                      child: ContainerLabelWidget("Goal"),
+                      padding:  EdgeInsets.only(top: 14, bottom: 8),
+                      child: HeadingH1Widget("Goal"),
                     )),
-                Container(
-                  width: double.infinity,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: ColorStrings.headingBlue
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: TaskType.values.map((type) {
-                      return Expanded(
-                        child: SizedBox(
-                          width: 300,
-                          child: ChoiceChip(
-                            backgroundColor: ColorStrings.whiteColor,
-                            selectedColor: ColorStrings.headingBlue,
-                            label: Text(type.toString().split('.').last,
-                              selectionColor: ColorStrings.whiteColor,),
-                            selected: _taskType == type,
-                            onSelected: (selected) {
-                              setState(() {
-                                _taskType = type;
-                              });
-                            },
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: Container(
+                    width: double.infinity,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: ColorStrings.headingBlue
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: TaskType.values.map((type) {
+                        return Expanded(
+                          child: SizedBox(
+                            width: 300,
+                            child: ChoiceChip(
+                              backgroundColor: ColorStrings.whiteColor,
+                              selectedColor: ColorStrings.headingBlue,
+                              label: Text(type.toString().split('.').last,
+                                selectionColor: ColorStrings.whiteColor,),
+                              selected: _taskType == type,
+                              onSelected: (selected) {
+                                setState(() {
+                                  _taskType = type;
+                                });
+                              },
+                            ),
                           ),
-                        ),
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
                 if (_taskType == TaskType.timer)
@@ -538,38 +587,41 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
-                      padding:  EdgeInsets.only(top: 14, bottom: 4),
-                      child: ContainerLabelWidget("Repeat Type"),
+                      padding:  EdgeInsets.only(top: 14, bottom: 8),
+                      child: HeadingH1Widget("Repeat Type"),
                     )),
-                Container(
-                  width: double.infinity,
-                  height: 52,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: ColorStrings.headingBlue
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: RepeatType.values.map((type) {
-                      return ChoiceChip(
-                        backgroundColor: ColorStrings.whiteColor,
-                        selectedColor: ColorStrings.headingBlue,
-                        label: Text(type.toString().split('.').last,
-                          selectionColor: ColorStrings.whiteColor,),
-                        selected: _repeatType == type,
-                        onSelected: (selected) {
-                          setState(() {
-                            _repeatType = type;
-                            if (type == RepeatType.selectDays) {
-                              selectedDays.clear();
-                            }
-                            if (type == RepeatType.selectedDate) {
-                              selectedDates.clear();
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
+                Padding(
+                  padding:  EdgeInsets.only(bottom: 12),
+                  child: Container(
+                    width: double.infinity,
+                    height: 52,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: ColorStrings.headingBlue
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: RepeatType.values.map((type) {
+                        return ChoiceChip(
+                          backgroundColor: ColorStrings.whiteColor,
+                          selectedColor: ColorStrings.headingBlue,
+                          label: Text(type.toString().split('.').last,
+                            selectionColor: ColorStrings.whiteColor,),
+                          selected: _repeatType == type,
+                          onSelected: (selected) {
+                            setState(() {
+                              _repeatType = type;
+                              if (type == RepeatType.selectDays) {
+                                selectedDays.clear();
+                              }
+                              if (type == RepeatType.selectedDate) {
+                                selectedDates.clear();
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
                 if (_repeatType == RepeatType.selectDays)
@@ -638,49 +690,118 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       ),
                     ],
                   ),
-                TextFormField(
-                  readOnly: true,
-                  decoration: const InputDecoration(labelText: 'Start Date'),
-                  onTap: () async {
-                    DateTime? picked = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2030),
-                    );
-                    if (picked != null) {
-                      setState(() {
-                        _startDate = picked;
-                      });
-                    }
-                  },
-                  controller: TextEditingController(
-                    text: _startDate != null
-                        ? _startDate!.toLocal().toString().split(' ')[0]
-                        : '',
-                  ),
-                ),
-                TextFormField(
-                  readOnly: true,
-                  decoration: const InputDecoration(labelText: 'End Date'),
-                  onTap: () async {
-                    DateTime? picked = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2030),
-                    );
-                    if (picked != null) {
-                      setState(() {
-                        _endDate = picked;
-                      });
-                    }
-                  },
-                  controller: TextEditingController(
-                    text: _endDate != null
-                        ? _endDate!.toLocal().toString().split(' ')[0]
-                        : '',
-                  ),
+                Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 16, bottom: 12),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: SizedBox(
+                          height: 26,
+                          width: double.infinity,
+                          child: HeadingH1Widget("Schedule"),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Column(
+                          children: [
+                            Padding(
+                              padding:  EdgeInsets.only(bottom: 8),
+                              child: HeadingH1Widget("Start"),
+                            ),
+                            Container(
+                              width: 140,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                color: ColorStrings.headingBlue
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(15.0),
+                                child: TextFormField(
+                                  style: GoogleFonts.poppins(fontSize: 15,color: ColorStrings.whiteColor, fontWeight: FontWeight.w600,),
+                                  readOnly: true,
+                                  decoration:  const InputDecoration(
+                                      border: InputBorder.none),
+                                  onTap: () async {
+                                    DateTime? picked = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2020),
+                                      lastDate: DateTime(2030),
+                                    );
+                                    if (picked != null) {
+                                      setState(() {
+                                        _startDate = picked;
+                                      });
+                                    }
+                                  },
+                                  controller: TextEditingController(
+                                    text: _startDate != null
+                                        ? _startDate!.toLocal().toString().split(' ')[0]
+                                        : '',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding:  EdgeInsets.only(top: 16),
+                            child: SizedBox(
+                              width: 32,
+                              child: SvgPicture.asset(ImageResource.shuffleIcon),
+                            ),
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            Padding(
+                              padding:  EdgeInsets.only(bottom: 6),
+                              child: HeadingH1Widget("End"),
+                            ),
+                            Container(
+                              width: 140,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: ColorStrings.headingBlue
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(15.0),
+                                child: TextFormField(
+                                  style: GoogleFonts.poppins(fontSize: 15,color: ColorStrings.whiteColor, fontWeight: FontWeight.w600,),
+                                  readOnly: true,
+                                  decoration: const InputDecoration(border: InputBorder.none),
+                                  onTap: () async {
+                                    DateTime? picked = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2020),
+                                      lastDate: DateTime(2030),
+                                    );
+                                    if (picked != null) {
+                                      setState(() {
+                                        _endDate = picked;
+                                      });
+                                    }
+                                  },
+                                  controller: TextEditingController(
+                                    text: _endDate != null
+                                        ? _endDate!.toLocal().toString().split(' ')[0]
+                                        : '',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 ElevatedButton(
                   onPressed: _submitForm,

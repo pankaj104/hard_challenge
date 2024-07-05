@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => HabitProvider(),
       child: ScreenUtilInit(
-        designSize: const Size(375, 812),
+        // designSize: const Size(375, 812),
         child: MaterialApp(
           title: 'Custom Challenge App',
           theme: ThemeData(
