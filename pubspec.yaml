@@ -49,6 +49,9 @@ dependencies:
   flutter_screenutil: ^5.9.3
   flutter_svg: ^2.0.10+1
   google_fonts: 6.1.0
+  bottom_picker: ^2.8.0
+  percent_indicator: ^4.2.3
+  fl_chart: ^0.68.0
 
 dev_dependencies:
   flutter_test:

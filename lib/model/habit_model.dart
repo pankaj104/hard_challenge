@@ -11,8 +11,9 @@ enum TaskType {
 }
 
 enum RepeatType {
-  daily,
   selectDays,
+  weekly,
+  monthly,
   selectedDate,
 }
 
@@ -27,6 +28,8 @@ class Habit {
   Map<DateTime, double> progress;
   List<int>? days;
   List<DateTime>? selectedDates;
+  int? selectedTimesPerWeek;
+  int? selectedTimesPerMonth;
   DateTime? startDate;
   DateTime? endDate;
 
@@ -41,25 +44,35 @@ class Habit {
     required this.progress,
     this.days,
     this.selectedDates,
+    this.selectedTimesPerWeek,
+    this.selectedTimesPerMonth,
     this.startDate,
     this.endDate,
   });
 
   @override
   String toString() {
-    return 'Habit(title: $title, category: $category, notificationTime: $notificationTime, taskType: $taskType, repeatType: $repeatType, timer: $timer, value: $value, progress: $progress, days: $days, startDate: $startDate, endDate: $endDate, selectedDates: $selectedDates)';
+    return 'Habit(title: $title, category: $category, notificationTime: $notificationTime, '
+        'taskType: $taskType, repeatType: $repeatType, timer: $timer, value: $value, '
+        'progress: $progress, days: $days, startDate: $startDate, endDate: $endDate, selectedDates: $selectedDates, '
+        'selectedTimesPerWeek: $selectedTimesPerWeek, selectedTimesPerMonth: $selectedTimesPerMonth)';
   }
 
   double getCompletionPercentage() {
     int totalDays = 0;
     int completedDays = progress.values.where((progress) => progress == 1.0).length;
 
-    if (repeatType == RepeatType.daily) {
+    // if (repeatType == RepeatType.daily) {
+    //
+    //   totalDays = endDate!.difference(startDate!).inDays;     // totalDays = progress.length;
+    //
+    // }
 
-      totalDays = endDate!.difference(startDate!).inDays;     // totalDays = progress.length;
-
-    } else if (repeatType == RepeatType.selectDays) {
+   if (repeatType == RepeatType.selectDays) {
       // Calculate for habits with selected days
+
+
+
 
       DateTime? loopDate = startDate!;
 
@@ -71,18 +84,53 @@ class Habit {
         // Move to the next day
         loopDate = loopDate.add(Duration(days: 1));
       }
-
-
-
-
       // totalDays = days?.length ?? 1;
-    } else if (repeatType == RepeatType.selectedDate) {
+    }
+   else if (repeatType == RepeatType.selectedDate) {
       // Calculate for habits with specific dates
       totalDays = selectedDates?.length ?? 1;
     }
 
+   else if (repeatType == RepeatType.weekly) {
+     // Calculate for habits with specific dates
+     countTaskDays(startDate!, endDate!, selectedTimesPerWeek! );
+     totalDays = selectedDates?.length ?? 1;
+   }
+
+   else if (repeatType == RepeatType.monthly) {
+     // Calculate for habits with specific dates
+     totalDays = selectedDates?.length ?? 1;
+   }
+
     return totalDays > 0 ? (completedDays / totalDays) * 100 : 0.0;
   }
+
+
+  int countTaskDays(DateTime startDate, DateTime endDate, int taskDays) {
+    if (startDate.isAfter(endDate)) {
+      throw ArgumentError('Start date must be before end date');
+    }
+
+    // Calculate the number of full weeks between the start and end dates.
+    int totalDays = endDate.difference(startDate).inDays + 1;
+    int fullWeeks = totalDays ~/ 7;
+
+    // Each full week will have 2 task occurrences.
+    int totalTaskDays = fullWeeks * selectedTimesPerWeek!;
+
+    // Calculate remaining days after accounting for full weeks.
+    int remainingDays = totalDays % 7;
+
+    // Check if there are enough remaining days to account for extra occurrences.
+    // Since the task occurs on any 2 days of the week, we count max(remainingDays, 2).
+    if (remainingDays > 0) {
+      totalTaskDays += (remainingDays >= selectedTimesPerWeek!) ? selectedTimesPerWeek! : remainingDays;
+    }
+    log("selectedTimesPerWeek:  $selectedTimesPerWeek");
+
+    return totalTaskDays;
+  }
+
 
 
 

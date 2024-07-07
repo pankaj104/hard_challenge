@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,8 @@ import '../../provider/habit_provider.dart';
 import '../../widgets/icon_button_widget.dart';
 
 class AddChallengeScreen extends StatefulWidget {
+  const AddChallengeScreen({super.key});
+
   @override
   _AddChallengeScreenState createState() => _AddChallengeScreenState();
 }
@@ -36,14 +39,17 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   String _title = 'Test';
   TimeOfDay _selectedTime = TimeOfDay.now();
   TaskType _taskType = TaskType.normal;
-  RepeatType _repeatType = RepeatType.daily;
+  RepeatType _repeatType = RepeatType.selectDays;
   Duration _timerDuration = const Duration(minutes: 1); // default 00:01:00
   int _taskValue = 5; // default value 5
 
-  DateTime _startDate = DateTime.now();
-  DateTime _endDate = DateTime.now().add(Duration(days: 8));
+  DateTime? _startDate;
+  DateTime? _endDate ;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   Color selectedColor = Colors.orange;
+
+  int selectedTimesPerWeek = 2;
+  int selectedTimesPerMonth = 1;
 
 
   IconData icon_selected = FontAwesomeIcons.glassMartiniAlt;
@@ -66,7 +72,6 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       IconData? newIcon = await showIconPicker(
                           context,
                           iconPackModes: [IconPack.fontAwesomeIcons]
-                        // iconPackMode: IconPack.fontAwesomeIcons,
                       );
 
                       if (newIcon != null) {
@@ -556,9 +561,6 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                         onSelected: (selected) {
                           setState(() {
                             _repeatType = type;
-                            if (type == RepeatType.selectDays) {
-                              selectedDays.clear();
-                            }
                             if (type == RepeatType.selectedDate) {
                               selectedDates.clear();
                             }
@@ -571,23 +573,25 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 if (_repeatType == RepeatType.selectDays)
                   Wrap(
                     children: [
-                      {'Mon': 1},
-                      {'Tue': 2},
-                      {'Wed': 3},
-                      {'Thu': 4},
-                      {'Fri': 5},
-                      {'Sat': 6},
-                      {'Sun': 7}
+                      {'M': 1},
+                      {'T': 2},
+                      {'W': 3},
+                      {'T': 4},
+                      {'F': 5},
+                      {'S': 6},
+                      {'S': 7}
                     ].map((dayMap) {
                       String day = dayMap.keys.first;
                       int dayValue = dayMap.values.first;
                       return ChoiceChip(
                         label: Text(day),
                         selected: selectedDays.contains(dayValue),
+                        showCheckmark: false,
                         onSelected: (selected) {
                           setState(() {
                             if (selected) {
                               selectedDays.add(dayValue);
+                              log('selectedDays value $selectedDays');
                             } else {
                               selectedDays.remove(dayValue);
                             }
@@ -596,6 +600,40 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       );
                     }).toList(),
                   ),
+
+                if (_repeatType == RepeatType.weekly)
+                  Row(
+                    children: [
+
+                      ElevatedButton(
+                        onPressed: _showWeeklyTimesPicker,
+                        child:  Text('$selectedTimesPerWeek times'),
+                      ),
+                      ElevatedButton(
+                        onPressed: _showWeeklyTimesPicker,
+                        child:  Text('Change'),
+                      ),
+
+                    ],
+                  ),
+
+                if (_repeatType == RepeatType.monthly)
+                  Row(
+                    children: [
+
+                      ElevatedButton(
+                        onPressed: _showMontlyimesPicker,
+                        child:  Text('$selectedTimesPerMonth times'),
+                      ),
+
+                      ElevatedButton(
+                        onPressed: _showMontlyimesPicker,
+                        child:  Text('Change'),
+                      ),
+
+                    ],
+                  ),
+
                 if (_repeatType == RepeatType.selectedDate)
                   Column(
                     children: [
@@ -619,18 +657,6 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             _calendarFormat = format;
                           });
                         },
-                      ),
-                      Wrap(
-                        children: selectedDates.map((date) {
-                          return Chip(
-                            label: Text(date.toLocal().toString().split(' ')[0]),
-                            onDeleted: () {
-                              setState(() {
-                                selectedDates.remove(date);
-                              });
-                            },
-                          );
-                        }).toList(),
                       ),
                     ],
                   ),
@@ -800,12 +826,43 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         days: _repeatType == RepeatType.selectDays ? selectedDays : null,
         startDate: _startDate,
         endDate: _endDate,
-        selectedDates:
-        _repeatType == RepeatType.selectedDate ? selectedDates : null,
+        selectedDates: _repeatType == RepeatType.selectedDate ? selectedDates : null,
+        selectedTimesPerWeek: _repeatType == RepeatType.weekly ? selectedTimesPerWeek : null,
+        selectedTimesPerMonth: _repeatType == RepeatType.monthly ? selectedTimesPerMonth : null,
       );
       log('All Saved Habbit Data $newHabit');
       Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
       Navigator.of(context).pop();
     }
+  }
+
+  void _showWeeklyTimesPicker() {
+    BottomPicker(
+      items: List.generate(6, (index) => Text((index + 1).toString())),
+      // title: 'Select a number',
+      onChange: (index) {
+        setState(() {
+          selectedTimesPerWeek = index + 1;
+        });
+      },
+
+       pickerTitle: Center(child: Text('Select Times per week')),
+      selectedItemIndex: selectedTimesPerWeek-1,
+    ).show(context);
+  }
+
+  void _showMontlyimesPicker() {
+    BottomPicker(
+      items: List.generate(28, (index) => Text((index + 1).toString())),
+      // title: 'Select a number',
+      onChange: (index) {
+        setState(() {
+          selectedTimesPerMonth = index + 1;
+        });
+      },
+
+      pickerTitle: Center(child: Text('Select Times per Month')),
+      selectedItemIndex: selectedTimesPerMonth-1,
+    ).show(context);
   }
 }
