@@ -830,7 +830,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         selectedTimesPerWeek: _repeatType == RepeatType.weekly ? selectedTimesPerWeek : null,
         selectedTimesPerMonth: _repeatType == RepeatType.monthly ? selectedTimesPerMonth : null,
       );
-      log('All Saved Habbit Data $newHabit');
+      log('New habbit added Data $newHabit');
       Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
       Navigator.of(context).pop();
     }

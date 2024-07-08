@@ -12,6 +12,7 @@ class HabitProvider with ChangeNotifier {
   void addHabit(Habit habit) {
     _habits.add(habit);
     notifyListeners();
+    log('all Habbit data $habits');
   }
 
   void updateHabit(int index, Habit updatedHabit) {
