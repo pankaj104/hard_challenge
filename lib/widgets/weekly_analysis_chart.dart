@@ -62,10 +62,10 @@ class _WeeklyAnalysisChartState extends State<WeeklyAnalysisChart> {
     DateTime normalizedDate = DateTime(date.year, date.month, date.day);
 
     // Iterate through the progress map to find the progress for the normalized date
-    for (var entry in widget.habit.progress.entries) {
+    for (var entry in widget.habit.progressJson.entries) {
       DateTime progressDate = DateTime(entry.key.year, entry.key.month, entry.key.day);
       if (progressDate == normalizedDate) {
-        return entry.value * 100;
+        return entry.value.progress * 100;
       }
     }
     return 0.0; // Return null if no progress found for the given date

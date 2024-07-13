@@ -59,6 +59,8 @@ class _TimerScreenState extends State<TimerScreen> {
       _timer?.cancel();
       _duration = _initialDuration;
       _updateProgress(complete: true);
+      widget.habit.progressJson[widget.selectedDate]?.status = TaskStatus.done;
+
     });
     Navigator.of(context).pop();
   }
@@ -68,7 +70,7 @@ class _TimerScreenState extends State<TimerScreen> {
     final elapsedSeconds = complete ? totalSeconds : totalSeconds - _duration.inSeconds;
     final progress = elapsedSeconds / totalSeconds;
 
-    widget.habit.progress[widget.selectedDate] = progress;
+    widget.habit.progressJson[widget.selectedDate]?.progress = progress;
     Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(widget.habit, widget.selectedDate, progress);
   }
 

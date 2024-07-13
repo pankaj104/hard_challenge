@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hard_challenge/model/habit_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarPage extends StatefulWidget {
+  final Habit habit;
+
+  const CalendarPage({super.key, required this.habit});
   @override
   _CalendarPageState createState() => _CalendarPageState();
 }
@@ -10,6 +14,46 @@ class _CalendarPageState extends State<CalendarPage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+
+   List<DateTime> habitDoneDateList = [];
+   List<DateTime> habitMissedDateList =[];
+   List<DateTime> habitSkippedDateList= [];
+
+  @override
+    void initState(){
+    super.initState();
+    habitDoneDateStore(widget.habit);
+    habitSkippedDateStore(widget.habit);
+    habitMissedDateStore(widget.habit);
+
+}
+
+  List<DateTime> habitDoneDateStore(Habit habit){
+    habit.progressJson.forEach((date, progress) {
+      if(progress.status == TaskStatus.done){
+        habitDoneDateList.add(date);
+      }
+    });
+    return habitDoneDateList;
+  }
+  List<DateTime> habitSkippedDateStore(Habit habit){
+    habit.progressJson.forEach((date, progress) {
+      if(progress.status == TaskStatus.skipped){
+        habitSkippedDateList.add(date);
+      }
+    });
+    return habitSkippedDateList;
+  }
+
+  List<DateTime> habitMissedDateStore(Habit habit){
+    habit.progressJson.forEach((date, progress) {
+      if(progress.status == TaskStatus.missed){
+        habitMissedDateList.add(date);
+      }
+    });
+    return habitMissedDateList;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +85,7 @@ class _CalendarPageState extends State<CalendarPage> {
           },
           calendarStyle: CalendarStyle(
             // Customize today and selected day styles
-            todayDecoration: BoxDecoration(
-              color: Colors.orange,
-              shape: BoxShape.circle,
-            ),
+
             selectedDecoration: BoxDecoration(
               color: Colors.blue,
               shape: BoxShape.circle,
@@ -61,7 +102,7 @@ class _CalendarPageState extends State<CalendarPage> {
           // Customize day cell builders
           calendarBuilders: CalendarBuilders(
             defaultBuilder: (context, date, events) {
-              if (date.day == 10 || date.day == 5 || date.day == 18) {
+              if (habitDoneDateList.any((element) => isSameDay(element, date))) {
                 return Container(
                   margin: const EdgeInsets.all(6.0),
                   alignment: Alignment.center,
@@ -74,7 +115,8 @@ class _CalendarPageState extends State<CalendarPage> {
                     style: TextStyle(color: Colors.white),
                   ),
                 );
-              } else if (date.day == 20 || date.day == 22) {
+              }
+              else if   (habitMissedDateList.any((element) => isSameDay(element, date)))  {
                 return Container(
                   margin: const EdgeInsets.all(6.0),
                   alignment: Alignment.center,
@@ -87,12 +129,13 @@ class _CalendarPageState extends State<CalendarPage> {
                     style: TextStyle(color: Colors.white),
                   ),
                 );
-              } else if (date.day == 23 || date.day == 24 || date.day == 25) {
+              }
+              else if   (habitSkippedDateList.any((element) => isSameDay(element, date)))  {
                 return Container(
                   margin: const EdgeInsets.all(6.0),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: Colors.orange,
+                    color: Colors.grey,
                     shape: BoxShape.circle,
                   ),
                   child: Text(

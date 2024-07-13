@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -12,7 +11,7 @@ class HabitProvider with ChangeNotifier {
   void addHabit(Habit habit) {
     _habits.add(habit);
     notifyListeners();
-    log('all Habbit data $habits');
+    log('All Habit data: $habits');
   }
 
   void updateHabit(int index, Habit updatedHabit) {
@@ -90,7 +89,7 @@ class HabitProvider with ChangeNotifier {
             log('End of week: $endOfWeek');
 
             // Count completions in the current week
-            int completedTimes = habit.progress.keys
+            int completedTimes = habit.progressJson.keys
                 .where((completedDate) =>
             completedDate.isAfter(startOfWeek.subtract(const Duration(days: 1))) &&
                 completedDate.isBefore(endOfWeek.add(const Duration(days: 1))))
@@ -104,7 +103,7 @@ class HabitProvider with ChangeNotifier {
             }
 
             // Additionally, show the habit on the days it was completed
-            return habit.progress.keys.any((completedDate) => isSameDate(completedDate, date));
+            return habit.progressJson.keys.any((completedDate) => isSameDate(completedDate, date));
           }
           return false;
 
@@ -124,8 +123,6 @@ class HabitProvider with ChangeNotifier {
         date1.day == date2.day;
   }
 
-
-
   bool isSameWeek(DateTime date1, DateTime date2) {
     final startOfWeek1 = date1.subtract(Duration(days: date1.weekday - 1));
     final startOfWeek2 = date2.subtract(Duration(days: date2.weekday - 1));
@@ -133,17 +130,27 @@ class HabitProvider with ChangeNotifier {
     return isSameDate(startOfWeek1, startOfWeek2);
   }
 
-  void updateHabitProgress(Habit habit, DateTime date, double progress) {
+  void updateHabitProgress(Habit habit, DateTime date, double progressValue) {
     int index = _habits.indexWhere((h) => h == habit);
     if (index != -1) {
-      _habits[index].progress[date] = progress;
+      if (_habits[index].progressJson.containsKey(date)) {
+        _habits[index].progressJson[date]!.progress = progressValue;
+      } else {
+        _habits[index].progressJson[date] = ProgressWithStatus(status: TaskStatus.done, progress: progressValue);
+      }
       notifyListeners();
     }
   }
 
-  // bool isSameDate(DateTime date1, DateTime date2) {
-  //   return date1.year == date2.year &&
-  //       date1.month == date2.month &&
-  //       date1.day == date2.day;
-  // }
+  void markTaskStatus(Habit habit, DateTime date, TaskStatus status) {
+    int index = _habits.indexWhere((h) => h == habit);
+    if (index != -1) {
+      if (_habits[index].progressJson.containsKey(date)) {
+        _habits[index].progressJson[date]!.status = status;
+      } else {
+        _habits[index].progressJson[date] = ProgressWithStatus(status: status, progress: 0.0);
+      }
+      notifyListeners();
+    }
+  }
 }

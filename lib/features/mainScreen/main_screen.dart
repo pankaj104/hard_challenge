@@ -41,20 +41,26 @@ class _MainScreenState extends State<MainScreen> {
                 width: 35.w,
                 child: SvgPicture.asset(ImageResource.calenderIcon),
               ),
-              // SizedBox(width: 30.w,),
               Container(
                 child: Column(
                   children: [
-                    Text("Today", style: GoogleFonts.poppins(fontSize: 32,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                    ),),
-                    Text(DateTime.now().toString().split(" ")[0],
-                      style: GoogleFonts.poppins(fontSize: 18,
+                    Text(
+                      "Today",
+                      style: GoogleFonts.poppins(
+                        fontSize: 32,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      DateTime.now().toString().split(" ")[0],
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
                         color: Colors.black.withOpacity(0.8),
                         fontWeight: FontWeight.w400,
+                      ),
                     ),
-                    ),],
+                  ],
                 ),
               ),
               Container(
@@ -67,25 +73,33 @@ class _MainScreenState extends State<MainScreen> {
           // Calendar
           Container(
             clipBehavior: Clip.hardEdge,
-            margin:  EdgeInsets.symmetric(horizontal: 14.w),
+            margin: EdgeInsets.symmetric(horizontal: 14.w),
             decoration: BoxDecoration(
               color: Colors.deepPurpleAccent.withOpacity(0.09),
-              borderRadius: BorderRadius.circular(20.0)
+              borderRadius: BorderRadius.circular(20.0),
             ),
             child: TableCalendar(
-              rowHeight:55,
+              rowHeight: 55,
               firstDay: DateTime.utc(2020, 10, 16),
               lastDay: DateTime.utc(2030, 3, 14),
               focusedDay: _selectedDate,
               headerStyle: const HeaderStyle(
-                titleTextStyle: TextStyle(fontWeight: FontWeight.w300, fontSize: 24,),
+                titleTextStyle: TextStyle(
+                  fontWeight: FontWeight.w300,
+                  fontSize: 24,
+                ),
                 formatButtonVisible: false,
-              titleCentered: true,),
+                titleCentered: true,
+              ),
               availableGestures: AvailableGestures.all,
               calendarFormat: CalendarFormat.week,
               daysOfWeekStyle: const DaysOfWeekStyle(
-                weekdayStyle: TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
-                weekendStyle: TextStyle(color: Colors.red,fontWeight: FontWeight.w300,fontSize: 15),
+                weekdayStyle:
+                TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
+                weekendStyle: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.w300,
+                    fontSize: 15),
               ),
               selectedDayPredicate: (day) {
                 return isSameDay(_selectedDate, day);
@@ -97,123 +111,141 @@ class _MainScreenState extends State<MainScreen> {
                 });
               },
             ),
-          ),  // Display habits for the selected date
+          ),
+          // Display habits for the selected date
           Expanded(
             child: Consumer<HabitProvider>(
               builder: (context, habitProvider, child) {
-                List<Habit> habitsForSelectedDate = habitProvider.getHabitsForDate(_selectedDate);
+                List<Habit> habitsForSelectedDate =
+                habitProvider.getHabitsForDate(_selectedDate);
                 return ListView.builder(
                   itemCount: habitsForSelectedDate.length,
                   itemBuilder: (context, index) {
                     Habit habit = habitsForSelectedDate[index];
-                    double progress = habit.progress[_selectedDate] ?? 0.0;
+                    double progress =
+                        habit.progressJson[_selectedDate]?.progress ?? 0.0;
+                    bool isSkipped =
+                        habit.progressJson[_selectedDate]?.status ==
+                            TaskStatus.skipped;
+
                     return Padding(
-                      padding:  EdgeInsets.only(top: 10.h,bottom: 5.h),
+                      padding: EdgeInsets.only(top: 10.h, bottom: 5.h),
                       child: Container(
                         clipBehavior: Clip.hardEdge,
-                        margin:  EdgeInsets.symmetric(horizontal: 14.w),
+                        margin: EdgeInsets.symmetric(horizontal: 14.w),
                         decoration: BoxDecoration(
                           color: Colors.black,
                           borderRadius: BorderRadius.circular(22.w),
-                          // border: Border.all(width: 2,color: Colors.white),
                           boxShadow: const [
                             BoxShadow(
                               offset: Offset(0.0, 4.0),
                               color: Colors.grey,
                               blurRadius: 4.0,
-                              spreadRadius: 0.0
-                          ),],
+                              spreadRadius: 0.0,
+                            ),
+                          ],
                         ),
                         height: 65.h,
                         width: double.infinity,
                         child: Stack(
                           children: [
                             Positioned.fill(
-                              child:
-                              LinearProgressIndicator(
-                                //Here you pass the percentage
-                                value: progress,
+                              child: LinearProgressIndicator(
+                                value: isSkipped ? 0.0 : progress,
                                 color: Colors.blue.withAlpha(100),
                                 backgroundColor: Colors.white,
                               ),
                             ),
-                             Padding(
+                            Padding(
                               padding: EdgeInsets.symmetric(horizontal: 10.h),
                               child: Row(
                                 children: [
                                   Padding(
-                                    padding:  EdgeInsets.only(left: 5.w, right: 15.w),
+                                    padding:
+                                    EdgeInsets.only(left: 5.w, right: 15.w),
                                     child: Container(
                                       height: 50.h,
                                       width: 48.w,
                                       decoration: BoxDecoration(
-                                        // borderRadius: BorderRadius.circular(20.0)
-                                        borderRadius: BorderRadius.circular(16.w),
-                                        border: Border.all(width: 1.2.w,color: Colors.blue),
+                                        borderRadius:
+                                        BorderRadius.circular(16.w),
+                                        border: Border.all(
+                                            width: 1.2.w, color: Colors.blue),
                                         image: const DecorationImage(
-                                          image: AssetImage(ImageResource.dumbleIcon),
+                                          image: AssetImage(
+                                              ImageResource.dumbleIcon),
                                           fit: BoxFit.cover,
                                         ),
                                       ),
                                     ),
                                   ),
                                   GestureDetector(
-                                    onTap: (){
+                                    onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => StatisticsScreen(habit: habit),),);
+                                          builder: (context) =>
+                                              StatisticsScreen(
+                                                habit: habit,
+                                                selectedDateforSkip: _selectedDate,
+                                              ),
+                                        ),
+                                      );
                                     },
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Padding(
-                                          padding:  EdgeInsets.only(top: 5.h, left: 10.w),
-                                          child: Text(habit.title, style: const TextStyle(fontWeight: FontWeight.w400,color: Colors.black, fontSize: 21),),
+                                          padding: EdgeInsets.only(
+                                              top: 5.h, left: 10.w),
+                                          child: Text(
+                                            habit.title,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.black,
+                                                fontSize: 21),
+                                          ),
                                         ),
                                         Padding(
-                                          padding:  EdgeInsets.only(left: 10.w),
-                                          child: Text('${habit.category} - ${habit.notificationTime.format(context)}',
-                                            style: TextStyle(color: Colors.black.withOpacity(0.7), fontSize: 19),),
+                                          padding:
+                                          EdgeInsets.only(left: 10.w),
+                                          child: Text(
+                                            isSkipped
+                                                ? 'Skipped'
+                                                : '${habit.category} - ${habit.notificationTime.format(context)}',
+                                            style: TextStyle(
+                                              color: Colors.black
+                                                  .withOpacity(0.7),
+                                              fontSize: 19,
+                                            ),
+                                          ),
                                         ),
-                                        // SizedBox(
-                                        //   height: 10,
-                                        //     width: 250,
-                                        //     child: LinearProgressIndicator(value: progress)),
                                       ],
                                     ),
                                   ),
-                                  SizedBox(width: 42.w,),
+                                  SizedBox(width: 42.w),
                                   GestureDetector(
-                                      onTap: () => _handleHabitTap(context, habit),
-                                      child: Padding(
-                                        padding:  EdgeInsets.only(left: 22.w,),
-                                        child: Container(
-                                            height: 28.h,
-                                            width: 28.w,
-                                            color:Colors.blue,
-                                            child: _buildTrailingWidget(context, habit, progress)),
-                                      )),
+                                    onTap: () => _handleHabitTap(
+                                        context, habit),
+                                    child: Padding(
+                                      padding: EdgeInsets.only(left: 22.w),
+                                      child: Container(
+                                        height: 28.h,
+                                        width: 28.w,
+                                        color: Colors.blue,
+                                        child: _buildTrailingWidget(
+                                            context, habit, progress),
+                                      ),
+                                    ),
+                                  ),
                                 ],
-                              )
-                               ,
-                            )
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     );
-                    //   ListTile(
-                    //   title: Text(habit.title),
-                    //   subtitle: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: [
-                    //       Text('${habit.category} - ${habit.notificationTime.format(context)}'),
-                    //       LinearProgressIndicator(value: progress),
-                    //     ],
-                    //   ),
-                    //   trailing: _buildTrailingWidget(context, habit, progress),
-                    //   onTap: () => _handleHabitTap(context, habit),
-                    // );
                   },
                 );
               },
@@ -233,7 +265,8 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _buildTrailingWidget(BuildContext context, Habit habit, double progress) {
+  Widget _buildTrailingWidget(
+      BuildContext context, Habit habit, double progress) {
     switch (habit.taskType) {
       case TaskType.timer:
         return const Icon(Icons.timer);
@@ -260,7 +293,10 @@ class _MainScreenState extends State<MainScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TimerScreen(habit: habit, selectedDate: _selectedDate),
+            builder: (context) => TimerScreen(
+              habit: habit,
+              selectedDate: _selectedDate,
+            ),
           ),
         );
         break;
@@ -269,11 +305,13 @@ class _MainScreenState extends State<MainScreen> {
         break;
       case TaskType.normal:
         setState(() {
-          double newProgress = (habit.progress[_selectedDate] ?? 0.0) == 1.0 ? 0.0 : 1.0;
+          double newProgress =
+          (habit.progressJson[_selectedDate]?.progress ?? 0.0) == 1.0
+              ? 0.0
+              : 1.0;
           Provider.of<HabitProvider>(context, listen: false)
               .updateHabitProgress(habit, _selectedDate, newProgress);
         });
-
         break;
     }
   }
@@ -282,12 +320,14 @@ class _MainScreenState extends State<MainScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final TextEditingController _valueCompleteController = TextEditingController();
+        final TextEditingController _valueCompleteController =
+        TextEditingController();
         return AlertDialog(
           title: Text('Complete Task: ${habit.title}'),
           content: TextField(
             controller: _valueCompleteController,
-            decoration: const InputDecoration(hintText: 'Enter completed value'),
+            decoration:
+            const InputDecoration(hintText: 'Enter completed value'),
             keyboardType: TextInputType.number,
           ),
           actions: <Widget>[
@@ -299,11 +339,14 @@ class _MainScreenState extends State<MainScreen> {
             ),
             TextButton(
               onPressed: () {
-                final completedValue = int.tryParse(_valueCompleteController.text) ?? 0;
+                final completedValue =
+                    int.tryParse(_valueCompleteController.text) ?? 0;
                 setState(() {
-                  double newProgress = completedValue / (habit.value ?? 1);
+                  double newProgress =
+                      completedValue / (habit.value ?? 1);
                   Provider.of<HabitProvider>(context, listen: false)
-                      .updateHabitProgress(habit, _selectedDate, newProgress);
+                      .updateHabitProgress(
+                      habit, _selectedDate, newProgress);
                 });
                 Navigator.of(context).pop();
               },
@@ -314,37 +357,4 @@ class _MainScreenState extends State<MainScreen> {
       },
     );
   }
-
-
 }
-
-// extension HabitProviderExtension on HabitProvider {
-//   List<Habit> getHabitsForDate(DateTime date) {
-//     return habits.where((habit) {
-//       switch (habit.repeatType) {
-//         case RepeatType.daily:
-//           return true;
-//         case RepeatType.selectDays:
-//           return habit.days?.contains(date.weekday) ?? false;
-//         case RepeatType.selectedDate:
-//           return habit.selectedDates?.any((selectedDate) => isSameDate(selectedDate, date)) ?? false;
-//         default:
-//           return false;
-//       }
-//     }).toList();
-//   }
-//
-//   void updateHabitProgress(Habit habit, DateTime date, double progress) {
-//     int index = habits.indexOf(habit);
-//     if (index != -1) {
-//       habits[index].progress[date] = progress;
-//       notifyListeners();
-//     }
-//   }
-//
-//   bool isSameDate(DateTime date1, DateTime date2) {
-//     return date1.year == date2.year &&
-//         date1.month == date2.month &&
-//         date1.day == date2.day;
-//   }
-// }

@@ -822,7 +822,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         repeatType: _repeatType,
         timer: _taskType == TaskType.timer ? _timerDuration : null,
         value: _taskType == TaskType.value ? _taskValue : null,
-        progress: {},
+        progressJson: {},
         days: _repeatType == RepeatType.selectDays ? selectedDays : null,
         startDate: _startDate,
         endDate: _endDate,
