@@ -32,6 +32,10 @@ class HabitProvider with ChangeNotifier {
     return _habits[index];
   }
 
+  List<Habit> getAllHabit() {
+    return _habits;
+  }
+
   void loadHabits(List<Habit> habits) {
     _habits = habits;
     notifyListeners();

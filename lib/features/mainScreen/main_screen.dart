@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hard_challenge/features/statistics/statistics_overall.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
 import 'package:hard_challenge/features/statistics/statistics_habit_wise_screen.dart';
 import 'package:provider/provider.dart';
@@ -36,7 +37,10 @@ class _MainScreenState extends State<MainScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-       IconButton(onPressed: (){}, icon: Icon(Icons.add_chart, size: 40, color: Colors.blue,)),
+       IconButton(onPressed: (){
+         Navigator.push(context, MaterialPageRoute(builder: (context) => const StatisticsOverall()));
+
+       }, icon: const Icon(Icons.add_chart, size: 40, color: Colors.blue,)),
               Container(
                 child: Column(
                   children: [
@@ -178,14 +182,12 @@ class _MainScreenState extends State<MainScreen> {
                                           builder: (context) =>
                                               StatisticsHabitWiseScreen(
                                                 habit: habit,
-                                                selectedDateforSkip: _selectedDate,
-                                              ),
+                                                selectedDateforSkip: _selectedDate,),
                                         ),
                                       );
                                     },
                                     child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Padding(
                                           padding: EdgeInsets.only(
@@ -248,7 +250,7 @@ class _MainScreenState extends State<MainScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddChallengeScreen()),
+            MaterialPageRoute(builder: (context) => const AddChallengeScreen()),
           );
         },
         child: const Icon(Icons.add),
