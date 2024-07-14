@@ -157,4 +157,42 @@ class HabitProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+  double getOverallCompletionPercentage() {
+    if (_habits.isEmpty) return 0.0;
+
+    double totalPercentage = 0.0;
+
+    for (Habit habit in _habits) {
+      totalPercentage += habit.getCompletionPercentage();
+    }
+        log('total percentage ${totalPercentage / _habits.length}');
+    return totalPercentage / _habits.length;
+  }
+
+
+  double getOverallSkippedPercentage() {
+    if (_habits.isEmpty) return 0.0;
+
+    double totalPercentage = 0.0;
+
+    for (Habit habit in _habits) {
+      totalPercentage += habit.getSkippedPercentage();
+    }
+    log('total percentage ${totalPercentage / _habits.length}');
+    return totalPercentage / _habits.length;
+  }
+
+  double getOverallMissedPercentage() {
+    if (_habits.isEmpty) return 0.0;
+
+    double totalPercentage = 0.0;
+
+    for (Habit habit in _habits) {
+      totalPercentage += habit.getMissedPercentage();
+    }
+    log('total percentage ${totalPercentage / _habits.length}');
+    return totalPercentage / _habits.length;
+  }
+
+
 }

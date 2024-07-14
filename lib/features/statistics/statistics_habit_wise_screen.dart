@@ -157,7 +157,6 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                   ),
                 ],
               ),
-
               WeeklyAnalysisChart(habit: widget.habit,),
 
               CalendarPage(habit: widget.habit,)

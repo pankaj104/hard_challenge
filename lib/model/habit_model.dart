@@ -173,6 +173,38 @@ class Habit {
 
     return  totalDays > 0 ? (skippedCount / totalDays) * 100 : 0.0;
   }
+  double getMissedPercentage() {
+    int totalDays = 0;
+    int MissedCount = 0;
+
+
+    progressJson.values.forEach((progress) {
+      if (progress.status == TaskStatus.missed) {
+        MissedCount++;
+      }
+    });
+
+    if (repeatType == RepeatType.selectDays) {
+      DateTime? loopDate = startDate;
+
+      while (loopDate!.isBefore(endDate!) || loopDate.isAtSameMomentAs(endDate!)) {
+        if (days!.contains(loopDate.weekday % 7)) {
+          totalDays++;
+        }
+        loopDate = loopDate.add(const Duration(days: 1));
+      }
+    } else if (repeatType == RepeatType.selectedDate) {
+      totalDays = selectedDates?.length ?? 1;
+    } else if (repeatType == RepeatType.weekly) {
+      totalDays = countTaskDays(startDate!, endDate!, selectedTimesPerWeek!);
+    } else if (repeatType == RepeatType.monthly) {
+      totalDays = selectedDates?.length ?? 1;
+    }
+
+    return  totalDays > 0 ? (MissedCount / totalDays) * 100 : 0.0;
+  }
+
+
 
 
 }
