@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
-import 'package:hard_challenge/features/statistics/statistics_screen.dart';
+import 'package:hard_challenge/features/statistics/statistics_habit_wise_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../addChallenge/add_challenge_screen.dart';
@@ -36,11 +36,7 @@ class _MainScreenState extends State<MainScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(
-                height: 35.h,
-                width: 35.w,
-                child: SvgPicture.asset(ImageResource.calenderIcon),
-              ),
+       IconButton(onPressed: (){}, icon: Icon(Icons.add_chart, size: 40, color: Colors.blue,)),
               Container(
                 child: Column(
                   children: [
@@ -168,15 +164,10 @@ class _MainScreenState extends State<MainScreen> {
                                       width: 48.w,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                        BorderRadius.circular(16.w),
-                                        border: Border.all(
-                                            width: 1.2.w, color: Colors.blue),
-                                        image: const DecorationImage(
-                                          image: AssetImage(
-                                              ImageResource.dumbleIcon),
-                                          fit: BoxFit.cover,
-                                        ),
+                                        BorderRadius.circular(18.w),
+                                        color: habit.iconBgColor
                                       ),
+                                      child: Icon(habit.habitIcon, size: 20,),
                                     ),
                                   ),
                                   GestureDetector(
@@ -185,7 +176,7 @@ class _MainScreenState extends State<MainScreen> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              StatisticsScreen(
+                                              StatisticsHabitWiseScreen(
                                                 habit: habit,
                                                 selectedDateforSkip: _selectedDate,
                                               ),

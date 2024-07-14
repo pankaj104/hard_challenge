@@ -47,9 +47,11 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   DateTime? _endDate ;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   Color selectedColor = Colors.orange;
-
   int selectedTimesPerWeek = 2;
   int selectedTimesPerMonth = 1;
+
+  TextEditingController notecontroller = TextEditingController();
+  String? habitNote ;
 
 
   IconData icon_selected = FontAwesomeIcons.glassMartiniAlt;
@@ -704,6 +706,18 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                         : '',
                   ),
                 ),
+                TextFormField(
+                  controller: notecontroller,
+                  decoration: const InputDecoration(
+                    labelText: 'Enter your text here',
+                    hintText: 'Type something...',
+                  ),
+                  onChanged: (value){
+                    setState(() {
+                      habitNote  = value.toString();
+                    });
+                  },
+                ),
                 ElevatedButton(
                   onPressed: _submitForm,
                   child: const Text('Add Habit'),
@@ -817,6 +831,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       final newHabit = Habit(
         title: _title,
         category: _selectedCategory,
+        habitIcon: icon_selected,
+        iconBgColor: selectedColor,
         notificationTime: _selectedTime,
         taskType: _taskType,
         repeatType: _repeatType,
@@ -829,6 +845,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         selectedDates: _repeatType == RepeatType.selectedDate ? selectedDates : null,
         selectedTimesPerWeek: _repeatType == RepeatType.weekly ? selectedTimesPerWeek : null,
         selectedTimesPerMonth: _repeatType == RepeatType.monthly ? selectedTimesPerMonth : null,
+        notes: habitNote
       );
       log('New habbit added Data $newHabit');
       Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);

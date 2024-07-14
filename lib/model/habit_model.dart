@@ -38,6 +38,8 @@ class ProgressWithStatus {
 class Habit {
   String title;
   String category;
+  IconData habitIcon;
+  Color iconBgColor;
   TimeOfDay notificationTime;
   TaskType taskType;
   RepeatType repeatType;
@@ -50,10 +52,13 @@ class Habit {
   int? selectedTimesPerMonth;
   DateTime? startDate;
   DateTime? endDate;
+  String? notes;
 
   Habit({
     required this.title,
     required this.category,
+    required this.habitIcon,
+    required this.iconBgColor,
     required this.notificationTime,
     required this.taskType,
     required this.repeatType,
@@ -66,14 +71,15 @@ class Habit {
     this.selectedTimesPerMonth,
     this.startDate,
     this.endDate,
+    this.notes,
   });
 
   @override
   String toString() {
-    return 'Habit(title: $title, category: $category, notificationTime: $notificationTime, '
+    return 'Habit(title: $title, category: $category,  habitIcon: $habitIcon, IconBgColor: $iconBgColor notificationTime: $notificationTime, '
         'taskType: $taskType, repeatType: $repeatType, timer: $timer, value: $value, '
         'progress: $progressJson, days: $days, startDate: $startDate, endDate: $endDate, selectedDates: $selectedDates, '
-        'selectedTimesPerWeek: $selectedTimesPerWeek, selectedTimesPerMonth: $selectedTimesPerMonth)';
+        'selectedTimesPerWeek: $selectedTimesPerWeek, selectedTimesPerMonth: $selectedTimesPerMonth, notes: $notes)';
   }
 
   double getCompletionPercentage() {

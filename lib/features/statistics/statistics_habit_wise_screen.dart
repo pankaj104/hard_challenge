@@ -12,30 +12,24 @@ import '../../widgets/icon_button_widget.dart';
 import '../../widgets/info_tile_widget.dart';
 import '../../widgets/weekly_analysis_chart.dart';
 
-class StatisticsScreen extends StatefulWidget {
+class StatisticsHabitWiseScreen extends StatefulWidget {
   final Habit habit;
   final DateTime selectedDateforSkip;
 
-  StatisticsScreen({required this.habit, required this.selectedDateforSkip});
+  StatisticsHabitWiseScreen({required this.habit, required this.selectedDateforSkip});
 
   @override
-  State<StatisticsScreen> createState() => _StatisticsScreenState();
+  State<StatisticsHabitWiseScreen> createState() => _StatisticsHabitWiseScreenState();
 }
 
-class _StatisticsScreenState extends State<StatisticsScreen> {
+class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
   @override
   Widget build(BuildContext context) {
     double completionPercentage = widget.habit.getCompletionPercentage();
     double skippedPercentage = widget.habit.getSkippedPercentage();
     double missedPercentage = 100.00 - completionPercentage - skippedPercentage ;
-
     log('data for statistics ${widget.habit}');
 
-    CalendarFormat _calendarFormat = CalendarFormat.month;
-    DateTime _focusedDay = DateTime.now();
-    DateTime? _selectedDay;
-
-    var taskStatus;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0,
@@ -66,6 +60,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
 
               Center(child: Text(' ${widget.habit.title}', style: const TextStyle(fontSize: 24))),
+              widget.habit.notes != null ?  Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Notes', style: const TextStyle(fontSize: 24, color: Colors.deepOrange)),
+                  Text(' ${widget.habit.notes}', style: const TextStyle(fontSize: 20)),
+                ],
+              )
+               : SizedBox(),
               const SizedBox(height: 16),
               Center(
                 child: ElevatedButton(onPressed: (){
