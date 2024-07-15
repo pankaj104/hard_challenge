@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +32,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   final _formKey = GlobalKey<FormState>();
   DateTime today = DateTime.now();
   String _selectedCategory = 'General';
+  String _repeatSelectedItem = 'Selected Days';
   String _title = '';
   TimeOfDay _selectedTime = TimeOfDay.now();
   TaskType _taskType = TaskType.normal;
@@ -198,7 +198,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     Padding(
                       padding:  EdgeInsets.only( top: 4, bottom: 2,),
                       child: Container(
-                        height: 70,
+                        height: 65,
                         width: double.infinity,
                         // margin:EdgeInsets.only(left: 10, right: 10)
                         decoration: BoxDecoration(
@@ -213,9 +213,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             Expanded(
                               child:
                               Padding(
-                                padding: EdgeInsets.only(left: 7,top: 9,bottom: 5),
+                                padding: EdgeInsets.only(left: 7,top: 7,bottom: 5),
                                 child: Container(
-                                  height:66,
+                                  height:60.h,
                                   width: double.infinity,
                                   child: DropdownButtonFormField<String>(
                                     icon: const Icon(Icons.keyboard_arrow_down_rounded),
@@ -308,22 +308,12 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            // Container(
-                            //   margin: EdgeInsets.only(left: 8),
-                            //   height: 40.h,
-                            //   width: 40.w,
-                            //   child: Center(child: Text("💧")),
-                            //   decoration: BoxDecoration(
-                            //     borderRadius: BorderRadius.circular(8),
-                            //     color: ColorStrings.havelockBlue
-                            //   ),
-                            // ),
                             GestureDetector(
                               onTap: _openColorPicker,
                               child: Container(
                                 margin: EdgeInsets.only(left: 8),
-                              width: 40.h,
-                                height: 40.w,
+                                height: 32.h,
+                                width: 36.w,
                                 decoration: BoxDecoration(
                                   color: selectedColor,
                                   borderRadius: BorderRadius.circular(8),
@@ -332,15 +322,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                 child: Icon(icon_selected, color: Colors.black),
                               ),
                             ),
-                            // Expanded(
-                            //   child: Padding(
-                            //     padding:  EdgeInsets.only(left: 8),
-                            //     child: ContainerLabelWidget("Water"),
-                            //   ),
-                            // ),
                             Expanded(
                               child: Padding(
-                                padding: EdgeInsets.only(left: 8),
+                                padding: EdgeInsets.only(left: 14),
                                 child: TextFormField(
                                   decoration:   InputDecoration(
                                       labelText: 'Habit Title',
@@ -583,50 +567,83 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       padding:  EdgeInsets.only(top: 14, bottom: 8),
                       child: HeadingH1Widget("Repeat Type"),
                     )),
-                Padding(
-                  padding:  EdgeInsets.only(bottom: 12),
-                  child: Container(
-                    width: double.infinity,
-                    height: 52,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: ColorStrings.headingBlue
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: RepeatType.values.map((type) {
-                        return ChoiceChip(
-                          backgroundColor: ColorStrings.whiteColor,
-                          selectedColor: ColorStrings.headingBlue,
-                          label: Text(type.toString().split('.').last,
-                            selectionColor: ColorStrings.whiteColor,),
-                          selected: _repeatType == type,
-                          onSelected: (selected) {
-                            setState(() {
-                              _repeatType = type;
-                              if (type == RepeatType.selectDays) {
-                                selectedDays.clear();
-                              }
-                              if (type == RepeatType.selectedDate) {
-                                selectedDates.clear();
-                              }
-                            });
-                          },
-                        );
-                      }).toList(),
-                    ),
+                // Padding(
+                //   padding:  EdgeInsets.only(bottom: 12),
+                //   child: Container(
+                //     width: double.infinity,
+                //     height: 52,
+                //     decoration: BoxDecoration(
+                //         borderRadius: BorderRadius.circular(16),
+                //         color: ColorStrings.headingBlue
+                //     ),
+                //     child: Row(
+                //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //       children: RepeatType.values.map((type) {
+                //         return ChoiceChip(
+                //           backgroundColor: ColorStrings.whiteColor,
+                //           selectedColor: ColorStrings.headingBlue,
+                //           label: Text(type.toString().split('.').last,
+                //             selectionColor: ColorStrings.whiteColor,),
+                //           selected: _repeatType == type,
+                //           onSelected: (selected) {
+                //             setState(() {
+                //               _repeatType = type;
+                //               if (type == RepeatType.selectDays) {
+                //                 selectedDays.clear();
+                //               }
+                //               if (type == RepeatType.selectedDate) {
+                //                 selectedDates.clear();
+                //               }
+                //             });
+                //           },
+                //         );
+                //       }).toList(),
+                //     ),
+                //   ),
+                // ),
+                Container(
+                  width: double.infinity,
+                  height: 60,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      color: ColorStrings.headingBlue,
+                      border: Border.all(width: 2,),
                   ),
-                ),
-                if (_repeatType == RepeatType.selectDays)
+                  child: Padding(
+                    padding:  EdgeInsets.only(top: 3,left: 2, right: 2),
+                    child: DropdownButtonFormField<String>(
+                      value: _repeatSelectedItem,
+                      dropdownColor: ColorStrings.headingBlue,
+                      icon:  Icon(Icons.keyboard_arrow_down_rounded),
+                      iconSize: 25,
+                      iconEnabledColor: ColorStrings.whiteColor,
+                      itemHeight: 50,
+                      items: repeatItems.map((item) => DropdownMenuItem<String>(
+                          value: item,
+                          child: Text(item,
+                            style: TextStyle(color: ColorStrings.whiteColor,
+                              fontSize: 15, fontWeight: FontWeight.w600), ),
+                        )).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _repeatSelectedItem = value! ;
+                          print(_repeatSelectedItem);
+                        });
+                      },
+                      decoration: InputDecoration(border: InputBorder.none,
+                        contentPadding: EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
+                    ),),
+                  ),),
+                if (_repeatSelectedItem == RepeatItems.selectedDays)
                   Wrap(
                     children: [
-                      {'Mon': 1},
-                      {'Tue': 2},
-                      {'Wed': 3},
-                      {'Thu': 4},
-                      {'Fri': 5},
-                      {'Sat': 6},
-                      {'Sun': 7}
+                      {'M': 1},
+                      {'Tu': 2},
+                      {'W': 3},
+                      {'Th': 4},
+                      {'F': 5},
+                      {'Sa': 6},
+                      {'Su': 7}
                     ].map((dayMap) {
                       String day = dayMap.keys.first;
                       int dayValue = dayMap.values.first;
@@ -645,7 +662,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       );
                     }).toList(),
                   ),
-                if (_repeatType == RepeatType.selectedDate)
+                if (_repeatSelectedItem == RepeatType.selectedDate)
                   Column(
                     children: [
                       TableCalendar(
@@ -915,7 +932,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         timer: _taskType == TaskType.timer ? _timerDuration : null,
         value: _taskType == TaskType.value ? _taskValue : null,
         progress: {},
-        days: _repeatType == RepeatType.selectDays ? selectedDays : null,
+        days: _repeatType == RepeatType.selectedDays ? selectedDays : null,
         startDate: _startDate,
         endDate: _endDate,
         selectedDates:

@@ -69,7 +69,7 @@ class HabitProvider with ChangeNotifier {
       switch (habit.repeatType) {
         case RepeatType.daily:
           return true;
-        case RepeatType.selectDays:
+        case RepeatType.selectedDays:
           return habit.days?.contains(date.weekday) ?? false;
         case RepeatType.selectedDate:
           return habit.selectedDates?.any((selectedDate) => isSameDate(selectedDate, date)) ?? false;

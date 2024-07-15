@@ -12,7 +12,13 @@ enum TaskType {
 
 enum RepeatType {
   daily,
-  selectDays,
+  selectedDays,
+  selectedDate,
+}
+
+enum RepeatItems {
+  daily,
+  selectedDays,
   selectedDate,
 }
 
@@ -58,7 +64,7 @@ class Habit {
 
       totalDays = endDate!.difference(startDate!).inDays;     // totalDays = progress.length;
 
-    } else if (repeatType == RepeatType.selectDays) {
+    } else if (repeatType == RepeatType.selectedDays) {
       // Calculate for habits with selected days
 
       DateTime? loopDate = startDate!;
