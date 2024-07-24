@@ -15,18 +15,18 @@ class IconButtonWidget extends StatelessWidget {
       onTap: onPressed,
       child: Container(
           height: 42.h,
-          width: 42.w,
+          width: 48.w,
           decoration: BoxDecoration(
             color: ColorStrings.lightSkyBlue,
             borderRadius: BorderRadius.circular(16.r),
           ),
           child: Padding(
-            padding:  EdgeInsets.all(12.h),
+            padding:  EdgeInsets.all(14.h),
             child: SvgPicture.asset(
               icon,
               color: ColorStrings.blackColor,
-              width: 12.w,
-              height: 12.h,
+              width: 8.w,
+              height: 8.h,
             ),
           )
       ),

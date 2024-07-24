@@ -9,7 +9,7 @@ class HeadingH1Widget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       headingtitle,
-      style: GoogleFonts.poppins(fontSize: 18,
+      style: GoogleFonts.poppins(fontSize: 17,
         color: Colors.black,
         fontWeight: FontWeight.w600,),
     );
