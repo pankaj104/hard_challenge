@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import '../model/habit_model.dart';
 
@@ -9,6 +11,7 @@ class HabitProvider with ChangeNotifier {
   void addHabit(Habit habit) {
     _habits.add(habit);
     notifyListeners();
+    log('All Habit data: $habits');
   }
 
   void updateHabit(int index, Habit updatedHabit) {
@@ -27,6 +30,10 @@ class HabitProvider with ChangeNotifier {
 
   Habit getHabit(int index) {
     return _habits[index];
+  }
+
+  List<Habit> getAllHabit() {
+    return _habits;
   }
 
   void loadHabits(List<Habit> habits) {
@@ -67,24 +74,51 @@ class HabitProvider with ChangeNotifier {
       }
 
       switch (habit.repeatType) {
-        case RepeatType.daily:
-          return true;
         case RepeatType.selectDays:
+        // Show habit if it repeats on specific days of the week
           return habit.days?.contains(date.weekday) ?? false;
+
+        case RepeatType.weekly:
+          if (habit.selectedTimesPerWeek != null) {
+            // Define the start of the week according to the date, considering Sunday as the start
+            DateTime startOfWeek;
+            if (date.weekday == DateTime.sunday) {
+              startOfWeek = date;
+            } else {
+              startOfWeek = date.subtract(Duration(days: date.weekday)); // Start from Sunday for this locale
+            }
+            DateTime endOfWeek = startOfWeek.add(const Duration(days: 6)); // End of week is 6 days after start
+
+            log('Start of week: $startOfWeek');
+            log('End of week: $endOfWeek');
+
+            // Count completions in the current week
+            int completedTimes = habit.progressJson.keys
+                .where((completedDate) =>
+            completedDate.isAfter(startOfWeek.subtract(const Duration(days: 1))) &&
+                completedDate.isBefore(endOfWeek.add(const Duration(days: 1))))
+                .length;
+
+            log('Completed times this week: $completedTimes');
+
+            // Show the habit if it is not completed the required number of times
+            if (completedTimes < habit.selectedTimesPerWeek!) {
+              return true;
+            }
+
+            // Additionally, show the habit on the days it was completed
+            return habit.progressJson.keys.any((completedDate) => isSameDate(completedDate, date));
+          }
+          return false;
+
         case RepeatType.selectedDate:
+        // Show habit if it repeats on specific selected dates
           return habit.selectedDates?.any((selectedDate) => isSameDate(selectedDate, date)) ?? false;
+
         default:
           return false;
       }
     }).toList();
-  }
-
-  void updateHabitProgress(Habit habit, DateTime date, double progress) {
-    int index = _habits.indexWhere((h) => h == habit);
-    if (index != -1) {
-      _habits[index].progress[date] = progress;
-      notifyListeners();
-    }
   }
 
   bool isSameDate(DateTime date1, DateTime date2) {
@@ -92,4 +126,73 @@ class HabitProvider with ChangeNotifier {
         date1.month == date2.month &&
         date1.day == date2.day;
   }
+
+  bool isSameWeek(DateTime date1, DateTime date2) {
+    final startOfWeek1 = date1.subtract(Duration(days: date1.weekday - 1));
+    final startOfWeek2 = date2.subtract(Duration(days: date2.weekday - 1));
+
+    return isSameDate(startOfWeek1, startOfWeek2);
+  }
+
+  void updateHabitProgress(Habit habit, DateTime date, double progressValue) {
+    int index = _habits.indexWhere((h) => h == habit);
+    if (index != -1) {
+      if (_habits[index].progressJson.containsKey(date)) {
+        _habits[index].progressJson[date]!.progress = progressValue;
+      } else {
+        _habits[index].progressJson[date] = ProgressWithStatus(status: TaskStatus.done, progress: progressValue);
+      }
+      notifyListeners();
+    }
+  }
+
+  void markTaskStatus(Habit habit, DateTime date, TaskStatus status) {
+    int index = _habits.indexWhere((h) => h == habit);
+    if (index != -1) {
+      if (_habits[index].progressJson.containsKey(date)) {
+        _habits[index].progressJson[date]!.status = status;
+      } else {
+        _habits[index].progressJson[date] = ProgressWithStatus(status: status, progress: 0.0);
+      }
+      notifyListeners();
+    }
+  }
+  double getOverallCompletionPercentage() {
+    if (_habits.isEmpty) return 0.0;
+
+    double totalPercentage = 0.0;
+
+    for (Habit habit in _habits) {
+      totalPercentage += habit.getCompletionPercentage();
+    }
+        log('total percentage ${totalPercentage / _habits.length}');
+    return totalPercentage / _habits.length;
+  }
+
+
+  double getOverallSkippedPercentage() {
+    if (_habits.isEmpty) return 0.0;
+
+    double totalPercentage = 0.0;
+
+    for (Habit habit in _habits) {
+      totalPercentage += habit.getSkippedPercentage();
+    }
+    log('total percentage ${totalPercentage / _habits.length}');
+    return totalPercentage / _habits.length;
+  }
+
+  double getOverallMissedPercentage() {
+    if (_habits.isEmpty) return 0.0;
+
+    double totalPercentage = 0.0;
+
+    for (Habit habit in _habits) {
+      totalPercentage += habit.getMissedPercentage();
+    }
+    log('total percentage ${totalPercentage / _habits.length}');
+    return totalPercentage / _habits.length;
+  }
+
+
 }
