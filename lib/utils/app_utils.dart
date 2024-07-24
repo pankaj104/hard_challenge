@@ -10,8 +10,6 @@ final List<int> selectedDays = [1, 2, 3, 4, 5, 6, 7];
 //Repeat type container items
 final List<String> repeatItems = ['Selected Days', 'Weekly', 'Monthly', 'Selected Date' ];
 
-final List<int> selectedDays = [];
-
 
 final List<DateTime> selectedDates = [];
 

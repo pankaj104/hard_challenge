@@ -1,8 +1,5 @@
 import 'dart:developer';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/utils/app_utils.dart';
 import 'package:hard_challenge/utils/colors.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
-import 'package:hard_challenge/widgets/container_label.dart';
 import 'package:hard_challenge/widgets/headingH1_widget.dart';
 import 'package:hard_challenge/widgets/headingH2_widget.dart';
 import 'package:numberpicker/numberpicker.dart';
@@ -39,9 +35,10 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   String _title = 'Test';
   TimeOfDay _selectedTime = TimeOfDay.now();
   TaskType _taskType = TaskType.normal;
-  RepeatType _repeatType = RepeatType.selectDays;
+  final RepeatType _repeatType = RepeatType.selectDays;
   Duration _timerDuration = const Duration(minutes: 1); // default 00:01:00
   int _taskValue = 5; // default value 5
+  RepeatType _repeatSelectedItem = RepeatType.selectDays;
 
   DateTime? _startDate;
   DateTime? _endDate ;
@@ -50,17 +47,24 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   int selectedTimesPerWeek = 2;
   int selectedTimesPerMonth = 1;
 
+  List<String> repeatItems = [
+    RepeatType.selectDays.toString(),
+    RepeatType.weekly.toString(),
+    RepeatType.monthly.toString(),
+    RepeatType.selectedDate.toString(),
+  ];
+
   TextEditingController notecontroller = TextEditingController();
   String? habitNote ;
 
 
-  IconData icon_selected = FontAwesomeIcons.glassMartiniAlt;
+  IconData iconSelected = FontAwesomeIcons.iceCream;
   void _openColorPicker() async {
     Color? pickedColor = await showDialog(
       context: context,
       builder: (context) {
         Color tempSelectedColor = selectedColor;
-        IconData selectedIcon = icon_selected;
+        IconData selectedIcon = iconSelected;
 
         return StatefulBuilder(
           builder: (context, setState) {
@@ -79,7 +83,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       if (newIcon != null) {
                         setState(() {
                           selectedIcon = newIcon;
-                          icon_selected = newIcon;
+                          iconSelected = newIcon;
                         });
                       }
                     },
@@ -165,7 +169,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         // title: const Text('Add Challenge'),
       ),
       body: Padding(
-        padding:  EdgeInsets.all(16.0),
+        padding:  const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child:
@@ -194,8 +198,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
-                        padding:  EdgeInsets.only(top: 22, bottom: 6),
-                        child: Container(
+                        padding:  const EdgeInsets.only(top: 22, bottom: 6),
+                        child: SizedBox(
                           height: 26,
                           width: double.infinity,
                           child: HeadingH1Widget("Category"),
@@ -203,7 +207,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       ),
                     ),
                     Padding(
-                      padding:  EdgeInsets.only( top: 4, bottom: 2,),
+                      padding:  const EdgeInsets.only( top: 4, bottom: 2,),
                       child: Container(
                         height: 65,
                         width: double.infinity,
@@ -220,8 +224,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             Expanded(
                               child:
                               Padding(
-                                padding: EdgeInsets.only(left: 7,top: 7,bottom: 5),
-                                child: Container(
+                                padding: const EdgeInsets.only(left: 7,top: 7,bottom: 5),
+                                child: SizedBox(
                                   height:60.h,
                                   width: double.infinity,
                                   child: DropdownButtonFormField<String>(
@@ -234,7 +238,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                     items: categories
                                         .map((category) => DropdownMenuItem<String>(
                                       value: category,
-                                      child: Text(category,style: TextStyle(color: ColorStrings.whiteColor,
+                                      child: Text(category,style: const TextStyle(color: ColorStrings.whiteColor,
                                           fontSize: 15, fontWeight: FontWeight.w600), ),
                                     ))
                                         .toList(),
@@ -244,15 +248,15 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                       });
                                     },
                                     decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
-                                      enabledBorder: OutlineInputBorder(
+                                      contentPadding: const EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
+                                      enabledBorder: const OutlineInputBorder(
                                         borderSide: BorderSide(color: ColorStrings.whiteColor,width: 2),
                                         borderRadius: BorderRadius.all(
                                           Radius.circular(8.0),),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
-                                        borderSide:  BorderSide(color: ColorStrings.whiteColor,width: 2),
+                                        borderSide:  const BorderSide(color: ColorStrings.whiteColor,width: 2),
                                       ),
                                     ),
                                   ),
@@ -260,7 +264,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(left: 22, right: 8, top: 5, bottom: 5),
+                              padding: const EdgeInsets.only(left: 22, right: 8, top: 5, bottom: 5),
                               child: Container(
                                 height: 40.h,
                                 width: 43.w,
@@ -269,7 +273,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                   border: Border.all(width: 2,color: ColorStrings.whiteColor)
                                 ),
                                 child: IconButton(
-                                  icon:  Icon(Icons.add,color: ColorStrings.whiteColor,),
+                                  icon:  const Icon(Icons.add,color: ColorStrings.whiteColor,),
                                   onPressed: () => _addNewCategory(context),
                                 ),
                               ),
@@ -280,182 +284,73 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 8,),
+                const SizedBox(height: 8,),
                 Column(
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
-                        padding:  EdgeInsets.only(top: 14, bottom: 6),
-                        child: Container(
+                        padding:  const EdgeInsets.only(top: 14, bottom: 6),
+                        child: SizedBox(
                           height: 26,
                           width: double.infinity,
                           child: HeadingH1Widget("Habit Name"),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding:  EdgeInsets.only( top: 4, bottom: 6,),
-                      child: Container(
-                        height: 60,
-                        width: double.infinity,
-                        // margin:EdgeInsets.only(left: 10, right: 10)
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: ColorStrings.whiteColor,
-                            boxShadow: [
-                              BoxShadow(
-                                offset: Offset(2.0, 6.0),
-                                color: Colors.grey,
-                                blurRadius: 6.0,
-                                spreadRadius: 0.0
-                              ),],
-                        ),
-                        child:
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              margin: EdgeInsets.only(left: 8),
-                              height: 40.h,
-                              width: 40.w,
-                              child: Center(child: Text("💧")),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: ColorStrings.havelockBlue
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding:  EdgeInsets.only(left: 8),
-                                child: ContainerLabelWidget("Water"),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ],
                 ),
-                SizedBox(height: 8,),
-                //Goal Column is commented
-                // Column(
-                //   children: [
-                //     Align(
-                //       alignment: Alignment.centerLeft,
-                //       child: Padding(
-                //         padding:  EdgeInsets.only(top: 14,bottom:4),
-                //         child: Container(
-                //           height: 26,
-                //           width: 41,
-                //           child: HeadingH1Widget("Goal"),
-                //         ),
-                //       ),
-                //     ),
-                //     Padding(
-                //       padding:  EdgeInsets.only( bottom: 6,),
-                //       child: Container(
-                //         height: 60,
-                //         width: 400,
-                //         // margin:EdgeInsets.only(left: 10, right: 10)
-                //         decoration: BoxDecoration(
-                //           borderRadius: BorderRadius.circular(16),
-                //           color: ColorStrings.headingBlue,
-                //         ),
-                //         child:
-                //         Row(
-                //           children: [
-                //             Row(
-                //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //               children: TaskType.values.map((type) {
-                //                 return ChoiceChip(
-                //                   label: Text(type.toString().split('.').last),
-                //                   selected: _taskType == type,
-                //                   onSelected: (selected) {
-                //                     setState(() {
-                //                       _taskType = type;
-                //                     });
-                //                   },
-                //                 );
-                //               }).toList(),
-                //             ),
-                //             if (_taskType == TaskType.timer)
-                //               TextFormField(
-                //                 readOnly: true,
-                //                 decoration: const InputDecoration(
-                //                     labelText: 'Timer Duration'),
-                //                 onTap: () async {
-                //                   Duration? picked = await showDurationPicker(
-                //                     context: context,
-                //                     initialDuration: _timerDuration,
-                //                   );
-                //                   if (picked != null) {
-                //                     setState(() {
-                //                       _timerDuration = picked;
-                //                     });
-                //                   }
-                //                 },
-                //                 controller: TextEditingController(
-                //                   text: _timerDuration
-                //                       .toString()
-                //                       .split('.')
-                //                       .first
-                //                       .padLeft(8, '0'),
-                //                 ),
-                //               ),
-                //             if (_taskType == TaskType.value)
-                //               TextFormField(
-                //                 decoration: const InputDecoration(labelText: 'Task Value'),
-                //                 keyboardType: TextInputType.number,
-                //                 initialValue: _taskValue.toString(),
-                //                 onSaved: (value) {
-                //                   _taskValue = int.parse(value!);
-                //                 },
-                //               ),
-                //           ],
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                
-                //Pankaj's code
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: _openColorPicker,
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: selectedColor,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: Colors.grey, width: 2),
+                const SizedBox(height: 8,),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: ColorStrings.whiteColor,
+                        boxShadow: const [
+                          BoxShadow(
+                              offset: Offset(2.0, 6.0),
+                              color: Colors.grey,
+                              blurRadius: 6.0,
+                              spreadRadius: 0.0
+                          ),],
+                      ),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: _openColorPicker,
+                            child: Container(
+                              margin: const EdgeInsets.only(left: 8),
+                              height: 40.h,
+                              width: 40.w,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: selectedColor
+                              ),
+                              child: Icon(iconSelected, color: Colors.black),
                             ),
-                            child: Icon(icon_selected, color: Colors.black),
                           ),
-                        ),
 
-                        SizedBox(width: 10,),
+                          const SizedBox(width: 10,),
 
 
-                        SizedBox(
-                          width: 250,
-                          child: TextFormField(
-                            decoration:  InputDecoration(
-                                labelText: 'Habit Title'),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Please enter a title';
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _title = value!;
-                            },
+                          SizedBox(
+                            width: 250,
+                            child: TextFormField(
+                              decoration:  const InputDecoration(
+                                  labelText: 'Habit Title'),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter a title';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                _title = value!;
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
 
                 TextFormField(
@@ -479,11 +374,11 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                     child: Padding(
-                      padding:  EdgeInsets.only(top: 14, bottom: 8),
+                      padding:  const EdgeInsets.only(top: 14, bottom: 8),
                       child: HeadingH1Widget("Goal"),
                     )),
                 Padding(
-                  padding: EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: Container(
                     width: double.infinity,
                     height: 52,
@@ -550,7 +445,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
-                      padding:  EdgeInsets.only(top: 14, bottom: 8),
+                      padding:  const EdgeInsets.only(top: 14, bottom: 8),
                       child: HeadingH1Widget("Repeat Type"),
                     )),
                 Container(
@@ -562,31 +457,38 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       border: Border.all(width: 2,),
                   ),
                   child: Padding(
-                    padding:  EdgeInsets.only(top: 3,left: 2, right: 2),
-                    child: DropdownButtonFormField<String>(
+                    padding:  const EdgeInsets.only(top: 3,left: 2, right: 2),
+                    child: DropdownButtonFormField<RepeatType>(
                       value: _repeatSelectedItem,
                       dropdownColor: ColorStrings.headingBlue,
-                      icon:  Icon(Icons.keyboard_arrow_down_rounded),
+                      icon:  const Icon(Icons.keyboard_arrow_down_rounded),
                       iconSize: 25,
                       iconEnabledColor: ColorStrings.whiteColor,
                       itemHeight: 50,
-                      items: repeatItems.map((item) => DropdownMenuItem<String>(
+                      items: RepeatType.values.map((RepeatType item) {
+                        return DropdownMenuItem<RepeatType>(
                           value: item,
-                          child: Text(item,
-                            style: TextStyle(color: ColorStrings.whiteColor,
-                              fontSize: 15, fontWeight: FontWeight.w600), ),
-                        )).toList(),
-                      onChanged: (value) {
+                          child: Text(
+                            item.toString().split('.').last,
+                            style: const TextStyle(
+                              color: ColorStrings.whiteColor,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (RepeatType? value) {
                         setState(() {
                           _repeatSelectedItem = value! ;
                           print(_repeatSelectedItem);
                         });
                       },
-                      decoration: InputDecoration(border: InputBorder.none,
+                      decoration: const InputDecoration(border: InputBorder.none,
                         contentPadding: EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
                     ),),
                   ),),
-                if (_repeatType == RepeatItems.selectedDays)
+                if (_repeatSelectedItem == RepeatType.selectDays)
                   Wrap(
                     children: [
                       {'M': 1},
@@ -618,7 +520,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                   ),
                 // if (_repeatSelectedItem == RepeatType.selectedDate)
 
-                if (_repeatType == RepeatType.weekly)
+                if (_repeatSelectedItem == RepeatType.weekly)
                   Row(
                     children: [
 
@@ -628,13 +530,13 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       ),
                       ElevatedButton(
                         onPressed: _showWeeklyTimesPicker,
-                        child:  Text('Change'),
+                        child:  const Text('Change'),
                       ),
 
                     ],
                   ),
 
-                if (_repeatType == RepeatType.monthly)
+                if (_repeatSelectedItem == RepeatType.monthly)
                   Row(
                     children: [
 
@@ -645,13 +547,13 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
 
                       ElevatedButton(
                         onPressed: _showMontlyimesPicker,
-                        child:  Text('Change'),
+                        child:  const Text('Change'),
                       ),
 
                     ],
                   ),
 
-                if (_repeatType == RepeatType.selectedDate)
+                if (_repeatSelectedItem == RepeatType.selectedDate)
                   Column(
                     children: [
                       TableCalendar(
@@ -680,7 +582,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 16, bottom: 12),
+                      padding: const EdgeInsets.only(top: 16, bottom: 12),
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: SizedBox(
@@ -695,7 +597,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                         Column(
                           children: [
                             Padding(
-                              padding:  EdgeInsets.only(bottom: 8),
+                              padding:  const EdgeInsets.only(bottom: 8),
                               child: HeadingH1Widget("Start"),
                             ),
                             Container(
@@ -706,7 +608,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                 color: ColorStrings.headingBlue
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(15.0),
+                                padding: const EdgeInsets.all(15.0),
                                 child: TextFormField(
                                   style: GoogleFonts.poppins(fontSize: 15,color: ColorStrings.whiteColor, fontWeight: FontWeight.w600,),
                                   readOnly: true,
@@ -737,7 +639,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                         ),
                         Expanded(
                           child: Padding(
-                            padding:  EdgeInsets.only(top: 16),
+                            padding:  const EdgeInsets.only(top: 16),
                             child: SizedBox(
                               width: 32,
                               child: SvgPicture.asset(ImageResource.shuffleIcon),
@@ -747,7 +649,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                         Column(
                           children: [
                             Padding(
-                              padding:  EdgeInsets.only(bottom: 6),
+                              padding:  const EdgeInsets.only(bottom: 6),
                               child: HeadingH1Widget("End"),
                             ),
                             Container(
@@ -758,7 +660,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                   color: ColorStrings.headingBlue
                               ),
                               child: Padding(
-                                padding: EdgeInsets.all(15.0),
+                                padding: const EdgeInsets.all(15.0),
                                 child: TextFormField(
                                   style: GoogleFonts.poppins(fontSize: 15,color: ColorStrings.whiteColor, fontWeight: FontWeight.w600,),
                                   readOnly: true,
@@ -872,12 +774,12 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final TextEditingController _newCategoryController =
+        final TextEditingController newCategoryController =
         TextEditingController();
         return AlertDialog(
           title: const Text('Add New Category'),
           content: TextField(
-            controller: _newCategoryController,
+            controller: newCategoryController,
             decoration:
             const InputDecoration(hintText: 'Enter new category'),
           ),
@@ -891,7 +793,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
             TextButton(
               onPressed: () {
                 setState(() {
-                  String newCategory = _newCategoryController.text;
+                  String newCategory = newCategoryController.text;
                   if (newCategory.isNotEmpty &&
                       !categories.contains(newCategory)) {
                     categories.add(newCategory);
@@ -915,7 +817,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       final newHabit = Habit(
         title: _title,
         category: _selectedCategory,
-        habitIcon: icon_selected,
+        habitIcon: iconSelected,
         iconBgColor: selectedColor,
         notificationTime: _selectedTime,
         taskType: _taskType,
@@ -947,7 +849,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         });
       },
 
-       pickerTitle: Center(child: Text('Select Times per week')),
+       pickerTitle: const Center(child: Text('Select Times per week')),
       selectedItemIndex: selectedTimesPerWeek-1,
     ).show(context);
   }
@@ -962,7 +864,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         });
       },
 
-      pickerTitle: Center(child: Text('Select Times per Month')),
+      pickerTitle: const Center(child: Text('Select Times per Month')),
       selectedItemIndex: selectedTimesPerMonth-1,
     ).show(context);
   }
