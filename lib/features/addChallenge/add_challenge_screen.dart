@@ -810,7 +810,6 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       },
     );
   }
-
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();

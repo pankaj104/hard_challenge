@@ -34,13 +34,19 @@ class _MainScreenState extends State<MainScreen> {
       ),
       body: Column(
         children: [
+          Consumer<HabitProvider>(
+      builder: (context, habitProvider, child) {
+        List<Habit> get_all_habit = habitProvider.getAllHabit();
+        return
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-       IconButton(onPressed: (){
-         Navigator.push(context, MaterialPageRoute(builder: (context) => const StatisticsOverall()));
-
-       }, icon: const Icon(Icons.add_chart, size: 40, color: Colors.blue,)),
+              IconButton(onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                 StatisticsOverall(habit: get_all_habit,)));
+              },
+                  icon: const Icon(
+                    Icons.add_chart, size: 40, color: Colors.blue,)),
               Container(
                 child: Column(
                   children: [
@@ -69,6 +75,8 @@ class _MainScreenState extends State<MainScreen> {
                 child: SvgPicture.asset(ImageResource.calenderIcon),
               ),
             ],
+          );
+      }
           ),
           // Calendar
           Container(

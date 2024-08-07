@@ -52,6 +52,9 @@ dependencies:
   bottom_picker: ^2.8.0
   percent_indicator: ^4.2.3
   fl_chart: ^0.68.0
+  shared_preferences: ^2.2.3
+  sqflite: ^2.3.2
+  path: ^1.8.3
 
 dev_dependencies:
   flutter_test:

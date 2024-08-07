@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
+import 'package:hard_challenge/widgets/weekly_analysis_chart_overall_habit.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
@@ -7,7 +8,9 @@ import '../../model/habit_model.dart';
 import '../../widgets/info_tile_widget.dart';
 
 class StatisticsOverall extends StatefulWidget {
-  const StatisticsOverall({super.key});
+  final List<Habit> habit;
+
+  const StatisticsOverall({super.key, required this.habit});
 
   @override
   State<StatisticsOverall> createState() => _StatisticsOverallState();
@@ -102,8 +105,11 @@ class _StatisticsOverallState extends State<StatisticsOverall> {
                     ],
                   ),
 
-                ],
+                  WeeklyAnalysisChartOverallHabit(habit: allHabits,),
 
+
+
+                ],
 
 
 
