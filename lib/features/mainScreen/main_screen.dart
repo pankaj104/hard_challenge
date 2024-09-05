@@ -10,6 +10,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../addChallenge/add_challenge_screen.dart';
 import '../../model/habit_model.dart';
 import '../../provider/habit_provider.dart';
+import '../statistics/statistics_category_wise.dart';
 import '../timer/timer_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -43,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
             children: [
               IconButton(onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                 StatisticsOverall(habit: get_all_habit,)));
+                    StatisticsCategoryWise(habit: get_all_habit,)));
               },
                   icon: const Icon(
                     Icons.add_chart, size: 40, color: Colors.blue,)),

@@ -8,5 +8,8 @@ class ImageResource{
   static const String closeIcon = 'assets/images/closeIcon.svg';
   static const String shuffleIcon = 'assets/images/shuffleIcon.svg';
   static const String backIcon = 'assets/images/back_icon.svg';
+  static const String crossTick = 'assets/images/cross_tick.svg';
+  static const String skipTick = 'assets/images/skip_tick.svg';
+  static const String doneTick = 'assets/images/done_tick.svg';
 
 }
