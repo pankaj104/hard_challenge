@@ -45,7 +45,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   int _taskValue = 5; // default value 5
   RepeatType _repeatSelectedItem = RepeatType.selectDays;
 
-  DateTime? _startDate;
+  DateTime _startDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   DateTime? _endDate ;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   Color selectedColor = Colors.orange;
@@ -91,7 +91,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   void _pickStartDate() {
     CustomDatePickerBottomSheet.showDatePicker(
       context,
-      _startDate ?? DateTime.now(), // Pass the currently selected date or current date if null
+      _startDate ?? DateTime(today.year, today.month, today.day), // Pass the currently selected date or current date if null
           (String formattedDate, DateTime newDate) {
         setState(() {
           _startDate = DateTime(newDate.year, newDate.month, newDate.day);
