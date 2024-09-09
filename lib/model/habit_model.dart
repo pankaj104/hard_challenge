@@ -38,7 +38,7 @@ class Habit {
   String category;
   IconData habitIcon;
   Color iconBgColor;
-  TimeOfDay notificationTime;
+  List<String> notificationTime;
   TaskType taskType;
   RepeatType repeatType;
   Duration? timer;

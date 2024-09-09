@@ -11,13 +11,19 @@ import 'package:hard_challenge/utils/colors.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
 import 'package:hard_challenge/widgets/headingH1_widget.dart';
 import 'package:hard_challenge/widgets/headingH2_widget.dart';
+import 'package:intl/intl.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../model/habit_model.dart';
 import '../../provider/habit_provider.dart';
+import '../../service/notification_helper.dart';
+import '../../widgets/date_picker_bottom_sheet.dart';
 import '../../widgets/icon_button_widget.dart';
 import 'package:bottom_picker/bottom_picker.dart';
+import '../../widgets/notification/add_reminder_button.dart';
+import '../../widgets/notification/notification_item.dart';
+import '../../widgets/notification/time_picker_bottom_sheet.dart';
 
 
 class AddChallengeScreen extends StatefulWidget {
@@ -33,7 +39,6 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   DateTime today = DateTime.now();
   String _selectedCategory = 'General';
   String _title = 'Test';
-  TimeOfDay _selectedTime = TimeOfDay.now();
   TaskType _taskType = TaskType.normal;
   final RepeatType _repeatType = RepeatType.selectDays;
   Duration _timerDuration = const Duration(minutes: 1); // default 00:01:00
@@ -57,6 +62,84 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   TextEditingController notecontroller = TextEditingController();
   String? habitNote ;
 
+  List<String> selectedTime = [];
+
+  void _addReminder(String time) {
+    setState(() {
+      selectedTime.add(time);
+      _scheduleNotification(time);
+    });
+  }
+
+  void _removeReminder(int index) {
+    setState(() {
+      selectedTime.removeAt(index);
+    });
+  }
+
+  void _editReminder(int index, String newTime) {
+    setState(() {
+      selectedTime[index] = newTime;
+    });
+  }
+  // Format the selected date to display
+  String _formatSelectedDate(DateTime date) {
+    return DateFormat('d MMM y').format(date);
+  }
+
+// Function to open the date picker bottom sheet and update selected date
+  void _pickStartDate() {
+    CustomDatePickerBottomSheet.showDatePicker(
+      context,
+      _startDate ?? DateTime.now(), // Pass the currently selected date or current date if null
+          (String formattedDate, DateTime newDate) {
+        setState(() {
+          _startDate = DateTime(newDate.year, newDate.month, newDate.day);
+          print('start date $_startDate');
+        });
+      },
+    );
+  }
+
+  // Function to open the date picker bottom sheet and update selected date
+  void _pickEndDate() {
+    CustomDatePickerBottomSheet.showDatePicker(
+      context,
+      _endDate ?? DateTime.now(), // Pass the currently selected date or current date if null
+          (String formattedDate, DateTime newDate) {
+        setState(() {
+          _endDate = DateTime(newDate.year, newDate.month, newDate.day);
+        });
+      },
+    );
+  }
+
+// Function to parse the time string and schedule a notification
+  void _scheduleNotification(String timeString) {
+    try {
+      // Trim the string to avoid any leading/trailing whitespace issues
+      timeString = timeString.trim();
+
+      DateFormat format = DateFormat('h:mm a');
+      DateTime parsedTime = format.parse(timeString);
+
+      // Assuming you're scheduling a notification for this time today
+      DateTime scheduledTime = DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+        parsedTime.hour,
+        parsedTime.minute,
+      );
+
+      // Schedule the notification (replace with your logic)
+      NotificationHelper.scheduleNotification(0, 'Reminder', 'It\'s time!', scheduledTime);
+    } catch (e) {
+      print("Error parsing time: $e");
+    }
+  }
+
+  DateTime selectedDate = DateTime.now();
 
   IconData iconSelected = FontAwesomeIcons.iceCream;
   void _openColorPicker() async {
@@ -175,6 +258,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
           child:
           SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Row(
                   children: [
@@ -194,18 +279,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                   ],
                 ),
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding:  const EdgeInsets.only(top: 22, bottom: 6),
-                        child: SizedBox(
-                          height: 26,
-                          width: double.infinity,
-                          child: HeadingH1Widget("Category"),
-                        ),
-                      ),
-                    ),
+                    HeadingH1Widget("Category"),
                     Padding(
                       padding:  const EdgeInsets.only( top: 4, bottom: 2,),
                       child: Container(
@@ -284,23 +360,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8,),
-                Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding:  const EdgeInsets.only(top: 14, bottom: 6),
-                        child: SizedBox(
-                          height: 26,
-                          width: double.infinity,
-                          child: HeadingH1Widget("Habit Name"),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8,),
+                HeadingH1Widget("Habit Name"),
 
                     Container(
                       decoration: BoxDecoration(
@@ -353,23 +413,34 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       ),
                     ),
 
-                TextFormField(
-                  readOnly: true,
-                  decoration: const InputDecoration(labelText: 'Notification Time'),
-                  onTap: () async {
-                    TimeOfDay? picked = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.now(),
-                    );
-                    if (picked != null) {
-                      setState(() {
-                        _selectedTime = picked;
-                      });
-                    }
-                  },
-                  controller: TextEditingController(
-                    text: _selectedTime.format(context),
-                  ),
+                HeadingH1Widget("Reminder"),
+
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...selectedTime.map((time) {
+                      int index = selectedTime.indexOf(time);
+                      return GestureDetector(
+                        onTap: () {
+                          // Open the time picker with the currently selected time for editing
+                          CustomTimePickerBottomSheet.showTimePicker(context, (newTime) {
+                            _editReminder(index, newTime);
+                          });
+                        },
+                        child: NotificationItem(
+                          time: time,
+                          onRemove: () => _removeReminder(index),
+                        ),
+                      );
+                    }).toList(),
+                    AddReminderButton(
+                      onAdd: () {
+                        CustomTimePickerBottomSheet.showTimePicker(context, (selectedTime) {
+                          _addReminder(selectedTime);
+                        });
+                      },
+                    ),
+                  ],
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
@@ -596,45 +667,28 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       children: [
                         Column(
                           children: [
-                            Padding(
-                              padding:  const EdgeInsets.only(bottom: 8),
-                              child: HeadingH1Widget("Start"),
-                            ),
-                            Container(
-                              width: 140,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                color: ColorStrings.headingBlue
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: TextFormField(
-                                  style: GoogleFonts.poppins(fontSize: 15,color: ColorStrings.whiteColor, fontWeight: FontWeight.w600,),
-                                  readOnly: true,
-                                  decoration:  const InputDecoration(
-                                      border: InputBorder.none),
-                                  onTap: () async {
-                                    DateTime? picked = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(2020),
-                                      lastDate: DateTime(2030),
-                                    );
-                                    if (picked != null) {
-                                      setState(() {
-                                        _startDate = picked;
-                                      });
-                                    }
-                                  },
-                                  controller: TextEditingController(
-                                    text: _startDate != null
-                                        ? _startDate!.toLocal().toString().split(' ')[0]
-                                        : '',
-                                  ),
+                            HeadingH1Widget("Start"),
+                            GestureDetector(
+                              onTap: _pickStartDate,
+                              child: Container(
+                                width: 140,
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: ColorStrings.headingBlue
+                                ),
+                                child: Center(
+                                  child: Text(_startDate != null ? _formatSelectedDate(_startDate!)
+                                      : _formatSelectedDate(DateTime.now())
+
+                                    ,   style: GoogleFonts.poppins(fontSize: 17,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,),),
                                 ),
                               ),
                             ),
+
+
                           ],
                         ),
                         Expanded(
@@ -648,41 +702,23 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                         ),
                         Column(
                           children: [
-                            Padding(
-                              padding:  const EdgeInsets.only(bottom: 6),
-                              child: HeadingH1Widget("End"),
-                            ),
-                            Container(
-                              width: 140,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  color: ColorStrings.headingBlue
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: TextFormField(
-                                  style: GoogleFonts.poppins(fontSize: 15,color: ColorStrings.whiteColor, fontWeight: FontWeight.w600,),
-                                  readOnly: true,
-                                  decoration: const InputDecoration(border: InputBorder.none),
-                                  onTap: () async {
-                                    DateTime? picked = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(2020),
-                                      lastDate: DateTime(2030),
-                                    );
-                                    if (picked != null) {
-                                      setState(() {
-                                        _endDate = picked;
-                                      });
-                                    }
-                                  },
-                                  controller: TextEditingController(
-                                    text: _endDate != null
-                                        ? _endDate!.toLocal().toString().split(' ')[0]
-                                        : '',
-                                  ),
+                            HeadingH1Widget("End"),
+                            GestureDetector(
+                              onTap: _pickEndDate,
+                              child: Container(
+                                width: 140,
+                                height: 52,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    color: ColorStrings.headingBlue
+                                ),
+                                child: Center(
+                                  child: Text(_endDate != null ? _formatSelectedDate(_endDate!)
+                                      : 'Select'
+
+                                    ,   style: GoogleFonts.poppins(fontSize: 17,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,),),
                                 ),
                               ),
                             ),
@@ -704,10 +740,18 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     });
                   },
                 ),
-                ElevatedButton(
-                  onPressed: _submitForm,
-                  child: const Text('Add Habit'),
+                SizedBox(height: 10,),
+
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _submitForm,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: const Text('Add Habit'),
+                    ),
+                  ),
                 ),
+                SizedBox(height: 90,)
               ],
             ),
           ),
@@ -818,7 +862,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         category: _selectedCategory,
         habitIcon: iconSelected,
         iconBgColor: selectedColor,
-        notificationTime: _selectedTime,
+        notificationTime: selectedTime,
         taskType: _taskType,
         repeatType: _repeatType,
         timer: _taskType == TaskType.timer ? _timerDuration : null,

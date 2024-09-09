@@ -215,7 +215,7 @@ class _MainScreenState extends State<MainScreen> {
                                           child: Text(
                                             isSkipped
                                                 ? 'Skipped'
-                                                : '${habit.category} - ${habit.notificationTime.format(context)}',
+                                                : '${habit.category}',
                                             style: TextStyle(
                                               color: Colors.black
                                                   .withOpacity(0.7),

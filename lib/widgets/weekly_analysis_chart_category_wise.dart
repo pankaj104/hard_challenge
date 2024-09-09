@@ -152,6 +152,7 @@ class _WeeklyAnalysisChartCategoryWiseState extends State<WeeklyAnalysisChartCat
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     final endOfWeek = _currentStartOfWeek.add(Duration(days: 6));
