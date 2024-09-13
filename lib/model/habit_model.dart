@@ -3,9 +3,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 
 enum TaskType {
-  normal,
-  timer,
-  value,
+  task,
+  count,
+  time,
 }
 
 enum RepeatType {

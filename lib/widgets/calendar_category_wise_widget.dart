@@ -19,10 +19,6 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
-  // List<DateTime> habitDoneDateList = [];
-  // List<DateTime> habitMissedDateList = [];
-  // List<DateTime> habitSkippedDateList = [];
-
   @override
   void initState() {
     super.initState();
@@ -138,16 +134,16 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
         onPageChanged: (focusedDay) {
           _focusedDay = focusedDay;
         },
-        calendarStyle: CalendarStyle(
+        calendarStyle: const CalendarStyle(
           selectedDecoration: BoxDecoration(
             color: Colors.blue,
             shape: BoxShape.circle,
           ),
         ),
-        daysOfWeekStyle: DaysOfWeekStyle(
+        daysOfWeekStyle: const DaysOfWeekStyle(
           weekendStyle: TextStyle(color: Colors.red),
         ),
-        headerStyle: HeaderStyle(
+        headerStyle: const HeaderStyle(
           formatButtonVisible: false,
           titleCentered: true,
         ),
@@ -159,7 +155,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                   height: 32,
                   width: 35,
                   decoration: BoxDecoration(
-                    color: Color(0xff079455),
+                    color: const Color(0xff079455),
                     borderRadius: BorderRadius.circular(9.6)
                   ),
 
@@ -184,7 +180,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     height: 32,
                     width: 35,
                     decoration: BoxDecoration(
-                        color: Color(0xffD92D20),
+                        color: const Color(0xffD92D20),
                         borderRadius: BorderRadius.circular(9.6)
                     ),
 
@@ -196,7 +192,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     height: 32,
                     width: 35,
                     decoration: BoxDecoration(
-                        color: Color(0xffF79009),
+                        color: const Color(0xffF79009),
                         borderRadius: BorderRadius.circular(9.6)
                     ),
 

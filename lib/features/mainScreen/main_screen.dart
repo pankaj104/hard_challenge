@@ -270,11 +270,11 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildTrailingWidget(
       BuildContext context, Habit habit, double progress) {
     switch (habit.taskType) {
-      case TaskType.timer:
+      case TaskType.time:
         return const Icon(Icons.timer);
-      case TaskType.value:
+      case TaskType.count:
         return Text('${habit.value}');
-      case TaskType.normal:
+      case TaskType.task:
       default:
         return Checkbox(
           value: progress == 1.0,
@@ -291,7 +291,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void _handleHabitTap(BuildContext context, Habit habit) {
     switch (habit.taskType) {
-      case TaskType.timer:
+      case TaskType.time:
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -302,10 +302,10 @@ class _MainScreenState extends State<MainScreen> {
           ),
         );
         break;
-      case TaskType.value:
+      case TaskType.count:
         _completeValueTask(context, habit);
         break;
-      case TaskType.normal:
+      case TaskType.task:
         setState(() {
           double newProgress =
           (habit.progressJson[_selectedDate]?.progress ?? 0.0) == 1.0

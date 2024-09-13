@@ -125,19 +125,17 @@ class _CalendarPageState extends State<CalendarPage> {
           onPageChanged: (focusedDay) {
             _focusedDay = focusedDay;
           },
-          calendarStyle: CalendarStyle(
-            // Customize today and selected day styles
-
+          calendarStyle: const CalendarStyle(
             selectedDecoration: BoxDecoration(
               color: Colors.blue,
               shape: BoxShape.circle,
             ),
           ),
-          daysOfWeekStyle: DaysOfWeekStyle(
+          daysOfWeekStyle: const DaysOfWeekStyle(
             // Customize weekdays row
             weekendStyle: TextStyle(color: Colors.red),
           ),
-          headerStyle: HeaderStyle(
+          headerStyle: const HeaderStyle(
             formatButtonVisible: false,
             titleCentered: true,
           ),
@@ -150,7 +148,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       height: 32,
                       width: 35,
                       decoration: BoxDecoration(
-                          color: Color(0xff079455),
+                          color: const Color(0xff079455),
                           borderRadius: BorderRadius.circular(9.6)
                       ),
 
@@ -166,7 +164,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       height: 32,
                       width: 35,
                       decoration: BoxDecoration(
-                          color: Color(0xffF79009),
+                          color: const Color(0xffF79009),
                           borderRadius: BorderRadius.circular(9.6)
                       ),
 
@@ -180,7 +178,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       height: 32,
                       width: 35,
                       decoration: BoxDecoration(
-                          color: Color(0xffD92D20),
+                          color: const Color(0xffD92D20),
                           borderRadius: BorderRadius.circular(9.6)
                       ),
 

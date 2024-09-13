@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,21 +10,27 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/utils/app_utils.dart';
 import 'package:hard_challenge/utils/colors.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
+import 'package:hard_challenge/widgets/custom_time_duration_picker.dart';
 import 'package:hard_challenge/widgets/headingH1_widget.dart';
 import 'package:hard_challenge/widgets/headingH2_widget.dart';
+import 'package:hard_challenge/widgets/label_changer.dart';
+import 'package:hard_challenge/widgets/number_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:numberpicker/numberpicker.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../model/habit_model.dart';
 import '../../provider/habit_provider.dart';
 import '../../service/notification_helper.dart';
+import '../../widgets/counter_widget.dart';
+import '../../widgets/custom_category_list.dart';
 import '../../widgets/date_picker_bottom_sheet.dart';
+import '../../widgets/habit_custom_button.dart';
 import '../../widgets/icon_button_widget.dart';
-import 'package:bottom_picker/bottom_picker.dart';
 import '../../widgets/notification/add_reminder_button.dart';
 import '../../widgets/notification/notification_item.dart';
 import '../../widgets/notification/time_picker_bottom_sheet.dart';
+import '../../widgets/task_type_tabbar.dart';
+import '../../widgets/weekday_chip.dart';
 
 
 class AddChallengeScreen extends StatefulWidget {
@@ -39,9 +46,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   DateTime today = DateTime.now();
   String _selectedCategory = 'General';
   String _title = 'Test';
-  TaskType _taskType = TaskType.normal;
+  TaskType _taskType = TaskType.task;
   final RepeatType _repeatType = RepeatType.selectDays;
-  Duration _timerDuration = const Duration(minutes: 1); // default 00:01:00
   int _taskValue = 5; // default value 5
   RepeatType _repeatSelectedItem = RepeatType.selectDays;
 
@@ -49,7 +55,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   DateTime? _endDate ;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   Color selectedColor = Colors.orange;
-  int selectedTimesPerWeek = 2;
+  int selectedTimesPerWeek = 1;
   int selectedTimesPerMonth = 1;
 
   List<String> repeatItems = [
@@ -63,6 +69,16 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   String? habitNote ;
 
   List<String> selectedTime = [];
+  final daysOfWeek = [
+    {'S': 7},
+    {'M': 1},
+    {'T': 2},
+    {'W': 3},
+    {'T': 4},
+    {'F': 5},
+    {'S': 6},
+  ];
+
 
   void _addReminder(String time) {
     setState(() {
@@ -140,6 +156,13 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   }
 
   DateTime selectedDate = DateTime.now();
+
+
+  void _onTabSelected(TaskType type) {
+    setState(() {
+      _taskType = type;
+    });
+  }
 
   IconData iconSelected = FontAwesomeIcons.iceCream;
   void _openColorPicker() async {
@@ -241,7 +264,164 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     }
   }
 
+  void _showCategorySelector() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
 
+                  IconButton(icon: Icon(Icons.close), onPressed: (){
+                    Navigator.pop(context);
+                  },),
+
+                  const SizedBox(width: 30,),
+
+                  Center(
+                    child: Text(
+                      'Select Habit Category',
+                      style: GoogleFonts.poppins(
+                        color: Colors.black,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: categories.map((category) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = category;
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: CustomCategoryList(
+                      categoryText: category,
+                      isSelected: _selectedCategory == category, // Check if it's selected
+                    ),
+                  );
+                }).toList(),
+              ),
+
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showRepeatType() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+
+                  IconButton(icon: Icon(Icons.close), onPressed: (){
+                    Navigator.pop(context);
+                  },),
+
+                  const SizedBox(width: 30,),
+
+                  Center(
+                    child: Text(
+                      'Select Repeat Type',
+                      style: GoogleFonts.poppins(
+                        color: Colors.black,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: RepeatType.values.map((RepeatType item) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _repeatSelectedItem = item;
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: CustomCategoryList(
+                      categoryText: item.name.toString(),
+                      isSelected: _repeatSelectedItem == item, // Check if it's selected
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  String _label = 'Times';
+
+  void _changeLabel() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
+      builder: (_) => LabelChanger(
+        initialLabel: _label,
+        onLabelChanged: (newLabel) {
+          setState(() {
+            _label = newLabel;
+          });
+        },
+      ),
+    );
+  }
+
+  String _formattedDuration = '00:01:00'; // Default formatted duration
+  Duration _timerDuration = const Duration(minutes: 1); // default 00:01:00
+
+  // Function to handle changing the duration
+  void _changeDuration(BuildContext context) {
+    CustomTimeDurationPickerBottomSheet.showTimePicker(
+      context,
+      _timerDuration,
+          (String formattedDuration, Duration newDuration) {
+        setState(() {
+          _formattedDuration = formattedDuration;
+          _timerDuration = newDuration;
+        });
+      },
+    );
+  }
 
 
   @override
@@ -281,126 +461,182 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+
+                    /// category add area
                     HeadingH1Widget("Category"),
-                    Padding(
-                      padding:  const EdgeInsets.only( top: 4, bottom: 2,),
-                      child: Container(
-                        height: 65,
-                        width: double.infinity,
-                        // margin:EdgeInsets.only(left: 10, right: 10)
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          color: ColorStrings.headingBlue,
-                          border: Border.all(width: 2,)
+
+          Padding(
+            padding: const EdgeInsets.only(top: 4, bottom: 2, right: 5, left: 5),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: _showCategorySelector, // Open bottom sheet on tap
+                  child: Container(
+                    height: 45,
+                    width: .70.sw,
+                    padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 5.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8.0,
+                          spreadRadius: 2.0,
+                          offset: const Offset(0, 4),
                         ),
-                        child:
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child:
-                              Padding(
-                                padding: const EdgeInsets.only(left: 7,top: 7,bottom: 5),
-                                child: SizedBox(
-                                  height:60.h,
-                                  width: double.infinity,
-                                  child: DropdownButtonFormField<String>(
-                                    icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                                    iconSize: 25,
-                                    iconEnabledColor: ColorStrings.whiteColor,
-                                    itemHeight: 50,
-                                    dropdownColor: ColorStrings.headingBlue,
-                                    value: _selectedCategory,
-                                    items: categories
-                                        .map((category) => DropdownMenuItem<String>(
-                                      value: category,
-                                      child: Text(category,style: const TextStyle(color: ColorStrings.whiteColor,
-                                          fontSize: 15, fontWeight: FontWeight.w600), ),
-                                    ))
-                                        .toList(),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _selectedCategory = value!;
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      contentPadding: const EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
-                                      enabledBorder: const OutlineInputBorder(
-                                        borderSide: BorderSide(color: ColorStrings.whiteColor,width: 2),
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(8.0),),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide:  const BorderSide(color: ColorStrings.whiteColor,width: 2),
-                                      ),
-                                    ),
-                                  ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 7, top: 7, bottom: 5),
+                      child: SizedBox(
+                        height: 50.h,
+                        width: double.infinity,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                _selectedCategory,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 22, right: 8, top: 5, bottom: 5),
-                              child: Container(
-                                height: 40.h,
-                                width: 43.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(width: 2,color: ColorStrings.whiteColor)
-                                ),
-                                child: IconButton(
-                                  icon:  const Icon(Icons.add,color: ColorStrings.whiteColor,),
-                                  onPressed: () => _addNewCategory(context),
-                                ),
-                              ),
-                            ),
-                          ],
+                              const Icon(Icons.keyboard_arrow_down_rounded, size: 25),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ],
+                  ),
+                ),
+                const SizedBox(width: 20,),
+                GestureDetector(
+                  onTap: () => _addNewCategory(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                        color: Colors.grey.shade200, // Background color for the icon
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.black,
+                      size: 24.0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          ],
                 ),
                 HeadingH1Widget("Habit Name"),
 
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: ColorStrings.whiteColor,
-                        boxShadow: const [
-                          BoxShadow(
-                              offset: Offset(2.0, 6.0),
-                              color: Colors.grey,
-                              blurRadius: 6.0,
-                              spreadRadius: 0.0
-                          ),],
-                      ),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: _openColorPicker,
-                            child: Container(
-                              margin: const EdgeInsets.only(left: 8),
-                              height: 40.h,
-                              width: 40.w,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: selectedColor
-                              ),
-                              child: Icon(iconSelected, color: Colors.black),
+                    // Container(
+                    //   decoration: BoxDecoration(
+                    //     borderRadius: BorderRadius.circular(16),
+                    //     color: ColorStrings.whiteColor,
+                    //     boxShadow: const [
+                    //       BoxShadow(
+                    //           offset: Offset(2.0, 6.0),
+                    //           color: Colors.grey,
+                    //           blurRadius: 6.0,
+                    //           spreadRadius: 0.0
+                    //       ),],
+                    //   ),
+                    //   child: Row(
+                    //     children: [
+                    //       GestureDetector(
+                    //         onTap: _openColorPicker,
+                    //         child: Container(
+                    //           margin: const EdgeInsets.only(left: 8),
+                    //           height: 40.h,
+                    //           width: 40.w,
+                    //           decoration: BoxDecoration(
+                    //               borderRadius: BorderRadius.circular(8),
+                    //               color: selectedColor
+                    //           ),
+                    //           child: Icon(iconSelected, color: Colors.black),
+                    //         ),
+                    //       ),
+                    //
+                    //       const SizedBox(width: 10,),
+                    //
+                    //
+                    //       SizedBox(
+                    //         width: 250,
+                    //         child: TextFormField(
+                    //           decoration:  const InputDecoration(
+                    //               labelText: 'Habit Title'),
+                    //           validator: (value) {
+                    //             if (value!.isEmpty) {
+                    //               return 'Please enter a title';
+                    //             }
+                    //             return null;
+                    //           },
+                    //           onSaved: (value) {
+                    //             _title = value!;
+                    //           },
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                Padding(
+                  padding: const EdgeInsets.symmetric( horizontal: 3),
+                  child: Container(
+                    // width: 328.w,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 6.0,
+                          spreadRadius: 0.0,
+                          offset: const Offset(2, 6),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(width: 10,),
+                        GestureDetector(
+                          onTap: _openColorPicker,
+                          child: Container(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                                color: selectedColor, // Background color for the icon
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(8)
                             ),
+
+                            child: Icon(iconSelected, color: Colors.black),
                           ),
-
-                          const SizedBox(width: 10,),
-
-
-                          SizedBox(
+                        ),
+                        SizedBox(width: 10,),
+                        Expanded(
+                          child: Container(
+                            alignment: Alignment.centerLeft,  // Aligns text to the left
                             width: 250,
                             child: TextFormField(
-                              decoration:  const InputDecoration(
-                                  labelText: 'Habit Title'),
+                              decoration:   InputDecoration(
+                                hintText: 'Habit Name',
+                                border: InputBorder.none,  // Removes the default underline
+                              ),
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  return 'Please enter a title';
+                                  return 'Please enter Habit name';
                                 }
                                 return null;
                               },
@@ -409,9 +645,11 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                               },
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                  ),
+                ),
 
                 HeadingH1Widget("Reminder"),
 
@@ -442,145 +680,182 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     ),
                   ],
                 ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding:  const EdgeInsets.only(top: 14, bottom: 8),
-                      child: HeadingH1Widget("Goal"),
-                    )),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Container(
-                    width: double.infinity,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: ColorStrings.headingBlue
-                    ),
+
+                HeadingH1Widget("Goal"),
+
+                TaskTypeTabBar(
+                  onTabSelected: _onTabSelected,
+                  selectedTaskType: _taskType,
+                ),
+                if (_taskType == TaskType.time)
+        Padding(
+          padding: const EdgeInsets.only(right: 5, left: 5, top: 10),
+          child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Display Duration Button
+            GestureDetector(
+            onTap: () => _changeDuration(context), // On tap, open the duration picker
+              child: Container(
+                width: 120.w,
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Color(0xFF1A3D89), // Blue color to match the design
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Text(
+                    _formattedDuration,
+                    style: GoogleFonts.poppins(fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 16), // Space between the two buttons
+
+            // Change Button
+            GestureDetector(
+              onTap: () => _changeDuration(context), // On tap, open the duration picker
+              child: Container(
+                width: 120.w,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Color(0xFF1A3D89), // Blue color to match the design
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Text(
+                    'Change',
+                    style: GoogleFonts.poppins(fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,),
+                  ),
+                ),
+              ),
+            ),
+          ],
+                ),
+        ),
+
+
+                if (_taskType == TaskType.count)
+
+                  Padding(
+                    padding: const EdgeInsets.only(right: 5, left: 5, top: 10),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: TaskType.values.map((type) {
-                        return Expanded(
-                          child: SizedBox(
-                            width: 300,
-                            child: ChoiceChip(
-                              backgroundColor: ColorStrings.whiteColor,
-                              selectedColor: ColorStrings.headingBlue,
-                              label: Text(type.toString().split('.').last,
-                                selectionColor: ColorStrings.whiteColor,),
-                              selected: _taskType == type,
-                              onSelected: (selected) {
-                                setState(() {
-                                  _taskType = type;
-                                });
-                              },
+                      children: [
+                        CounterWidget(
+                          initialValue: _taskValue,
+                          onValueChanged: (newValue) {
+                            setState(() {
+                              _taskValue = newValue;
+                            });
+                          },
+                        ),
+                        SizedBox(width: 45),
+                        GestureDetector(
+                          onTap: _changeLabel,
+                          child: Container(
+                            width: 110,
+                            decoration: BoxDecoration(
+                              color: ColorStrings.headingBlue,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: const [
+                                BoxShadow(
+                                  spreadRadius: 1,
+                                  offset: Offset(1, 1),
+                                  blurRadius: 1,
+                                  color: Colors.black12,
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 8.0),
+                                child: Text(
+                                  _label,
+                                  style: GoogleFonts.poppins(fontSize: 17,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w400,),
+                                ),
+                              ),
                             ),
                           ),
-                        );
-                      }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                HeadingH1Widget("Repeat Type"),
+
+                Padding(
+                  padding: const EdgeInsets.only(top: 4, bottom: 2, right: 5, left: 5),
+                  child: GestureDetector(
+                    onTap: _showRepeatType, // Open bottom sheet on tap
+                    child: Container(
+                      height: 45,
+                      padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 5.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8.0,
+                            spreadRadius: 2.0,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 7, top: 7, bottom: 5),
+                        child: SizedBox(
+                          height: 50.h,
+                          width: double.infinity,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  _repeatSelectedItem.name,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                const Icon(Icons.keyboard_arrow_down_rounded, size: 25),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                if (_taskType == TaskType.timer)
-                  TextFormField(
-                    readOnly: true,
-                    decoration: const InputDecoration(labelText: 'Timer Duration'),
-                    onTap: () async {
-                      Duration? picked = await showDurationPicker(
-                        context: context,
-                        initialDuration: _timerDuration,
-                      );
-                      if (picked != null) {
-                        setState(() {
-                          _timerDuration = picked;
-                        });
-                      }
-                    },
-                    controller: TextEditingController(
-                      text: _timerDuration
-                          .toString()
-                          .split('.')
-                          .first
-                          .padLeft(8, '0'),
-                    ),
-                  ),
-                if (_taskType == TaskType.value)
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'Task Value'),
-                    keyboardType: TextInputType.number,
-                    initialValue: _taskValue.toString(),
-                    onSaved: (value) {
-                      _taskValue = int.parse(value!);
-                    },
-                  ),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding:  const EdgeInsets.only(top: 14, bottom: 8),
-                      child: HeadingH1Widget("Repeat Type"),
-                    )),
-                Container(
-                  width: double.infinity,
-                  height: 60,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      color: ColorStrings.headingBlue,
-                      border: Border.all(width: 2,),
-                  ),
-                  child: Padding(
-                    padding:  const EdgeInsets.only(top: 3,left: 2, right: 2),
-                    child: DropdownButtonFormField<RepeatType>(
-                      value: _repeatSelectedItem,
-                      dropdownColor: ColorStrings.headingBlue,
-                      icon:  const Icon(Icons.keyboard_arrow_down_rounded),
-                      iconSize: 25,
-                      iconEnabledColor: ColorStrings.whiteColor,
-                      itemHeight: 50,
-                      items: RepeatType.values.map((RepeatType item) {
-                        return DropdownMenuItem<RepeatType>(
-                          value: item,
-                          child: Text(
-                            item.toString().split('.').last,
-                            style: const TextStyle(
-                              color: ColorStrings.whiteColor,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (RepeatType? value) {
-                        setState(() {
-                          _repeatSelectedItem = value! ;
-                          print(_repeatSelectedItem);
-                        });
-                      },
-                      decoration: const InputDecoration(border: InputBorder.none,
-                        contentPadding: EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
-                    ),),
-                  ),),
+
+                SizedBox(height: 20,),
                 if (_repeatSelectedItem == RepeatType.selectDays)
                   Wrap(
-                    children: [
-                      {'M': 1},
-                      {'Tu': 2},
-                      {'W': 3},
-                      {'Th': 4},
-                      {'F': 5},
-                      {'Sa': 6},
-                      {'Su': 7}
-                    ].map((dayMap) {
+                    spacing: 6.0,
+                    children: daysOfWeek.map((dayMap) {
                       String day = dayMap.keys.first;
                       int dayValue = dayMap.values.first;
-                      return ChoiceChip(
-                        label: Text(day),
-                        selected: selectedDays.contains(dayValue),
-                        showCheckmark: false,
+
+                      return WeekdayChip(
+                        day: day,
+                        dayValue: dayValue,
+                        isSelected: selectedDays.contains(dayValue),
                         onSelected: (selected) {
                           setState(() {
                             if (selected) {
                               selectedDays.add(dayValue);
-                              log('selectedDays value $selectedDays');
                             } else {
                               selectedDays.remove(dayValue);
                             }
@@ -589,40 +864,163 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       );
                     }).toList(),
                   ),
-                // if (_repeatSelectedItem == RepeatType.selectedDate)
 
                 if (_repeatSelectedItem == RepeatType.weekly)
-                  Row(
-                    children: [
 
-                      ElevatedButton(
-                        onPressed: _showWeeklyTimesPicker,
-                        child:  Text('$selectedTimesPerWeek times'),
-                      ),
-                      ElevatedButton(
-                        onPressed: _showWeeklyTimesPicker,
-                        child:  const Text('Change'),
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 5, left: 5, top: 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Display Duration Button
+                        GestureDetector(
+                          onTap: () {
 
-                    ],
+                            CustomNumberPickerBottomSheet.showNumberPicker(
+                              context,
+                              selectedTimesPerWeek,
+                              6,
+                              'Set Times per Week',
+                                  (int selectedNumber) {
+                                setState(() {
+                                  selectedTimesPerWeek = selectedNumber; // Update the current value
+                                });
+                              },
+                            );
+                          },
+                          child: Container(
+                            width: 120.w,
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Color(0xFF1A3D89), // Blue color to match the design
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                            '$selectedTimesPerWeek Times',
+                                style: GoogleFonts.poppins(fontSize: 16,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 16), // Space between the two buttons
+
+                        // Change Button
+                        GestureDetector(
+                          // onTap: () => _showWeeklyTimesPicker, // On tap, open the duration picker
+                          onTap: () {
+
+                            CustomNumberPickerBottomSheet.showNumberPicker(
+                              context,
+                              selectedTimesPerWeek,
+                              6,
+                              'Set Times per Week',
+                                  (int selectedNumber) {
+                                setState(() {
+                                  selectedTimesPerWeek = selectedNumber; // Update the current value
+                                });
+                              },
+                            );
+                          },
+                          child: Container(
+                            width: 120.w,
+                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Color(0xFF1A3D89), // Blue color to match the design
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Change',
+                                style: GoogleFonts.poppins(fontSize: 16,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
 
                 if (_repeatSelectedItem == RepeatType.monthly)
-                  Row(
-                    children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 5, left: 5, top: 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Display Duration Button
+                        GestureDetector(
+                          onTap: () {
+                            CustomNumberPickerBottomSheet.showNumberPicker(
+                              context,
+                              selectedTimesPerMonth,
+                              28,
+                              'Set Times per Month',
+                                  (int selectedNumber) {
+                                setState(() {
+                                  selectedTimesPerMonth = selectedNumber; // Update the current value
+                                });
+                              },
+                            );
+                          },
+                          child: Container(
+                            width: 120.w,
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Color(0xFF1A3D89), // Blue color to match the design
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '$selectedTimesPerMonth Times',
+                                style: GoogleFonts.poppins(fontSize: 16,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 16), // Space between the two buttons
 
-                      ElevatedButton(
-                        onPressed: _showMontlyimesPicker,
-                        child:  Text('$selectedTimesPerMonth times'),
-                      ),
-
-                      ElevatedButton(
-                        onPressed: _showMontlyimesPicker,
-                        child:  const Text('Change'),
-                      ),
-
-                    ],
+                        // Change Button
+                        GestureDetector(
+                          onTap: () {
+                            CustomNumberPickerBottomSheet.showNumberPicker(
+                              context,
+                              selectedTimesPerMonth,
+                              28,
+                              'Set Times per Month',
+                                  (int selectedNumber) {
+                                setState(() {
+                                  selectedTimesPerMonth = selectedNumber; // Update the current value
+                                });
+                              },
+                            );
+                          },
+                          child: Container(
+                            width: 120.w,
+                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Color(0xFF1A3D89), // Blue color to match the design
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Change',
+                                style: GoogleFonts.poppins(fontSize: 16,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+
 
                 if (_repeatSelectedItem == RepeatType.selectedDate)
                   Column(
@@ -680,15 +1078,12 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                 child: Center(
                                   child: Text(_startDate != null ? _formatSelectedDate(_startDate!)
                                       : _formatSelectedDate(DateTime.now())
-
                                     ,   style: GoogleFonts.poppins(fontSize: 17,
                                     color: Colors.white,
                                     fontWeight: FontWeight.w600,),),
                                 ),
                               ),
                             ),
-
-
                           ],
                         ),
                         Expanded(
@@ -715,8 +1110,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                 child: Center(
                                   child: Text(_endDate != null ? _formatSelectedDate(_endDate!)
                                       : 'Select'
-
-                                    ,   style: GoogleFonts.poppins(fontSize: 17,
+                                    ,style: GoogleFonts.poppins(fontSize: 17,
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600,),),
                                 ),
@@ -740,77 +1134,23 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     });
                   },
                 ),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
 
                 Center(
                   child: ElevatedButton(
                     onPressed: _submitForm,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: const Text('Add Habit'),
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Add Habit'),
                     ),
                   ),
                 ),
-                SizedBox(height: 90,)
+                const SizedBox(height: 90,)
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Future<Duration?> showDurationPicker(
-      {required BuildContext context, required Duration initialDuration}) async {
-    return showDialog<Duration>(
-      context: context,
-      builder: (BuildContext context) {
-        Duration tempDuration = initialDuration;
-        return AlertDialog(
-          title: const Text('Pick Duration'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              NumberPicker(
-                minValue: 0,
-                maxValue: 23,
-                value: tempDuration.inHours,
-                onChanged: (value) {
-                  setState(() {
-                    tempDuration =
-                        Duration(hours: value, minutes: tempDuration.inMinutes % 60);
-                  });
-                },
-              ),
-              NumberPicker(
-                minValue: 0,
-                maxValue: 59,
-                value: tempDuration.inMinutes % 60,
-                onChanged: (value) {
-                  setState(() {
-                    tempDuration =
-                        Duration(hours: tempDuration.inHours, minutes: value);
-                  });
-                },
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop(tempDuration);
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -820,37 +1160,81 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       builder: (BuildContext context) {
         final TextEditingController newCategoryController =
         TextEditingController();
-        return AlertDialog(
-          title: const Text('Add New Category'),
-          content: TextField(
-            controller: newCategoryController,
-            decoration:
-            const InputDecoration(hintText: 'Enter new category'),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  String newCategory = newCategoryController.text;
-                  if (newCategory.isNotEmpty &&
-                      !categories.contains(newCategory)) {
-                    categories.add(newCategory);
-                    _selectedCategory = newCategory;
-                  }
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text('Add'),
+        return Dialog(
+          backgroundColor: Colors.white,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 60),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                 Text(
+                    'Habit New Category',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      color: Colors.black,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    textScaler: TextScaler.noScaling
+                ),
+                const SizedBox(height: 10),
 
+                TextField(
+                  controller: newCategoryController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter new category',
+                    labelStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.blueGrey,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Colors.black26.withOpacity(0.2),
+                        width: .4,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Colors.blue,
+                        width: 2.0,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    HabitCustomButton(buttonText: 'Cancel', onTap: () {
+                      Navigator.of(context).pop();
+                    }, color: Colors.white,),
+                    HabitCustomButton(buttonText: 'Add', onTap: () {
+                      setState(() {
+                        String newCategory = newCategoryController.text;
+                        if (newCategory.isNotEmpty &&
+                            !categories.contains(newCategory)) {
+                          categories.add(newCategory);
+                          _selectedCategory = newCategory;
+                        }
+                      });
+                      Navigator.of(context).pop();
+                    }, color: const Color(0xff7e94e5),),
+                  ],
+                ),
+                const SizedBox(height: 10),
+              ],
             ),
-          ],
+          ),
         );
+
       },
     );
   }
@@ -865,8 +1249,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         notificationTime: selectedTime,
         taskType: _taskType,
         repeatType: _repeatType,
-        timer: _taskType == TaskType.timer ? _timerDuration : null,
-        value: _taskType == TaskType.value ? _taskValue : null,
+        timer: _taskType == TaskType.time ? _timerDuration : null,
+        value: _taskType == TaskType.count ? _taskValue : null,
         progressJson: {},
         days: _repeatType == RepeatType.selectDays ? selectedDays : null,
         startDate: _startDate,
@@ -880,35 +1264,5 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
       Navigator.of(context).pop();
     }
-  }
-
-  void _showWeeklyTimesPicker() {
-    BottomPicker(
-      items: List.generate(6, (index) => Text((index + 1).toString())),
-      // title: 'Select a number',
-      onChange: (index) {
-        setState(() {
-          selectedTimesPerWeek = index + 1;
-        });
-      },
-
-       pickerTitle: const Center(child: Text('Select Times per week')),
-      selectedItemIndex: selectedTimesPerWeek-1,
-    ).show(context);
-  }
-
-  void _showMontlyimesPicker() {
-    BottomPicker(
-      items: List.generate(28, (index) => Text((index + 1).toString())),
-      // title: 'Select a number',
-      onChange: (index) {
-        setState(() {
-          selectedTimesPerMonth = index + 1;
-        });
-      },
-
-      pickerTitle: const Center(child: Text('Select Times per Month')),
-      selectedItemIndex: selectedTimesPerMonth-1,
-    ).show(context);
   }
 }
