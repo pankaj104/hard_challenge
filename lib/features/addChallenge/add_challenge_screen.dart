@@ -32,7 +32,6 @@ import '../../widgets/notification/time_picker_bottom_sheet.dart';
 import '../../widgets/task_type_tabbar.dart';
 import '../../widgets/weekday_chip.dart';
 
-
 class AddChallengeScreen extends StatefulWidget {
   const AddChallengeScreen({super.key});
 
@@ -107,7 +106,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   void _pickStartDate() {
     CustomDatePickerBottomSheet.showDatePicker(
       context,
-      _startDate ?? DateTime(today.year, today.month, today.day), // Pass the currently selected date or current date if null
+      _startDate ?? DateTime.now(), // Use current date if _startDate is null
           (String formattedDate, DateTime newDate) {
         setState(() {
           _startDate = DateTime(newDate.year, newDate.month, newDate.day);
@@ -123,9 +122,20 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       context,
       _endDate ?? DateTime.now(), // Pass the currently selected date or current date if null
           (String formattedDate, DateTime newDate) {
-        setState(() {
-          _endDate = DateTime(newDate.year, newDate.month, newDate.day);
-        });
+        if (newDate.isBefore(_startDate)) {
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showFlushBar(
+              context,
+              message: "End date cannot be before the start date.",
+            );
+          });
+
+        } else {
+          setState(() {
+            _endDate = DateTime(newDate.year, newDate.month, newDate.day);
+          });
+        }
       },
     );
   }
@@ -387,6 +397,23 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   }
 
   String _label = 'Times';
+  List<int> daysInMonth = List.generate(31, (index) => index + 1); // Days from 1 to 31
+
+  final List<DateTime> selectedDates = [];
+
+  void toggleDateSelection(int day) {
+    DateTime selectedDay = DateTime(today.year, today.month, day);
+
+    if (selectedDates.contains(selectedDay)) {
+      setState(() {
+        selectedDates.remove(selectedDay);
+      });
+    } else {
+      setState(() {
+        selectedDates.add(selectedDay);
+      });
+    }
+  }
 
   void _changeLabel() {
     showModalBottomSheet(
@@ -408,6 +435,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
 
   String _formattedDuration = '00:01:00'; // Default formatted duration
   Duration _timerDuration = const Duration(minutes: 1); // default 00:01:00
+  FocusNode? focusNode;
 
   // Function to handle changing the duration
   void _changeDuration(BuildContext context) {
@@ -421,6 +449,18 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         });
       },
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    focusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    focusNode?.dispose();
+    super.dispose();
   }
 
 
@@ -541,56 +581,6 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 ),
                 HeadingH1Widget("Habit Name"),
 
-                    // Container(
-                    //   decoration: BoxDecoration(
-                    //     borderRadius: BorderRadius.circular(16),
-                    //     color: ColorStrings.whiteColor,
-                    //     boxShadow: const [
-                    //       BoxShadow(
-                    //           offset: Offset(2.0, 6.0),
-                    //           color: Colors.grey,
-                    //           blurRadius: 6.0,
-                    //           spreadRadius: 0.0
-                    //       ),],
-                    //   ),
-                    //   child: Row(
-                    //     children: [
-                    //       GestureDetector(
-                    //         onTap: _openColorPicker,
-                    //         child: Container(
-                    //           margin: const EdgeInsets.only(left: 8),
-                    //           height: 40.h,
-                    //           width: 40.w,
-                    //           decoration: BoxDecoration(
-                    //               borderRadius: BorderRadius.circular(8),
-                    //               color: selectedColor
-                    //           ),
-                    //           child: Icon(iconSelected, color: Colors.black),
-                    //         ),
-                    //       ),
-                    //
-                    //       const SizedBox(width: 10,),
-                    //
-                    //
-                    //       SizedBox(
-                    //         width: 250,
-                    //         child: TextFormField(
-                    //           decoration:  const InputDecoration(
-                    //               labelText: 'Habit Title'),
-                    //           validator: (value) {
-                    //             if (value!.isEmpty) {
-                    //               return 'Please enter a title';
-                    //             }
-                    //             return null;
-                    //           },
-                    //           onSaved: (value) {
-                    //             _title = value!;
-                    //           },
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
                 Padding(
                   padding: const EdgeInsets.symmetric( horizontal: 3),
                   child: Container(
@@ -630,14 +620,24 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             alignment: Alignment.centerLeft,  // Aligns text to the left
                             width: 250,
                             child: TextFormField(
+                              focusNode: focusNode,
                               decoration:   InputDecoration(
                                 hintText: 'Habit Name',
                                 border: InputBorder.none,  // Removes the default underline
                               ),
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  return 'Please enter Habit name';
+                                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                                    showFlushBar(
+                                      context,
+                                      message: "Please Enter Habit name",
+                                    );
+
+                                    FocusScope.of(context).requestFocus(focusNode);
+                                  });
+                                  return 'Please Enter Habit name';
                                 }
+
                                 return null;
                               },
                               onSaved: (value) {
@@ -840,6 +840,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                   ),
                 ),
 
+
                 SizedBox(height: 20,),
                 if (_repeatSelectedItem == RepeatType.selectDays)
                   Wrap(
@@ -1023,31 +1024,101 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
 
 
                 if (_repeatSelectedItem == RepeatType.selectedDate)
-                  Column(
-                    children: [
-                      TableCalendar(
-                        focusedDay: DateTime.now(),
-                        firstDay: DateTime(2020),
-                        lastDay: DateTime(2030),
-                        calendarFormat: _calendarFormat,
-                        selectedDayPredicate: (day) => selectedDates.contains(day),
-                        onDaySelected: (selectedDay, focusedDay) {
-                          setState(() {
-                            if (selectedDates.contains(selectedDay)) {
-                              selectedDates.remove(selectedDay);
-                            } else {
-                              selectedDates.add(selectedDay);
-                            }
-                          });
-                        },
-                        onFormatChanged: (format) {
-                          setState(() {
-                            _calendarFormat = format;
-                          });
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Container(
+                      height: 280,
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 7, // 7 days in a week
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                        ),
+                        itemCount: daysInMonth.length,
+                        itemBuilder: (context, index) {
+                          int day = daysInMonth[index];
+                          DateTime date = DateTime(today.year, today.month, day);
+                          bool isSelected = selectedDates.contains(date);
+
+                          return GestureDetector(
+                            onTap: () => toggleDateSelection(day),
+                            child: Container(
+                              height: 30,
+                              width: 30,
+                              decoration: isSelected? BoxDecoration(
+                                color: Color(0xff079455),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow:  [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8.0,
+                                    spreadRadius: 2.0,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+
+                              ):
+                              BoxDecoration(
+                                color:  Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow:  [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8.0,
+                                    spreadRadius: 2.0,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Container(
+                                  child: Text(
+                                    day.toString(),
+                                    style: GoogleFonts.poppins(
+                                      color: isSelected ? Colors.white : Colors.black,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
                         },
                       ),
-                    ],
+                    ),
                   ),
+
+
+
+                  // Column(
+                  //   children: [
+                  //     TableCalendar(
+                  //       focusedDay: DateTime.now(),
+                  //       firstDay: DateTime(2020),
+                  //       lastDay: DateTime(2030),
+                  //       calendarFormat: _calendarFormat,
+                  //       selectedDayPredicate: (day) => selectedDates.contains(day),
+                  //       onDaySelected: (selectedDay, focusedDay) {
+                  //         setState(() {
+                  //           if (selectedDates.contains(selectedDay)) {
+                  //             selectedDates.remove(selectedDay);
+                  //           } else {
+                  //             selectedDates.add(selectedDay);
+                  //           }
+                  //         });
+                  //       },
+                  //       onFormatChanged: (format) {
+                  //         setState(() {
+                  //           _calendarFormat = format;
+                  //         });
+                  //       },
+                  //     ),
+                  //   ],
+                  // ),
+
+
+
                 Column(
                   children: [
                     Padding(
@@ -1122,28 +1193,60 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     ),
                   ],
                 ),
-                TextFormField(
-                  controller: notecontroller,
-                  decoration: const InputDecoration(
-                    labelText: 'Enter your text here',
-                    hintText: 'Type something...',
-                  ),
-                  onChanged: (value){
-                    setState(() {
-                      habitNote  = value.toString();
-                    });
-                  },
-                ),
-                const SizedBox(height: 10,),
 
-                Center(
-                  child: ElevatedButton(
-                    onPressed: _submitForm,
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('Add Habit'),
+                HeadingH1Widget("Notes"),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 6.0,
+                          spreadRadius: 0.0,
+                          offset: const Offset(2, 6),
+                        ),
+                      ],
+                    ),
+                    child: TextFormField(
+                      controller: notecontroller,
+                      minLines: 1,
+                      maxLines: 10,
+                      decoration: InputDecoration(
+                        hintText: 'Add helpful note',
+                        border: InputBorder.none,
+                        hintStyle: GoogleFonts.manrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.cyan,
+                        ),
+                        // border: const OutlineInputBorder(
+                        //   borderSide: BorderSide(
+                        //     color:Colors.black12,
+                        //   ),
+                        //   borderRadius: BorderRadius.all(
+                        //     Radius.circular(8),
+                        //   ),
+                        // ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 15,
+                        ),
+                      ),
+
+                      onChanged: (value){
+                        setState(() {
+                          habitNote  = value.toString();
+                        });
+                      },
                     ),
                   ),
+                ),
+                const SizedBox(height: 40,),
+                Center(
+                  child: HabitCustomButton(buttonText: 'Add Habit', onTap: _submitForm, color: ColorStrings.headingBlue, widthOfButton: double.infinity, buttonTextColor: Colors.white,)
                 ),
                 const SizedBox(height: 90,)
               ],
@@ -1209,13 +1312,12 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 ),
 
                 const SizedBox(height: 20),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     HabitCustomButton(buttonText: 'Cancel', onTap: () {
                       Navigator.of(context).pop();
-                    }, color: Colors.white,),
+                    }, color: Colors.white, widthOfButton: 100, buttonTextColor: Colors.black,),
                     HabitCustomButton(buttonText: 'Add', onTap: () {
                       setState(() {
                         String newCategory = newCategoryController.text;
@@ -1226,7 +1328,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                         }
                       });
                       Navigator.of(context).pop();
-                    }, color: const Color(0xff7e94e5),),
+                    }, color: const Color(0xff7e94e5), widthOfButton: 100, buttonTextColor:  Colors.black,),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -1262,7 +1364,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       );
       log('New habbit added Data $newHabit');
       Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
+
       Navigator.of(context).pop();
+
     }
   }
 }

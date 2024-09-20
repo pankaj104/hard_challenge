@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HabitCustomButton extends StatelessWidget {
   final String buttonText;
   final Color color;
+  final Color buttonTextColor;
   final VoidCallback onTap;
+  final double widthOfButton;
 
-  const HabitCustomButton({super.key, required this.buttonText, required this.onTap, required this.color});
+  const HabitCustomButton({super.key, required this.buttonText, required this.onTap, required this.color, required this.widthOfButton, required this.buttonTextColor});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +18,7 @@ class HabitCustomButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 5),
         child: Container(
           height: 40,
-          width: 100,
+          width: widthOfButton,
           padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 3.0),
           decoration: BoxDecoration(
             color: color,
@@ -29,7 +32,11 @@ class HabitCustomButton extends StatelessWidget {
               ),
             ],
           ),
-          child: Center(child: Text(buttonText))
+          child: Center(child: Text(buttonText, style:
+          GoogleFonts.poppins(fontSize: 15,
+            color: buttonTextColor,
+            fontWeight: FontWeight.w400,)
+            ,))
         ),
       ),
     );
