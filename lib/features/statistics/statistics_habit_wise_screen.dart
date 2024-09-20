@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:table_calendar/table_calendar.dart';
 import '../../model/habit_model.dart';
 import '../../utils/image_resource.dart';
 import '../../widgets/calendar_widget.dart';
@@ -25,9 +24,9 @@ class StatisticsHabitWiseScreen extends StatefulWidget {
 class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
   @override
   Widget build(BuildContext context) {
-    double completionPercentage = widget.habit.getCompletionPercentage();
-    double skippedPercentage = widget.habit.getSkippedPercentage();
-    double missedPercentage = 100.00 - completionPercentage - skippedPercentage ;
+    double completionPercentage = widget.habit.getCompletionPercentageByCategory(widget.habit.category);
+    double skippedPercentage = widget.habit.getSkippedPercentageByCategory(widget.habit.category);
+    double missedPercentage = widget.habit.getMissedPercentageByCategory(widget.habit.category);
     log('data for statistics ${widget.habit}');
 
     return Scaffold(
@@ -95,14 +94,18 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                       Stack(
                         alignment: Alignment.center,
                         children: [
+
+                          /// Missed percentage
                           CircularPercentIndicator(
                             radius: 100.0,
                             lineWidth: 20.0,
-                            percent: 1-(completionPercentage / 100 + skippedPercentage / 100),
+                            percent:  widget.habit.getMissedPercentageByCategory(widget.habit.category)/100,
                             backgroundColor: Colors.transparent,
                             progressColor: Colors.blue[700],
                             circularStrokeCap: CircularStrokeCap.round,
                           ),
+
+                          /// Skipped percentage
                           CircularPercentIndicator(
                             radius: 100.0,
                             lineWidth: 20.0,
@@ -112,6 +115,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                             circularStrokeCap: CircularStrokeCap.round,
                           ),
 
+                          /// completed percentage
                           CircularPercentIndicator(
                             radius: 100.0,
                             lineWidth: 20.0,

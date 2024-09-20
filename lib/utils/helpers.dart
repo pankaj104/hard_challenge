@@ -1,26 +1,8 @@
-
-import 'dart:ui';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:hard_challenge/utils/colors.dart';
 
-// All constant in project.
-
-final List<String> categories = ['General', 'Work', 'Health', 'Other'];
-
-final List<int> selectedDays = [1, 2, 3, 4, 5, 6, 7];
-//Repeat type container items
-final List<String> repeatItems = ['Selected Days', 'Weekly', 'Monthly', 'Selected Date' ];
-
-
-
-final List<Color> predefinedColors = [
-  Colors.orange,
-  Colors.green,
-  Colors.blue,
-  Colors.purple,
-  Colors.red,
-];
-
+/// Invokes the toast message using [Flushbar] plugin
 Flushbar showFlushBar(
     BuildContext context, {
       required String message,
@@ -32,11 +14,11 @@ Flushbar showFlushBar(
         // maxLines: 20,
         style: const TextStyle(
           fontSize: 16,
-          color: Colors.white,
+          color: ColorStrings.whiteColor,
         ),
       ),
       // message: message,
-      backgroundColor: Colors.pink,
+      backgroundColor: ColorStrings.greenColor,
       duration: Duration(seconds: durationInSeconds),
       borderRadius: const BorderRadius.only(
         bottomLeft: Radius.circular(20),

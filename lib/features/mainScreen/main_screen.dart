@@ -10,6 +10,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../addChallenge/add_challenge_screen.dart';
 import '../../model/habit_model.dart';
 import '../../provider/habit_provider.dart';
+import '../statistics/statistics_category_wise.dart';
 import '../timer/timer_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -34,13 +35,19 @@ class _MainScreenState extends State<MainScreen> {
       ),
       body: Column(
         children: [
+          Consumer<HabitProvider>(
+      builder: (context, habitProvider, child) {
+        List<Habit> get_all_habit = habitProvider.getAllHabit();
+        return
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-       IconButton(onPressed: (){
-         Navigator.push(context, MaterialPageRoute(builder: (context) => const StatisticsOverall()));
-
-       }, icon: const Icon(Icons.add_chart, size: 40, color: Colors.blue,)),
+              IconButton(onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                    StatisticsCategoryWise(habit: get_all_habit,)));
+              },
+                  icon: const Icon(
+                    Icons.add_chart, size: 40, color: Colors.blue,)),
               Container(
                 child: Column(
                   children: [
@@ -69,6 +76,8 @@ class _MainScreenState extends State<MainScreen> {
                 child: SvgPicture.asset(ImageResource.calenderIcon),
               ),
             ],
+          );
+      }
           ),
           // Calendar
           Container(
@@ -206,7 +215,7 @@ class _MainScreenState extends State<MainScreen> {
                                           child: Text(
                                             isSkipped
                                                 ? 'Skipped'
-                                                : '${habit.category} - ${habit.notificationTime.format(context)}',
+                                                : '${habit.category}',
                                             style: TextStyle(
                                               color: Colors.black
                                                   .withOpacity(0.7),
@@ -261,11 +270,11 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildTrailingWidget(
       BuildContext context, Habit habit, double progress) {
     switch (habit.taskType) {
-      case TaskType.timer:
+      case TaskType.time:
         return const Icon(Icons.timer);
-      case TaskType.value:
+      case TaskType.count:
         return Text('${habit.value}');
-      case TaskType.normal:
+      case TaskType.task:
       default:
         return Checkbox(
           value: progress == 1.0,
@@ -282,7 +291,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void _handleHabitTap(BuildContext context, Habit habit) {
     switch (habit.taskType) {
-      case TaskType.timer:
+      case TaskType.time:
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -293,10 +302,10 @@ class _MainScreenState extends State<MainScreen> {
           ),
         );
         break;
-      case TaskType.value:
+      case TaskType.count:
         _completeValueTask(context, habit);
         break;
-      case TaskType.normal:
+      case TaskType.task:
         setState(() {
           double newProgress =
           (habit.progressJson[_selectedDate]?.progress ?? 0.0) == 1.0

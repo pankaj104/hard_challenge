@@ -7,11 +7,15 @@ class HeadingH1Widget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      headingtitle,
-      style: GoogleFonts.poppins(fontSize: 17,
-        color: Colors.black,
-        fontWeight: FontWeight.w600,),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Text(
+        headingtitle,
+        style: GoogleFonts.poppins(fontSize: 17,
+          color: Colors.black,
+          fontWeight: FontWeight.w600,),
+      ),
     );
   }
 }
+

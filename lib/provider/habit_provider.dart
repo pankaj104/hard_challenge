@@ -157,38 +157,38 @@ class HabitProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  double getOverallCompletionPercentage() {
+  double getOverallCompletionPercentage(String categoryName) {
     if (_habits.isEmpty) return 0.0;
 
     double totalPercentage = 0.0;
 
     for (Habit habit in _habits) {
-      totalPercentage += habit.getCompletionPercentage();
+      totalPercentage += habit.getCompletionPercentageByCategory(categoryName);
     }
         log('total percentage ${totalPercentage / _habits.length}');
     return totalPercentage / _habits.length;
   }
 
 
-  double getOverallSkippedPercentage() {
+  double getOverallSkippedPercentage(String categoryName) {
     if (_habits.isEmpty) return 0.0;
 
     double totalPercentage = 0.0;
 
     for (Habit habit in _habits) {
-      totalPercentage += habit.getSkippedPercentage();
+      totalPercentage += habit.getSkippedPercentageByCategory(categoryName);
     }
     log('total percentage ${totalPercentage / _habits.length}');
     return totalPercentage / _habits.length;
   }
 
-  double getOverallMissedPercentage() {
+  double getOverallMissedPercentage(String categoryName) {
     if (_habits.isEmpty) return 0.0;
 
     double totalPercentage = 0.0;
 
     for (Habit habit in _habits) {
-      totalPercentage += habit.getMissedPercentage();
+      totalPercentage += habit.getMissedPercentageByCategory(categoryName);
     }
     log('total percentage ${totalPercentage / _habits.length}');
     return totalPercentage / _habits.length;
