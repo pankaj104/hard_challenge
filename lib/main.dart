@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
       child: ScreenUtilInit(
         // designSize: const Size(375, 812),
         child: MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'Custom Challenge App',
           theme: ThemeData(
             primarySwatch: Colors.blue,

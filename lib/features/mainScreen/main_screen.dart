@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -5,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/features/statistics/statistics_overall.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
 import 'package:hard_challenge/features/statistics/statistics_habit_wise_screen.dart';
+import 'package:intl/intl.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../addChallenge/add_challenge_screen.dart';
@@ -20,11 +24,32 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   late DateTime _selectedDate;
-
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
+  }
+
+  String formatDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final tomorrow = today.add(const Duration(days: 1));
+    final selectedDate = DateTime(date.year, date.month, date.day);
+    if (selectedDate.isAtSameMomentAs(today)) {
+      return 'Today';
+    } else if (selectedDate.isAtSameMomentAs(yesterday)) {
+      return 'Yesterday';
+    } else if (selectedDate.isAtSameMomentAs(tomorrow)) {
+      return 'Tomorrow';
+    } else {
+      // Check if the selected date is in the same year
+      if (date.year == now.year) {
+        return DateFormat('d MMM').format(date); // Format without year
+      } else {
+        return DateFormat('d MMM yyyy').format(date); // Format with year
+      }
+    }
   }
 
   @override
@@ -38,89 +63,148 @@ class _MainScreenState extends State<MainScreen> {
           Consumer<HabitProvider>(
       builder: (context, habitProvider, child) {
         List<Habit> get_all_habit = habitProvider.getAllHabit();
+        // final Map<DateTime, double> taskCompletion; // Map of date to completion percentage
+        // double completion = taskCompletion[date] ?? 0.0;
+
+
         return
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Column(
             children: [
-              IconButton(onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                    StatisticsCategoryWise(habit: get_all_habit,)));
-              },
-                  icon: const Icon(
-                    Icons.add_chart, size: 40, color: Colors.blue,)),
-              Container(
-                child: Column(
-                  children: [
-                    Text(
-                      "Today",
-                      style: GoogleFonts.poppins(
-                        fontSize: 32,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                        StatisticsCategoryWise(habit: get_all_habit,)));
+                  },
+                      icon: const Icon(
+                        Icons.add_chart, size: 40, color: Colors.blue,)),
+                  Container(
+                    child: Column(
+                      children: [
+                        Text(
+                          formatDate(_selectedDate),
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      DateTime.now().toString().split(" ")[0],
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        color: Colors.black.withOpacity(0.8),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  Container(
+                    height: 35.h,
+                    width: 35.w,
+                    child: SvgPicture.asset(ImageResource.calenderIcon),
+                  ),
+                ],
               ),
               Container(
-                height: 35.h,
-                width: 35.w,
-                child: SvgPicture.asset(ImageResource.calenderIcon),
+                clipBehavior: Clip.hardEdge,
+                margin: EdgeInsets.symmetric(horizontal: 14.w),
+                decoration: const BoxDecoration(
+                  color: Colors.transparent,
+                ),
+                child: TableCalendar(
+                  rowHeight: 55,
+                  firstDay: DateTime.utc(2020, 10, 16),
+                  lastDay: DateTime.utc(2030, 3, 14),
+                  focusedDay: _selectedDate,
+                  availableGestures: AvailableGestures.all,
+                  calendarFormat: CalendarFormat.week,
+                  daysOfWeekStyle: const DaysOfWeekStyle(
+                    weekdayStyle: TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
+                    weekendStyle: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w300,
+                      fontSize: 15,
+                    ),
+                  ),
+                  selectedDayPredicate: (day) {
+                    return isSameDay(_selectedDate, day);
+                  },
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDate = selectedDay;
+                      print("selectedDay: $selectedDay");
+                    });
+                  },
+                  calendarBuilders: CalendarBuilders(
+                    defaultBuilder: (context, date, _) {
+                      // Directly calculate completion without additional parsing
+                      double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
+                      return Container(
+                        child: Center(
+                          child: CircularPercentIndicator(
+                            radius: 20.0,
+                            lineWidth: 5.0,
+                            percent: completion,
+                            center: Text(
+                              "${date.day}",
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            progressColor: completion == 1.0 ? Colors.green : Colors.blue,
+                            backgroundColor: Colors.grey.shade300,
+                          ),
+                        ),
+                      );
+                    },
+                    todayBuilder: (context, date, _) {
+                      double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
+                      return Container(
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.transparent,
+                        ),
+                        child: Center(
+                          child: CircularPercentIndicator(
+                            radius: 20.0,
+                            lineWidth: 5.0,
+                            percent: completion,
+                            center: Text(
+                              "${date.day}",
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            progressColor: completion == 1.0 ? Colors.green : Colors.blue,
+                            backgroundColor: Colors.grey.shade300,
+                          ),
+                        ),
+                      );
+                    },
+                    selectedBuilder: (context, date, _) {
+                      double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
+                      log('completion of selected day $completion $date');
+                      return Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Center(
+                          child: CircularPercentIndicator(
+                            radius: 20.0,
+                            lineWidth: 5.0,
+                            percent: completion,
+                            center: Text(
+                              "${date.day}",
+                              style: const TextStyle(fontSize: 16, color: Colors.black),
+                            ),
+                            progressColor: completion == 1.0 ? Colors.green : Colors.red,
+                            backgroundColor: Colors.white60,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ],
           );
       }
           ),
           // Calendar
-          Container(
-            clipBehavior: Clip.hardEdge,
-            margin: EdgeInsets.symmetric(horizontal: 14.w),
-            decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent.withOpacity(0.09),
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            child: TableCalendar(
-              rowHeight: 55,
-              firstDay: DateTime.utc(2020, 10, 16),
-              lastDay: DateTime.utc(2030, 3, 14),
-              focusedDay: _selectedDate,
-              headerStyle: const HeaderStyle(
-                titleTextStyle: TextStyle(
-                  fontWeight: FontWeight.w300,
-                  fontSize: 24,
-                ),
-                formatButtonVisible: false,
-                titleCentered: true,
-              ),
-              availableGestures: AvailableGestures.all,
-              calendarFormat: CalendarFormat.week,
-              daysOfWeekStyle: const DaysOfWeekStyle(
-                weekdayStyle:
-                TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
-                weekendStyle: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.w300,
-                    fontSize: 15),
-              ),
-              selectedDayPredicate: (day) {
-                return isSameDay(_selectedDate, day);
-              },
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _selectedDate = selectedDay;
-                  print("selectedDay: $selectedDay");
-                });
-              },
-            ),
-          ),
           // Display habits for the selected date
           Expanded(
             child: Consumer<HabitProvider>(

@@ -36,6 +36,18 @@ class HabitProvider with ChangeNotifier {
     return _habits;
   }
 
+  double getAverageProgressForDate(DateTime date) {
+    // Calculate total progress for all habits, using 0.0 for habits without data for this date
+    double totalProgress = _habits.fold(0.0, (sum, habit) {
+      double progress = habit.progressJson[date]?.progress ?? 0.0;
+      return sum + progress;
+    });
+
+    // Return average progress based on all habits
+    return _habits.isEmpty ? 0.0 : totalProgress / _habits.length;
+  }
+
+
   void loadHabits(List<Habit> habits) {
     _habits = habits;
     notifyListeners();
