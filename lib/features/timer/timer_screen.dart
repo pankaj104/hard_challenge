@@ -71,7 +71,7 @@ class _TimerScreenState extends State<TimerScreen> {
     final progress = elapsedSeconds / totalSeconds;
 
     widget.habit.progressJson[widget.selectedDate]?.progress = progress;
-    Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(widget.habit, widget.selectedDate, progress);
+    Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(widget.habit, widget.selectedDate, progress, TaskStatus.done);
   }
 
   @override

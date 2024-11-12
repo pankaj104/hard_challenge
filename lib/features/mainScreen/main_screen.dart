@@ -27,7 +27,9 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedDate = DateTime.now();
+    _selectedDate = DateTime.now().toUtc();
+    _selectedDate = DateTime.utc(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    print('_selectedDate $_selectedDate'); // Output: 2024-11-10 00:00:00.000Z
   }
 
   String formatDate(DateTime date) {
@@ -106,106 +108,103 @@ class _MainScreenState extends State<MainScreen> {
                 decoration: const BoxDecoration(
                   color: Colors.transparent,
                 ),
-                child: TableCalendar(
-                  rowHeight: 55,
-                  firstDay: DateTime.utc(2020, 10, 16),
-                  lastDay: DateTime.utc(2030, 3, 14),
-                  focusedDay: _selectedDate,
-                  availableGestures: AvailableGestures.all,
-                  calendarFormat: CalendarFormat.week,
-                  daysOfWeekStyle: const DaysOfWeekStyle(
-                    weekdayStyle: TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
-                    weekendStyle: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.w300,
-                      fontSize: 15,
-                    ),
-                  ),
-                  selectedDayPredicate: (day) {
-                    return isSameDay(_selectedDate, day);
+                child: Consumer<HabitProvider>(
+                  builder: (context, habitProvider, child) {
+                    return Consumer<HabitProvider>(
+                        builder: (context, habitProvider, child) {
+                          return TableCalendar(
+                            rowHeight: 55,
+                            firstDay: DateTime.utc(2020, 10, 16),
+                            lastDay: DateTime.utc(2030, 3, 14),
+                            focusedDay: _selectedDate,
+                            availableGestures: AvailableGestures.all,
+                            calendarFormat: CalendarFormat.week,
+                            daysOfWeekStyle: const DaysOfWeekStyle(
+                              weekdayStyle: TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
+                              weekendStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.w300, fontSize: 15),
+                            ),
+                            selectedDayPredicate: (day) {
+                              return isSameDay(_selectedDate, day);
+                            },
+                            headerStyle: const HeaderStyle(
+                              formatButtonVisible: false,
+                              leftChevronVisible: false,
+                              rightChevronVisible: false,
+                              headerPadding: EdgeInsets.only(left: 10, bottom: 5, top: 5),
+                              titleTextStyle: TextStyle(fontSize: 0),
+                            ),
+                            onDaySelected: (selectedDay, focusedDay) {
+                              setState(() {
+                                _selectedDate = selectedDay;
+                              });
+                            },
+                            calendarBuilders: CalendarBuilders(
+                              defaultBuilder: (context, date, _) {
+                                log('date check $date');
+                                double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
+                                return Center(
+                                  child: CircularPercentIndicator(
+                                    radius: 20.0,
+                                    lineWidth: 5.0,
+                                    percent: completion,
+                                    center: Text(
+                                      "${date.day}",
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                    progressColor: completion == 1.0 ? Colors.green : Colors.blue,
+                                    backgroundColor: Colors.grey.shade300,
+                                  ),
+                                );
+                              },
+                              todayBuilder: (context, date, _) {
+                                log('date check1 $date');
+                                double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
+                                return Center(
+                                  child: CircularPercentIndicator(
+                                    radius: 20.0,
+                                    lineWidth: 5.0,
+                                    percent: completion,
+                                    center: Text(
+                                      "${date.day}",
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                    progressColor: completion == 1.0 ? Colors.green : Colors.blue,
+                                    backgroundColor: Colors.grey.shade300,
+                                  ),
+                                );
+                              },
+                              selectedBuilder: (context, date, _) {
+                                double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
+                                return Container(
+                                  height: 50,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                  child: Center(
+                                    child: CircularPercentIndicator(
+                                      radius: 20.0,
+                                      lineWidth: 5.0,
+                                      percent: completion,
+                                      center: Text(
+                                        "${date.day}",
+                                        style: const TextStyle(fontSize: 16, color: Colors.black),
+                                      ),
+                                      progressColor: completion == 1.0 ? Colors.green : Colors.red,
+                                      backgroundColor: Colors.white60,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      );
+
                   },
-                  headerStyle: const HeaderStyle(
-                    formatButtonVisible: false,
-                    leftChevronVisible: false,
-                    rightChevronVisible: false,
-                    headerPadding: EdgeInsets.only(left: 10, bottom: 5, top: 5),
-                    titleTextStyle: TextStyle(fontSize: 0)
-                  ),
-                  onDaySelected: (selectedDay, focusedDay) {
-                    setState(() {
-                      _selectedDate = selectedDay;
-                      print("selectedDay: $selectedDay");
-                    });
-                  },
-                  calendarBuilders: CalendarBuilders(
-                    defaultBuilder: (context, date, _) {
-                      // Directly calculate completion without additional parsing
-                      double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
-                      return Container(
-                        child: Center(
-                          child: CircularPercentIndicator(
-                            radius: 20.0,
-                            lineWidth: 5.0,
-                            percent: completion,
-                            center: Text(
-                              "${date.day}",
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            progressColor: completion == 1.0 ? Colors.green : Colors.blue,
-                            backgroundColor: Colors.grey.shade300,
-                          ),
-                        ),
-                      );
-                    },
-                    todayBuilder: (context, date, _) {
-                      double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
-                      return Container(
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.transparent,
-                        ),
-                        child: Center(
-                          child: CircularPercentIndicator(
-                            radius: 20.0,
-                            lineWidth: 5.0,
-                            percent: completion,
-                            center: Text(
-                              "${date.day}",
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            progressColor: completion == 1.0 ? Colors.green : Colors.blue,
-                            backgroundColor: Colors.grey.shade300,
-                          ),
-                        ),
-                      );
-                    },
-                    selectedBuilder: (context, date, _) {
-                      double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
-                      log('completion of selected day $completion $date');
-                      return Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: Center(
-                          child: CircularPercentIndicator(
-                            radius: 20.0,
-                            lineWidth: 5.0,
-                            percent: completion,
-                            center: Text(
-                              "${date.day}",
-                              style: const TextStyle(fontSize: 16, color: Colors.black),
-                            ),
-                            progressColor: completion == 1.0 ? Colors.green : Colors.red,
-                            backgroundColor: Colors.white60,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                )
+
               ),
             ],
           );
@@ -320,12 +319,20 @@ class _MainScreenState extends State<MainScreen> {
                                   ),
                                   SizedBox(width: 42.w),
                                   GestureDetector(
-                                    onTap: () => _handleHabitTap(
-                                        context, habit),
+                                    onTap: () {
+                                      setState(() {
+                                        log('print handle habit tap');
+                                        _handleHabitTap(
+                                            context, habit);
+                                      });
+
+                                    },
                                     child: Padding(
                                       padding: EdgeInsets.only(left: 22.w),
-                                      child: _buildTrailingWidget(
-                                          context, habit, progress),
+                                      child: Container(
+                                        child: _buildTrailingWidget(
+                                            context, habit, progress),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -379,7 +386,6 @@ class _MainScreenState extends State<MainScreen> {
               child: Text('${habit.value}')),
         );
       case TaskType.task:
-      default:
         return Padding(
           padding: EdgeInsets.only(left: 22.w),
           child: Container(
@@ -387,17 +393,54 @@ class _MainScreenState extends State<MainScreen> {
             width: 28.w,
             color: Colors.blue,
             child: Checkbox(
-              value: progress == 1.0,
+              value: habit.progressJson[_selectedDate]?.progress == 1.0,
               onChanged: (bool? value) {
                 setState(() {
+                  // Fetch the current status for the selected date
+                  TaskStatus? currentStatus = habit.progressJson[_selectedDate]?.status;
+
+                  // Log the current status (for debugging purposes)
+                  log('current status: $currentStatus');
+
                   double newProgress = value == true ? 1.0 : 0.0;
-                  Provider.of<HabitProvider>(context, listen: false)
-                      .updateHabitProgress(habit, _selectedDate, newProgress);
+                  TaskStatus newStatus;
+
+                  // Check the current status and toggle accordingly
+                  if (currentStatus == TaskStatus.reOpen) {
+                    // If the current status is 'reOpen', mark it as completed (done)
+                    newProgress = 1.0; // Mark progress as 100%
+                    newStatus = TaskStatus.done; // Change status to 'done'
+                  } else if (currentStatus == TaskStatus.done) {
+                    // If the task is already done, uncheck it (mark as reOpen)
+                    newProgress = 0.0; // Mark progress as 0%
+                    newStatus = TaskStatus.reOpen; // Change status to 'reOpen'
+                  } else if (currentStatus == TaskStatus.skipped) {
+                    // If the task was skipped, check it (mark as done)
+                    newProgress = 1.0; // Mark progress as 100%
+                    newStatus = TaskStatus.done; // Change status to 'done'
+                  }
+     else if (currentStatus == TaskStatus.missed) {
+    // If the task was skipped, check it (mark as done)
+    newProgress = 1.0; // Mark progress as 100%
+    newStatus = TaskStatus.done; // Change status to 'done'
+    }
+                  else {
+                    // Default case: Mark as 'done' (progress is 100% initially)
+                    newProgress = 1.0;
+                    newStatus = TaskStatus.done; // Set status to 'done'
+                  }
+
+                  // Update the habit progress for the selected date with the new status and progress
+                  Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, _selectedDate, newProgress, newStatus);
                 });
               },
-            ),
+            )
+
           ),
         );
+      default:
+        return Container();
+
     }
   }
 
@@ -420,13 +463,39 @@ class _MainScreenState extends State<MainScreen> {
         break;
       case TaskType.task:
         setState(() {
-          double newProgress =
-          (habit.progressJson[_selectedDate]?.progress ?? 0.0) == 1.0
-              ? 0.0
-              : 1.0;
-          Provider.of<HabitProvider>(context, listen: false)
-              .updateHabitProgress(habit, _selectedDate, newProgress);
+          // Get the current progress and status for the selected date
+          double currentProgress = habit.progressJson[_selectedDate]?.progress ?? 0.0;
+          TaskStatus currentStatus = habit.progressJson[_selectedDate]?.status ?? TaskStatus.missed;
+          log('current status init $currentStatus');
+
+          double newProgress;
+          TaskStatus newStatus;
+
+          // Check the current status and toggle accordingly
+          if (currentStatus == TaskStatus.reOpen) {
+            // If the current status is 'reOpen', mark it as completed (done)
+            newProgress = 1.0; // Mark progress as 100% (or any other appropriate value)
+            newStatus = TaskStatus.done; // Change status to 'done'
+          } else if (currentStatus == TaskStatus.done) {
+            log('current status $currentStatus');
+            // If the task is already done, uncheck it (mark as skipped)
+            newProgress = 0.0; // Mark progress as 0%
+            newStatus = TaskStatus.reOpen; // Change status to 'skipped'
+          } else if (currentStatus == TaskStatus.skipped) {
+            // If the task was skipped, check it (mark as done)
+            newProgress = 1.0; // Mark progress as 100%
+            newStatus = TaskStatus.done; // Change status to 'done'
+          } else {
+            // Default case: Mark as 'reOpen' (progress is 0% initially)
+            newProgress = 0.0;
+            newStatus = TaskStatus.reOpen; // Set status to 'reOpen'
+          }
+
+          // Update the habit progress for the selected date with the new status and progress
+          Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, _selectedDate, newProgress, newStatus);
         });
+
+
         break;
     }
   }
@@ -461,7 +530,7 @@ class _MainScreenState extends State<MainScreen> {
                       completedValue / (habit.value ?? 1);
                   Provider.of<HabitProvider>(context, listen: false)
                       .updateHabitProgress(
-                      habit, _selectedDate, newProgress);
+                      habit, _selectedDate, newProgress, TaskStatus.done);
                 });
                 Navigator.of(context).pop();
               },

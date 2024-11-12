@@ -26,9 +26,14 @@ class StatisticsHabitWiseScreen extends StatefulWidget {
 class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
   @override
   Widget build(BuildContext context) {
-    double completionPercentage = widget.habit.getCompletionPercentageByCategory(widget.habit.category);
-    double skippedPercentage = widget.habit.getSkippedPercentageByCategory(widget.habit.category);
-    double missedPercentage = widget.habit.getMissedPercentageByCategory(widget.habit.category);
+    double completionPercentage = Provider.of<HabitProvider>(context)
+        .getCompletionPercentageByCategory(widget.habit, widget.habit.category);
+
+    // widget.habit.getCompletionPercentageByCategory(widget.habit.category);
+    double skippedPercentage = Provider.of<HabitProvider>(context)
+        .getSkippedPercentageByCategory(widget.habit, widget.habit.category) ;
+    double missedPercentage = Provider.of<HabitProvider>(context)
+        .getMissedPercentageByCategory(widget.habit, widget.habit.category) ;
     log('data for statistics ${widget.habit}');
 
     return Scaffold(
@@ -77,12 +82,23 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
 
                       // Check if the task is already skipped
                       if (widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped) {
-                        // If skipped, set it back to normal
-                        Provider.of<HabitProvider>(context, listen: false).markTaskAsSkipped(widget.habit,widget.selectedDateforSkip, TaskStatus.reOpen);
+                        // If it's skipped, mark it as 'reOpen' (task needs to be reopened)
+                        Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
+                          widget.habit,
+                          widget.selectedDateforSkip,
+                          0.0, // Reset progress to 0
+                          TaskStatus.reOpen, // Mark as 'reOpen'
+                        );
                       } else {
-                        // If not skipped, mark it as skipped
-                        Provider.of<HabitProvider>(context, listen: false).markTaskAsSkipped(widget.habit,widget.selectedDateforSkip, TaskStatus.skipped);
+                        // If it's not skipped, mark it as skipped
+                        Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
+                          widget.habit,
+                          widget.selectedDateforSkip,
+                          0.0, // Mark progress as 0% (skipped)
+                          TaskStatus.skipped, // Mark status as 'skipped'
+                        );
                       }
+
                     });
                   },
                   child: widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped
@@ -105,11 +121,13 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                           CircularPercentIndicator(
                             radius: 100.0,
                             lineWidth: 20.0,
-                            percent:  widget.habit.getMissedPercentageByCategory(widget.habit.category)/100,
+                            percent:  Provider.of<HabitProvider>(context)
+                                .getMissedPercentageByCategory(widget.habit, widget.habit.category) / 100,
                             backgroundColor: Colors.transparent,
                             progressColor: Colors.blue[700],
                             circularStrokeCap: CircularStrokeCap.round,
                           ),
+
 
                           /// Skipped percentage
                           CircularPercentIndicator(
