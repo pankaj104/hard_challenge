@@ -19,6 +19,7 @@ enum TaskStatus {
   done,
   missed,
   skipped,
+  reOpen
 }
 
 class ProgressWithStatus {
@@ -106,9 +107,13 @@ class Habit {
     progressJson[date] = ProgressWithStatus(status: TaskStatus.missed, progress: 0.0);
   }
 
-  void markTaskAsSkipped(DateTime date) {
+  void markTaskAsSkipped(DateTime date, TaskStatus status) {
     progressJson[date] = ProgressWithStatus(status: TaskStatus.skipped, progress: 0.0);
   }
+
+  // void markTaskAsreOpen(DateTime date, TaskStatus status) {
+  //   progressJson[date] = ProgressWithStatus(status: TaskStatus.reOpen, progress: 0.0);
+  // }
 
   void updateProgress(DateTime date, double progressValue) {
     if (progressJson.containsKey(date)) {

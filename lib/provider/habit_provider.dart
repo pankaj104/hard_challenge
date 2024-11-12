@@ -53,6 +53,11 @@ class HabitProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void markTaskAsSkipped(Habit habit, DateTime date, TaskStatus status) {
+    habit.progressJson[date] = ProgressWithStatus(status: status, progress: 0.0);
+    notifyListeners(); // Notify listeners of data change
+  }
+  
   Map<DateTime, List<Habit>> getHabitsForSelectedDates() {
     Map<DateTime, List<Habit>> habitsByDate = {};
     for (var habit in _habits) {

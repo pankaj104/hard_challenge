@@ -304,7 +304,8 @@ class _MainScreenState extends State<MainScreen> {
                                           padding:
                                           EdgeInsets.only(left: 10.w),
                                           child: Text(
-                                            isSkipped
+                                            habit.progressJson[_selectedDate]?.status ==
+                                                TaskStatus.skipped
                                                 ? 'Skipped'
                                                 : '${habit.category}',
                                             style: TextStyle(
@@ -323,13 +324,8 @@ class _MainScreenState extends State<MainScreen> {
                                         context, habit),
                                     child: Padding(
                                       padding: EdgeInsets.only(left: 22.w),
-                                      child: Container(
-                                        height: 28.h,
-                                        width: 28.w,
-                                        color: Colors.blue,
-                                        child: _buildTrailingWidget(
-                                            context, habit, progress),
-                                      ),
+                                      child: _buildTrailingWidget(
+                                          context, habit, progress),
                                     ),
                                   ),
                                 ],
@@ -358,27 +354,53 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _buildTrailingWidget(
-      BuildContext context, Habit habit, double progress) {
+  Widget _buildTrailingWidget(BuildContext context, Habit habit, double progress) {
+    // Check if the task status is skipped
+    if (habit.progressJson[_selectedDate]?.status == TaskStatus.skipped) {
+      return const SizedBox.shrink(); // Return an empty widget
+    }
     switch (habit.taskType) {
       case TaskType.time:
-        return const Icon(Icons.timer);
+        return Padding(
+          padding: EdgeInsets.only(left: 22.w),
+          child: Container(
+              height: 28.h,
+              width: 28.w,
+              color: Colors.blue,
+              child: const Icon(Icons.timer)),
+        );
       case TaskType.count:
-        return Text('${habit.value}');
+        return Padding(
+          padding: EdgeInsets.only(left: 22.w),
+          child: Container(
+              height: 28.h,
+              width: 28.w,
+              color: Colors.blue,
+              child: Text('${habit.value}')),
+        );
       case TaskType.task:
       default:
-        return Checkbox(
-          value: progress == 1.0,
-          onChanged: (bool? value) {
-            setState(() {
-              double newProgress = value == true ? 1.0 : 0.0;
-              Provider.of<HabitProvider>(context, listen: false)
-                  .updateHabitProgress(habit, _selectedDate, newProgress);
-            });
-          },
+        return Padding(
+          padding: EdgeInsets.only(left: 22.w),
+          child: Container(
+            height: 28.h,
+            width: 28.w,
+            color: Colors.blue,
+            child: Checkbox(
+              value: progress == 1.0,
+              onChanged: (bool? value) {
+                setState(() {
+                  double newProgress = value == true ? 1.0 : 0.0;
+                  Provider.of<HabitProvider>(context, listen: false)
+                      .updateHabitProgress(habit, _selectedDate, newProgress);
+                });
+              },
+            ),
+          ),
         );
     }
   }
+
 
   void _handleHabitTap(BuildContext context, Habit habit) {
     switch (habit.taskType) {

@@ -2,7 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:provider/provider.dart';
 import '../../model/habit_model.dart';
 import '../../utils/image_resource.dart';
 import '../../widgets/calendar_widget.dart';
@@ -69,21 +71,25 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                : SizedBox(),
               const SizedBox(height: 16),
               Center(
-                child: ElevatedButton(onPressed: (){
-                  setState(() {
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
 
-                    widget.habit.progressJson[widget.selectedDateforSkip] = ProgressWithStatus(
-                      status: TaskStatus.skipped,
-                      progress: 0.0,
-                    );
-
-
-                  });
-
-                }, child: widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped
-                    ? Text("${TaskStatus.skipped} ")
-                    : Text("Skip this session ${widget.selectedDateforSkip.day} Date"),
+                      // Check if the task is already skipped
+                      if (widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped) {
+                        // If skipped, set it back to normal
+                        Provider.of<HabitProvider>(context, listen: false).markTaskAsSkipped(widget.habit,widget.selectedDateforSkip, TaskStatus.reOpen);
+                      } else {
+                        // If not skipped, mark it as skipped
+                        Provider.of<HabitProvider>(context, listen: false).markTaskAsSkipped(widget.habit,widget.selectedDateforSkip, TaskStatus.skipped);
+                      }
+                    });
+                  },
+                  child: widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped
+                      ? Text("Skipped")  // Text to show when skipped
+                      : Text("Skip Task of ${widget.selectedDateforSkip.day} Date"),  // Text to show normally
                 ),
+
               ),
               Text('Category: ${widget.habit.category}', style: const TextStyle(fontSize: 18)),
               const SizedBox(height: 16),
