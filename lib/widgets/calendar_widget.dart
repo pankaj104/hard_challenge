@@ -54,14 +54,18 @@ class _CalendarPageState extends State<CalendarPage> {
 
   List<DateTime> habitMissedDateStore(Habit habit) {
     List<DateTime> habitMissedDateList = [];
-    DateTime now = DateTime.now();
+    DateTime nowWithUtc = DateTime.now().toUtc();
+    DateTime now = DateTime.utc(nowWithUtc.year, nowWithUtc.month, nowWithUtc.day);
 
-    // Define start and end dates for iteration
-    DateTime startDate = habit.startDate ?? now;
-    DateTime endDate = habit.endDate ?? now;
+    log('test now $now');
 
-    // Iterate over the date range from startDate to endDate
-    for (DateTime date = startDate; date.isBefore(now) || date.isAtSameMomentAs(now); date = date.add(const Duration(days: 1))) {
+    DateTime habitStartDate = habit.startDate ?? now;
+    DateTime startDate = DateTime.utc(habitStartDate.year, habitStartDate.month, habitStartDate.day);
+
+    // DateTime endDate = habit.endDate ?? now;
+
+    // Iterate over the date range from startDate to one day before 'now'
+    for (DateTime date = startDate; date.isBefore(now); date = date.add(const Duration(days: 1))) {
       bool isValidDate = false;
 
       // Check based on repeat type
@@ -74,7 +78,6 @@ class _CalendarPageState extends State<CalendarPage> {
           isValidDate = true;
         }
       } else if (habit.repeatType == RepeatType.weekly) {
-        // Weekly repetition is handled similarly to selectDays here, but you might need to adjust based on specific rules.
         isValidDate = habit.days!.contains(date.weekday % 7);
       } else if (habit.repeatType == RepeatType.monthly) {
         if (habit.selectedDates != null && habit.selectedDates!.any((d) => d.month == date.month && d.day == date.day)) {
@@ -89,6 +92,8 @@ class _CalendarPageState extends State<CalendarPage> {
         habitMissedDateList.add(date);
       }
     }
+
+    log ('habitMissedDateList $habitMissedDateList');
 
     return habitMissedDateList;
   }
