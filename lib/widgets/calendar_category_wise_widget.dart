@@ -114,7 +114,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
         firstDay: DateTime.utc(2022, 1, 1),
         lastDay: DateTime.utc(2030, 12, 31),
         focusedDay: _focusedDay,
-        calendarFormat: _calendarFormat,
+        calendarFormat: CalendarFormat.month,
         selectedDayPredicate: (day) {
           return isSameDay(_selectedDay, day);
         },
@@ -124,13 +124,13 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
             _focusedDay = focusedDay; // update `_focusedDay` here as well
           });
         },
-        onFormatChanged: (format) {
-          if (_calendarFormat != format) {
-            setState(() {
-              _calendarFormat = format;
-            });
-          }
-        },
+        // onFormatChanged: (format) {
+        //   if (_calendarFormat != format) {
+        //     setState(() {
+        //       _calendarFormat = format;
+        //     });
+        //   }
+        // },
         onPageChanged: (focusedDay) {
           _focusedDay = focusedDay;
         },
@@ -158,6 +158,112 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     color: const Color(0xff079455),
                     borderRadius: BorderRadius.circular(9.6)
                   ),
+
+                    child: SvgPicture.asset(ImageResource.doneTick, height: 10, width: 10,)),
+              );
+
+              //   Container(
+              //   margin: const EdgeInsets.all(6.0),
+              //   alignment: Alignment.center,
+              //   decoration: BoxDecoration(
+              //     color: Colors.green,
+              //     shape: BoxShape.circle,
+              //   ),
+              //   child: Text(
+              //     '${date.day}',
+              //     style: TextStyle(color: Colors.white),
+              //   ),
+              // );
+            } else if (habitMissedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+              return Center(
+                child: Container(
+                    height: 32,
+                    width: 35,
+                    decoration: BoxDecoration(
+                        color: const Color(0xffD92D20),
+                        borderRadius: BorderRadius.circular(9.6)
+                    ),
+
+                    child: SvgPicture.asset(ImageResource.crossTick, height: 10, width: 10,)),
+              );
+            } else if (habitSkippedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+              return Center(
+                child: Container(
+                    height: 32,
+                    width: 35,
+                    decoration: BoxDecoration(
+                        color: const Color(0xffF79009),
+                        borderRadius: BorderRadius.circular(9.6)
+                    ),
+
+                    child: SvgPicture.asset(ImageResource.skipTick, height: 10, width: 10,)),
+              );
+            }
+            return null;
+          },
+          todayBuilder: (context, date, events) {
+            if (habitDoneDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+              return Center(
+                child: Container(
+                    height: 32,
+                    width: 35,
+                    decoration: BoxDecoration(
+                        color: const Color(0xff079455),
+                        borderRadius: BorderRadius.circular(9.6)
+                    ),
+
+                    child: SvgPicture.asset(ImageResource.doneTick, height: 10, width: 10,)),
+              );
+
+              //   Container(
+              //   margin: const EdgeInsets.all(6.0),
+              //   alignment: Alignment.center,
+              //   decoration: BoxDecoration(
+              //     color: Colors.green,
+              //     shape: BoxShape.circle,
+              //   ),
+              //   child: Text(
+              //     '${date.day}',
+              //     style: TextStyle(color: Colors.white),
+              //   ),
+              // );
+            } else if (habitMissedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+              return Center(
+                child: Container(
+                    height: 32,
+                    width: 35,
+                    decoration: BoxDecoration(
+                        color: const Color(0xffD92D20),
+                        borderRadius: BorderRadius.circular(9.6)
+                    ),
+
+                    child: SvgPicture.asset(ImageResource.crossTick, height: 10, width: 10,)),
+              );
+            } else if (habitSkippedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+              return Center(
+                child: Container(
+                    height: 32,
+                    width: 35,
+                    decoration: BoxDecoration(
+                        color: const Color(0xffF79009),
+                        borderRadius: BorderRadius.circular(9.6)
+                    ),
+
+                    child: SvgPicture.asset(ImageResource.skipTick, height: 10, width: 10,)),
+              );
+            }
+            return null;
+          },
+          selectedBuilder: (context, date, events) {
+            if (habitDoneDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+              return Center(
+                child: Container(
+                    height: 32,
+                    width: 35,
+                    decoration: BoxDecoration(
+                        color: const Color(0xff079455),
+                        borderRadius: BorderRadius.circular(9.6)
+                    ),
 
                     child: SvgPicture.asset(ImageResource.doneTick, height: 10, width: 10,)),
               );

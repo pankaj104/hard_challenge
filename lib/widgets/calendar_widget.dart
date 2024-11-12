@@ -105,7 +105,7 @@ class _CalendarPageState extends State<CalendarPage> {
           firstDay: DateTime.utc(2022, 1, 1),
           lastDay: DateTime.utc(2030, 12, 31),
           focusedDay: _focusedDay,
-          calendarFormat: _calendarFormat,
+          calendarFormat: CalendarFormat.month,
           selectedDayPredicate: (day) {
             return isSameDay(_selectedDay, day);
           },
@@ -114,13 +114,6 @@ class _CalendarPageState extends State<CalendarPage> {
               _selectedDay = selectedDay;
               _focusedDay = focusedDay; // update `_focusedDay` here as well
             });
-          },
-          onFormatChanged: (format) {
-            if (_calendarFormat != format) {
-              setState(() {
-                _calendarFormat = format;
-              });
-            }
           },
           onPageChanged: (focusedDay) {
             _focusedDay = focusedDay;
@@ -188,6 +181,101 @@ class _CalendarPageState extends State<CalendarPage> {
 
               return null;
             },
+            todayBuilder: (context, date, events) {
+              if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, date))) {
+                return Center(
+                  child: Container(
+                      height: 32,
+                      width: 35,
+                      decoration: BoxDecoration(
+                          color: const Color(0xff079455),
+                          borderRadius: BorderRadius.circular(9.6)
+                      ),
+
+                      child: SvgPicture.asset(ImageResource.doneTick, height: 10, width: 10,)),
+                );
+              }
+
+
+
+              if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
+                return Center(
+                  child: Container(
+                      height: 32,
+                      width: 35,
+                      decoration: BoxDecoration(
+                          color: const Color(0xffF79009),
+                          borderRadius: BorderRadius.circular(9.6)
+                      ),
+
+                      child: SvgPicture.asset(ImageResource.skipTick, height: 10, width: 10,)),
+                );
+              }
+
+              if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
+                return Center(
+                  child: Container(
+                      height: 32,
+                      width: 35,
+                      decoration: BoxDecoration(
+                          color: const Color(0xffD92D20),
+                          borderRadius: BorderRadius.circular(9.6)
+                      ),
+
+                      child: SvgPicture.asset(ImageResource.crossTick, height: 10, width: 10,)),
+                );
+              }
+
+              return null;
+            },
+            selectedBuilder: (context, date, events) {
+              if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, date))) {
+                return Center(
+                  child: Container(
+                      height: 32,
+                      width: 35,
+                      decoration: BoxDecoration(
+                          color: const Color(0xff079455),
+                          borderRadius: BorderRadius.circular(9.6)
+                      ),
+
+                      child: SvgPicture.asset(ImageResource.doneTick, height: 10, width: 10,)),
+                );
+              }
+
+
+
+              if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
+                return Center(
+                  child: Container(
+                      height: 32,
+                      width: 35,
+                      decoration: BoxDecoration(
+                          color: const Color(0xffF79009),
+                          borderRadius: BorderRadius.circular(9.6)
+                      ),
+
+                      child: SvgPicture.asset(ImageResource.skipTick, height: 10, width: 10,)),
+                );
+              }
+
+              if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
+                return Center(
+                  child: Container(
+                      height: 32,
+                      width: 35,
+                      decoration: BoxDecoration(
+                          color: const Color(0xffD92D20),
+                          borderRadius: BorderRadius.circular(9.6)
+                      ),
+
+                      child: SvgPicture.asset(ImageResource.crossTick, height: 10, width: 10,)),
+                );
+              }
+
+              return null;
+            },
+
           ),
         ),
 

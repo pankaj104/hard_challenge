@@ -124,6 +124,13 @@ class _MainScreenState extends State<MainScreen> {
                   selectedDayPredicate: (day) {
                     return isSameDay(_selectedDate, day);
                   },
+                  headerStyle: const HeaderStyle(
+                    formatButtonVisible: false,
+                    leftChevronVisible: false,
+                    rightChevronVisible: false,
+                    headerPadding: EdgeInsets.only(left: 10, bottom: 5, top: 5),
+                    titleTextStyle: TextStyle(fontSize: 0)
+                  ),
                   onDaySelected: (selectedDay, focusedDay) {
                     setState(() {
                       _selectedDate = selectedDay;
