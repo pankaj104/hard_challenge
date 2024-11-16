@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:hard_challenge/widgets/number_picker.dart';
 
@@ -75,6 +77,7 @@ class _CounterWidgetState extends State<CounterWidget> {
                   (int selectedNumber) {
                 setState(() {
                   _currentValue = selectedNumber; // Update the current value
+                  log('_currentValue $_currentValue selectedNumber $selectedNumber');
                 });
               },
             );

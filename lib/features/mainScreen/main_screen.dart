@@ -217,11 +217,6 @@ class _MainScreenState extends State<MainScreen> {
               builder: (context, habitProvider, child) {
                 List<Habit> habitsForSelectedDate =
                 habitProvider.getHabitsForDate(_selectedDate);
-
-                String taskProgressDataWithDateWise (DateTime date){
-                  return 'sdfsd';
-                }
-
                 return ListView.builder(
                   itemCount: habitsForSelectedDate.length,
                   itemBuilder: (context, index) {
@@ -294,7 +289,7 @@ class _MainScreenState extends State<MainScreen> {
                                         );
                                       },
                                       child: Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                        padding: EdgeInsets.only(left: 12.w),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           mainAxisAlignment: MainAxisAlignment.center,
@@ -305,7 +300,9 @@ class _MainScreenState extends State<MainScreen> {
                                                 fontWeight: FontWeight.w600,
                                                 color: Colors.black,
                                                 fontSize: 20.sp,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
+                                              maxLines: 1,
                                             ),
                                             SizedBox(height: 2),
                                             Row(
@@ -342,13 +339,6 @@ class _MainScreenState extends State<MainScreen> {
                                   ),
 
                                   // Trailing widget
-                                  // GestureDetector(
-                                  //   onTap: () {
-                                  //     setState(() {
-                                  //       log('Handle habit tap');
-                                  //       _handleHabitTap(context, habit);
-                                  //     });
-                                  //   },
                                     Padding(
                                       padding: EdgeInsets.only(left: 0),
                                       child: _buildTrailingWidget(context, habit, progress),
@@ -400,10 +390,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
             );
-            },          child: Padding(
-            padding: EdgeInsets.only(left: 65.w),
-            child: const Icon(Icons.play_arrow_rounded),
-          ),
+            },          child: const Icon(Icons.play_arrow_rounded),
         );
       case TaskType.count:
         return GestureDetector(
@@ -509,18 +496,39 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  // String formatDuration(Duration duration) {
+  //   String twoDigits(int n) => n.toString().padLeft(2, '0');
+  //
+  //   int hours = duration.inHours;
+  //   String minutes = twoDigits(duration.inMinutes.remainder(60));
+  //   String seconds = twoDigits(duration.inSeconds.remainder(60));
+  //
+  //   if (hours > 0) {
+  //     return "$hours:$minutes:$seconds";  // Format as HH:MM:SS when hours > 0
+  //   } else {
+  //     return "$minutes:$seconds";  // Format as MM:SS when hours == 0
+  //   }
+  // }
   String formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+    int hours = duration.inHours;
     String minutes = twoDigits(duration.inMinutes.remainder(60));
     String seconds = twoDigits(duration.inSeconds.remainder(60));
-    return "$minutes:$seconds";
+
+    // Always return HH:MM:SS format
+    return "$hours:$minutes:$seconds";
   }
+
+
+
   String _buildTrailingString(BuildContext context, Habit habit) {
     switch (habit.taskType) {
       case TaskType.time:
 
         Duration runningDuration = habit.progressJson[_selectedDate]?.duration ?? Duration();
         return '${formatDuration(runningDuration)}/${formatDuration(habit.timer!)}';
+
       case TaskType.count:
         int multipliedProgress = ((habit.progressJson[_selectedDate]?.progress ?? 0.0) * (habit.value ?? 1.0)).toInt();
         return '$multipliedProgress/${(habit.value!)}';
