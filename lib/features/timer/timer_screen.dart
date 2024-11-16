@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../model/habit_model.dart';
@@ -25,13 +24,22 @@ class _TimerScreenState extends State<TimerScreen> {
   void initState() {
     super.initState();
     _initialDuration = widget.habit.timer!;
-    _duration = _initialDuration;
+    // Calculate remaining duration based on the saved progress
+    final savedElapsedDuration = widget.habit.progressJson[widget.selectedDate]?.duration ?? Duration.zero;
+
+    // Make sure _duration is non-negative
+    _duration = _initialDuration - savedElapsedDuration;
+    if (_duration.isNegative) {
+      _duration = Duration.zero;  // Reset to zero if negative
+    }
   }
 
   void _startTimer() {
     setState(() {
       _isRunning = true;
     });
+
+    // Start the timer and update _duration every second
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         if (_duration.inSeconds > 0) {
@@ -57,12 +65,21 @@ class _TimerScreenState extends State<TimerScreen> {
     setState(() {
       _isRunning = false;
       _timer?.cancel();
-      _duration = _initialDuration;
+      _duration = Duration.zero;
       _updateProgress(complete: true);
       widget.habit.progressJson[widget.selectedDate]?.status = TaskStatus.done;
-
     });
     Navigator.of(context).pop();
+  }
+
+  void _resetTimer() {
+    // Reset the timer to its initial duration and stop the current timer
+    setState(() {
+      _isRunning = false;
+      _timer?.cancel();
+      _duration = _initialDuration;  // Reset _duration to initial value
+    });
+    _updateProgress();
   }
 
   void _updateProgress({bool complete = false}) {
@@ -70,13 +87,26 @@ class _TimerScreenState extends State<TimerScreen> {
     final elapsedSeconds = complete ? totalSeconds : totalSeconds - _duration.inSeconds;
     final progress = elapsedSeconds / totalSeconds;
 
+    // Save the current remaining duration in ProgressWithStatus's duration field
+    widget.habit.progressJson[widget.selectedDate]?.duration = _initialDuration - _duration;
     widget.habit.progressJson[widget.selectedDate]?.progress = progress;
-    Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(widget.habit, widget.selectedDate, progress, TaskStatus.done);
+
+    // Update the habit progress in the provider
+    Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
+      widget.habit,
+      widget.selectedDate,
+      progress,
+      complete ? TaskStatus.done : TaskStatus.goingOn,
+      Duration(seconds: elapsedSeconds),
+    );
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    if (!_isRunning) {
+      _updateProgress();
+    }
     super.dispose();
   }
 
@@ -111,6 +141,11 @@ class _TimerScreenState extends State<TimerScreen> {
                 ElevatedButton(
                   onPressed: _completeTimer,
                   child: const Text('Complete'),
+                ),
+                const SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: _resetTimer,
+                  child: const Text('Reset'),
                 ),
               ],
             ),

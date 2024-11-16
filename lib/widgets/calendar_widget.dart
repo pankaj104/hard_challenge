@@ -92,9 +92,6 @@ class _CalendarPageState extends State<CalendarPage> {
         habitMissedDateList.add(date);
       }
     }
-
-    log ('habitMissedDateList $habitMissedDateList');
-
     return habitMissedDateList;
   }
 

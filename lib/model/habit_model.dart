@@ -1,3 +1,4 @@
+// habit_model.dart
 import 'package:flutter/material.dart';
 
 enum TaskType {
@@ -17,14 +18,37 @@ enum TaskStatus {
   done,
   missed,
   skipped,
-  reOpen
+  reOpen,
+  goingOn
 }
 
 class ProgressWithStatus {
   TaskStatus status;
   double progress;
+  Duration? duration;
 
-  ProgressWithStatus({required this.status, required this.progress});
+  ProgressWithStatus({
+    required this.status,
+    required this.progress,
+    this.duration,
+  });
+
+  // Add fromMap method
+  factory ProgressWithStatus.fromMap(Map<String, dynamic> map) {
+    return ProgressWithStatus(
+      status: TaskStatus.values[map['status']], // Assumes status is saved as an int index
+      progress: map['progress'],
+      duration: map['duration'] != null ? Duration(seconds: map['duration']) : null,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'status': status.index, // Save the enum as an index
+      'progress': progress,
+      'duration': duration?.inSeconds, // Save duration as seconds
+    };
+  }
 
   @override
   String toString() {

@@ -54,6 +54,8 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,7 +142,6 @@ class _MainScreenState extends State<MainScreen> {
                             },
                             calendarBuilders: CalendarBuilders(
                               defaultBuilder: (context, date, _) {
-                                log('date check $date');
                                 double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
                                 return Center(
                                   child: CircularPercentIndicator(
@@ -157,7 +158,6 @@ class _MainScreenState extends State<MainScreen> {
                                 );
                               },
                               todayBuilder: (context, date, _) {
-                                log('date check1 $date');
                                 double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
                                 return Center(
                                   child: CircularPercentIndicator(
@@ -217,6 +217,11 @@ class _MainScreenState extends State<MainScreen> {
               builder: (context, habitProvider, child) {
                 List<Habit> habitsForSelectedDate =
                 habitProvider.getHabitsForDate(_selectedDate);
+
+                String taskProgressDataWithDateWise (DateTime date){
+                  return 'sdfsd';
+                }
+
                 return ListView.builder(
                   itemCount: habitsForSelectedDate.length,
                   itemBuilder: (context, index) {
@@ -233,108 +238,122 @@ class _MainScreenState extends State<MainScreen> {
                         clipBehavior: Clip.hardEdge,
                         margin: EdgeInsets.symmetric(horizontal: 14.w),
                         decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(22.w),
-                          boxShadow: const [
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
                             BoxShadow(
                               offset: Offset(0.0, 4.0),
-                              color: Colors.grey,
-                              blurRadius: 4.0,
-                              spreadRadius: 0.0,
+                              color: Colors.grey.withOpacity(0.5),
+                              blurRadius: 2.0,
+                              spreadRadius: 1.0,
                             ),
                           ],
                         ),
-                        height: 65.h,
-                        width: double.infinity,
+                        height: 65,
                         child: Stack(
                           children: [
+                            // Progress indicator background
                             Positioned.fill(
                               child: LinearProgressIndicator(
                                 value: isSkipped ? 0.0 : progress,
-                                color: Colors.blue.withAlpha(100),
+                                color: Colors.blue.withOpacity(0.3),
                                 backgroundColor: Colors.white,
                               ),
                             ),
+
+                            // Content
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10.h),
+                              padding: EdgeInsets.symmetric(horizontal: 15.w),
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Padding(
-                                    padding:
-                                    EdgeInsets.only(left: 5.w, right: 15.w),
-                                    child: Container(
-                                      height: 50.h,
-                                      width: 48.w,
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                        BorderRadius.circular(18.w),
-                                        color: habit.iconBgColor
-                                      ),
-                                      child: Icon(habit.habitIcon, size: 20,),
+                                  // Icon container
+                                  Container(
+                                    height: 50,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                      color: habit.iconBgColor,
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
+                                    child: Icon(habit.habitIcon, size: 24.sp, color: Colors.white),
                                   ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              StatisticsHabitWiseScreen(
-                                                habit: habit,
-                                                selectedDateforSkip: _selectedDate,),
-                                        ),
-                                      );
-                                    },
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              top: 5.h, left: 10.w),
-                                          child: Text(
-                                            habit.title,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.black,
-                                                fontSize: 21),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                          EdgeInsets.only(left: 10.w),
-                                          child: Text(
-                                            habit.progressJson[_selectedDate]?.status ==
-                                                TaskStatus.skipped
-                                                ? 'Skipped'
-                                                : '${habit.category}',
-                                            style: TextStyle(
-                                              color: Colors.black
-                                                  .withOpacity(0.7),
-                                              fontSize: 19,
+
+                                  // Habit details
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => StatisticsHabitWiseScreen(
+                                              habit: habit,
+                                              selectedDateforSkip: _selectedDate,
                                             ),
                                           ),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              habit.title,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.black,
+                                                fontSize: 20.sp,
+                                              ),
+                                            ),
+                                            SizedBox(height: 2),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  habit.progressJson[_selectedDate]?.status == TaskStatus.skipped
+                                                      ? 'Skipped'
+                                                      : habit.category,
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 13.sp,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 5.w), // Dynamic width spacing for better responsiveness
+                                                Container(
+                                                  height: 15.h, // Adjust height as needed
+                                                  width: 1, // Thin vertical line
+                                                  color: Colors.black, // Divider color
+                                                  margin: EdgeInsets.symmetric(horizontal: 5.w),
+                                                ),
+                                                Text(
+                                                  _buildTrailingString(context,habit),
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 13.sp,
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(width: 42.w),
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        log('print handle habit tap');
-                                        _handleHabitTap(
-                                            context, habit);
-                                      });
-
-                                    },
-                                    child: Padding(
-                                      padding: EdgeInsets.only(left: 22.w),
-                                      child: Container(
-                                        child: _buildTrailingWidget(
-                                            context, habit, progress),
                                       ),
                                     ),
                                   ),
+
+                                  // Trailing widget
+                                  // GestureDetector(
+                                  //   onTap: () {
+                                  //     setState(() {
+                                  //       log('Handle habit tap');
+                                  //       _handleHabitTap(context, habit);
+                                  //     });
+                                  //   },
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 0),
+                                      child: _buildTrailingWidget(context, habit, progress),
+                                    ),
+                                  // ),
                                 ],
                               ),
                             ),
@@ -342,6 +361,8 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                       ),
                     );
+
+
                   },
                 );
               },
@@ -368,30 +389,74 @@ class _MainScreenState extends State<MainScreen> {
     }
     switch (habit.taskType) {
       case TaskType.time:
-        return Padding(
-          padding: EdgeInsets.only(left: 22.w),
-          child: Container(
-              height: 28.h,
-              width: 28.w,
-              color: Colors.blue,
-              child: const Icon(Icons.timer)),
+        return GestureDetector(
+          onTap: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TimerScreen(
+                  habit: habit,
+                  selectedDate: _selectedDate,
+                ),
+              ),
+            );
+            },          child: Padding(
+            padding: EdgeInsets.only(left: 65.w),
+            child: const Icon(Icons.play_arrow_rounded),
+          ),
         );
       case TaskType.count:
-        return Padding(
-          padding: EdgeInsets.only(left: 22.w),
-          child: Container(
-              height: 28.h,
-              width: 28.w,
-              color: Colors.blue,
-              child: Text('${habit.value}')),
+        return GestureDetector(
+          onTap: (){
+            _completeValueTask(context, habit);
+          },
+          child: Padding(
+              padding: EdgeInsets.only(left: 65.w),
+            child: (habit.progressJson[_selectedDate]?.progress ?? 0.0) < 1.0
+                ? Icon(Icons.add_rounded)
+                : Icon(Icons.check_rounded),
+          ),
         );
       case TaskType.task:
-        return Padding(
-          padding: EdgeInsets.only(left: 22.w),
-          child: Container(
-            height: 28.h,
-            width: 28.w,
-            color: Colors.blue,
+        return GestureDetector(
+          onTap: (){
+            setState(() {
+              // Get the current progress and status for the selected date
+              double currentProgress = habit.progressJson[_selectedDate]?.progress ?? 0.0;
+              TaskStatus currentStatus = habit.progressJson[_selectedDate]?.status ?? TaskStatus.missed;
+              log('current status init $currentStatus');
+
+              double newProgress;
+              TaskStatus newStatus;
+
+              // Check the current status and toggle accordingly
+              if (currentStatus == TaskStatus.reOpen) {
+                // If the current status is 'reOpen', mark it as completed (done)
+                newProgress = 1.0; // Mark progress as 100% (or any other appropriate value)
+                newStatus = TaskStatus.done; // Change status to 'done'
+              } else if (currentStatus == TaskStatus.done) {
+                log('current status $currentStatus');
+                // If the task is already done, uncheck it (mark as skipped)
+                newProgress = 0.0; // Mark progress as 0%
+                newStatus = TaskStatus.reOpen; // Change status to 'skipped'
+              } else if (currentStatus == TaskStatus.skipped) {
+                // If the task was skipped, check it (mark as done)
+                newProgress = 1.0; // Mark progress as 100%
+                newStatus = TaskStatus.done; // Change status to 'done'
+              } else {
+                // Default case: Mark as 'reOpen' (progress is 0% initially)
+                newProgress = 0.0;
+                newStatus = TaskStatus.reOpen; // Set status to 'reOpen'
+              }
+
+              // Update the habit progress for the selected date with the new status and progress
+              Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, _selectedDate, newProgress, newStatus, null);
+            });
+
+
+          },
+          child: Padding(
+            padding: EdgeInsets.only(left: 65.w),
             child: Checkbox(
               value: habit.progressJson[_selectedDate]?.progress == 1.0,
               onChanged: (bool? value) {
@@ -419,11 +484,12 @@ class _MainScreenState extends State<MainScreen> {
                     newProgress = 1.0; // Mark progress as 100%
                     newStatus = TaskStatus.done; // Change status to 'done'
                   }
-     else if (currentStatus == TaskStatus.missed) {
-    // If the task was skipped, check it (mark as done)
-    newProgress = 1.0; // Mark progress as 100%
-    newStatus = TaskStatus.done; // Change status to 'done'
-    }
+                 else if (currentStatus == TaskStatus.missed) {
+                // If the task was skipped, check it (mark as done)
+                newProgress = 1.0; // Mark progress as 100%
+                newStatus = TaskStatus.done; // Change status to 'done'
+                }
+
                   else {
                     // Default case: Mark as 'done' (progress is 100% initially)
                     newProgress = 1.0;
@@ -431,11 +497,10 @@ class _MainScreenState extends State<MainScreen> {
                   }
 
                   // Update the habit progress for the selected date with the new status and progress
-                  Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, _selectedDate, newProgress, newStatus);
+                  Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, _selectedDate, newProgress, newStatus, null);
                 });
               },
-            )
-
+            ),
           ),
         );
       default:
@@ -444,101 +509,53 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-
-  void _handleHabitTap(BuildContext context, Habit habit) {
+  String formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$minutes:$seconds";
+  }
+  String _buildTrailingString(BuildContext context, Habit habit) {
     switch (habit.taskType) {
       case TaskType.time:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TimerScreen(
-              habit: habit,
-              selectedDate: _selectedDate,
-            ),
-          ),
-        );
-        break;
+
+        Duration runningDuration = habit.progressJson[_selectedDate]?.duration ?? Duration();
+        return '${formatDuration(runningDuration)}/${formatDuration(habit.timer!)}';
       case TaskType.count:
-        _completeValueTask(context, habit);
-        break;
+        int multipliedProgress = ((habit.progressJson[_selectedDate]?.progress ?? 0.0) * (habit.value ?? 1.0)).toInt();
+        return '$multipliedProgress/${(habit.value!)}';
       case TaskType.task:
-        setState(() {
-          // Get the current progress and status for the selected date
-          double currentProgress = habit.progressJson[_selectedDate]?.progress ?? 0.0;
-          TaskStatus currentStatus = habit.progressJson[_selectedDate]?.status ?? TaskStatus.missed;
-          log('current status init $currentStatus');
+        return 'Task';
+      default:
+        return '';
 
-          double newProgress;
-          TaskStatus newStatus;
-
-          // Check the current status and toggle accordingly
-          if (currentStatus == TaskStatus.reOpen) {
-            // If the current status is 'reOpen', mark it as completed (done)
-            newProgress = 1.0; // Mark progress as 100% (or any other appropriate value)
-            newStatus = TaskStatus.done; // Change status to 'done'
-          } else if (currentStatus == TaskStatus.done) {
-            log('current status $currentStatus');
-            // If the task is already done, uncheck it (mark as skipped)
-            newProgress = 0.0; // Mark progress as 0%
-            newStatus = TaskStatus.reOpen; // Change status to 'skipped'
-          } else if (currentStatus == TaskStatus.skipped) {
-            // If the task was skipped, check it (mark as done)
-            newProgress = 1.0; // Mark progress as 100%
-            newStatus = TaskStatus.done; // Change status to 'done'
-          } else {
-            // Default case: Mark as 'reOpen' (progress is 0% initially)
-            newProgress = 0.0;
-            newStatus = TaskStatus.reOpen; // Set status to 'reOpen'
-          }
-
-          // Update the habit progress for the selected date with the new status and progress
-          Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, _selectedDate, newProgress, newStatus);
-        });
-
-
-        break;
     }
   }
 
   void _completeValueTask(BuildContext context, Habit habit) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        final TextEditingController _valueCompleteController =
-        TextEditingController();
-        return AlertDialog(
-          title: Text('Complete Task: ${habit.title}'),
-          content: TextField(
-            controller: _valueCompleteController,
-            decoration:
-            const InputDecoration(hintText: 'Enter completed value'),
-            keyboardType: TextInputType.number,
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                final completedValue =
-                    int.tryParse(_valueCompleteController.text) ?? 0;
-                setState(() {
-                  double newProgress =
-                      completedValue / (habit.value ?? 1);
-                  Provider.of<HabitProvider>(context, listen: false)
-                      .updateHabitProgress(
-                      habit, _selectedDate, newProgress, TaskStatus.done);
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text('Complete'),
-            ),
-          ],
-        );
-      },
-    );
+    log('Specific habit: $habit');
+
+    setState(() {
+      // Get the current progress for the selected date or default to 0.0 if not set
+      double currentProgress = habit.progressJson[_selectedDate]?.progress ?? 0.0;
+
+      // Increment progress by 1.0 and divide by habit.value, but keep it within a max of 1.0
+      double newProgress = ((currentProgress * (habit.value ?? 1.0)) + 1.0) / (habit.value ?? 1.0);
+
+      // Ensure newProgress doesn't exceed 1.0
+      newProgress = newProgress.clamp(0.0, 1.0);
+
+      // Update the habit's progress in HabitProvider with newProgress and status 'done'
+
+      if (newProgress >= 1.0){
+        Provider.of<HabitProvider>(context, listen: false)
+            .updateHabitProgress(habit, _selectedDate, newProgress, TaskStatus.done, null);
+      }
+      else{
+        Provider.of<HabitProvider>(context, listen: false)
+            .updateHabitProgress(habit, _selectedDate, newProgress, TaskStatus.goingOn , null);
+      }
+    });
   }
+
 }
