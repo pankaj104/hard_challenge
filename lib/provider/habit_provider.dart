@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:hard_challenge/database/database_helper.dart';
 import '../model/habit_model.dart';
 
 class HabitProvider with ChangeNotifier {
@@ -275,13 +276,13 @@ class HabitProvider with ChangeNotifier {
     return isSameDate(startOfWeek1, startOfWeek2);
   }
 
-  void updateHabitProgress(Habit habit, DateTime date, double progressValue,TaskStatus status) {
+  void updateHabitProgress(Habit habit, DateTime date, double progressValue,TaskStatus status, Duration? timerHabitDuration) {
     int index = _habits.indexWhere((h) => h == habit);
     if (index != -1) {
       // if (_habits[index].progressJson.containsKey(date)) {
       //   _habits[index].progressJson[date]!.progress = progressValue;
       // } else {
-        _habits[index].progressJson[date] = ProgressWithStatus(status: status, progress: progressValue);
+        _habits[index].progressJson[date] = ProgressWithStatus(status: status, progress: progressValue, duration: timerHabitDuration ?? Duration());
       // }
       notifyListeners();
     }

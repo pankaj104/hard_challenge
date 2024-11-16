@@ -87,7 +87,8 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                           widget.habit,
                           widget.selectedDateforSkip,
                           0.0, // Reset progress to 0
-                          TaskStatus.reOpen, // Mark as 'reOpen'
+                          TaskStatus.reOpen,
+                          null
                         );
                       } else {
                         // If it's not skipped, mark it as skipped
@@ -96,6 +97,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                           widget.selectedDateforSkip,
                           0.0, // Mark progress as 0% (skipped)
                           TaskStatus.skipped, // Mark status as 'skipped'
+                          null
                         );
                       }
 

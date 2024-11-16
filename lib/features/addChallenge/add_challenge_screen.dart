@@ -751,6 +751,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                           onValueChanged: (newValue) {
                             setState(() {
                               _taskValue = newValue;
+                              log('task value  $_taskValue');
                             });
                           },
                         ),
