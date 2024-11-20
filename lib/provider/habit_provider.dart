@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:hard_challenge/database/database_helper.dart';
+import 'package:hard_challenge/utils/helpers.dart';
+import 'package:intl/intl.dart';
 import '../model/habit_model.dart';
 
 class HabitProvider with ChangeNotifier {
@@ -300,23 +302,57 @@ class HabitProvider with ChangeNotifier {
     }
   }
 
+
   double getCompletionPercentageByCategory(Habit habit, String category) {
     int completedDays = 0;
+    double completedProgress = 0.0;
 
     // Filter progressJson for entries in this category
     Map<DateTime, ProgressWithStatus> categoryProgressJson = Map.fromEntries(
       habit.progressJson.entries.where((entry) => habit.category == category),
     );
 
-    // Count completed (done) days for the specific category
-    completedDays = categoryProgressJson.values
-        .where((progress) => progress.status == TaskStatus.done)
-        .length;
+    if (habit.habitType == HabitType.quit) {
+      // For "quit" habits, count days that are either unmarked or not "done"
+      DateTime currentDate = habit.startDate;
+
+      while (currentDate.isBefore(DateTime.now()) || currentDate.isAtSameMomentAs(DateTime.now())) {
+        // Get the progress for the current date if it exists
+
+        String formattedDate = formatStartDateToUtc(currentDate);
+        ProgressWithStatus? progress = categoryProgressJson[DateTime.parse(formattedDate)];
+
+        log('Formatted currentDate: $formattedDate    $currentDate');
+        log('Checking categoryProgressJson: $categoryProgressJson');
+        log('Progress on $formattedDate: $progress');
+
+        // Count the day if there is no progress recorded or if the status is not "done"
+        if (progress == null || progress.status != TaskStatus.done) {
+          completedProgress += (1.0 - (progress?.progress ?? 0.0));
+          completedDays++;
+        }
+        // Move to the next day
+        currentDate = currentDate.add(Duration(days: 1));
+      }
+    } else {
+      // For other habit types, count only days marked as "done"
+      completedDays = categoryProgressJson.values
+          .where((progress) => progress.status == TaskStatus.done)
+          .length;
+
+
+      completedProgress = categoryProgressJson.values
+          .where((progress) => progress.progress != null)
+          .map((progress) => progress.progress)
+          .fold(0.0, (sum, progress) => sum + progress);
+    }
 
     int totalDays = countTotalDays(habit);
-    log('total Days of specific habit $totalDays');
-    log('completedDays of specific habit $completedDays');
-    return totalDays > 0 ? (completedDays / totalDays) * 100 : 0.0;
+    log('Total days for specific habit: $totalDays');
+    log('Completed days for specific habit: $completedDays');
+    log('completedProgress: $completedProgress');
+
+    return totalDays > 0 ? (completedProgress / totalDays.toDouble()) * 100 : 0.0;
   }
 
   double getOverallCompletionPercentage(String categoryName) {

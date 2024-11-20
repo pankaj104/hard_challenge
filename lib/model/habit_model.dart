@@ -14,6 +14,11 @@ enum RepeatType {
   selectedDate,
 }
 
+enum HabitType {
+  build,
+  quit
+}
+
 enum TaskStatus {
   done,
   missed,
@@ -64,6 +69,7 @@ class Habit {
   List<String> notificationTime;
   TaskType taskType;
   RepeatType repeatType;
+  HabitType habitType;
   Duration? timer;
   int? value;
   Map<DateTime, ProgressWithStatus> progressJson;
@@ -71,7 +77,7 @@ class Habit {
   List<DateTime>? selectedDates;
   int? selectedTimesPerWeek;
   int? selectedTimesPerMonth;
-  DateTime? startDate;
+  DateTime startDate;
   DateTime? endDate;
   String? notes;
 
@@ -82,6 +88,7 @@ class Habit {
     required this.iconBgColor,
     required this.notificationTime,
     required this.taskType,
+    required this.habitType,
     required this.repeatType,
     this.timer,
     this.value,
@@ -90,7 +97,7 @@ class Habit {
     this.selectedDates,
     this.selectedTimesPerWeek,
     this.selectedTimesPerMonth,
-    this.startDate,
+    required this.startDate,
     this.endDate,
     this.notes,
   });
@@ -98,7 +105,7 @@ class Habit {
   @override
   String toString() {
     return 'Habit(title: $title, category: $category,  habitIcon: $habitIcon, IconBgColor: $iconBgColor notificationTime: $notificationTime, '
-        'taskType: $taskType, repeatType: $repeatType, timer: $timer, value: $value, '
+        'taskType: $taskType, habitType: $habitType, repeatType: $repeatType, timer: $timer, value: $value, '
         'progress: $progressJson, days: $days, startDate: $startDate, endDate: $endDate, selectedDates: $selectedDates, '
         'selectedTimesPerWeek: $selectedTimesPerWeek, selectedTimesPerMonth: $selectedTimesPerMonth, notes: $notes)';
   }

@@ -77,7 +77,7 @@ class _WeeklyAnalysisChartState extends State<WeeklyAnalysisChart> {
       barRods: [
         BarChartRodData(
           toY: getProgressForDate(date)!,
-          color: _touchedIndex == x ? Colors.blueAccent : Colors.blue,
+          color: widget.habit.habitType == HabitType.build ? _touchedIndex == x ? Colors.blueAccent : Colors.blue : _touchedIndex == x ? Colors.blue : Colors.red,
           width: 16,
         ),
       ],

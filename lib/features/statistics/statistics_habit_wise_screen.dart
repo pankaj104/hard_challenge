@@ -29,6 +29,8 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
     double completionPercentage = Provider.of<HabitProvider>(context)
         .getCompletionPercentageByCategory(widget.habit, widget.habit.category);
 
+    log('completionPercentage $completionPercentage');
+
     // widget.habit.getCompletionPercentageByCategory(widget.habit.category);
     double skippedPercentage = Provider.of<HabitProvider>(context)
         .getSkippedPercentageByCategory(widget.habit, widget.habit.category) ;
@@ -55,7 +57,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
 
                   Expanded(
                     child: Center(
-                      child: HeadingH2Widget("Statistics"),
+                      child: HeadingH2Widget("Statistics Habit wise"),
                     ),
                   ),
                   SizedBox(
@@ -69,11 +71,11 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
               widget.habit.notes != null ?  Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Notes', style: const TextStyle(fontSize: 24, color: Colors.deepOrange)),
+                  const Text('Notes', style: TextStyle(fontSize: 24, color: Colors.deepOrange)),
                   Text(' ${widget.habit.notes}', style: const TextStyle(fontSize: 20)),
                 ],
               )
-               : SizedBox(),
+               : const SizedBox(),
               const SizedBox(height: 16),
               Center(
                 child: ElevatedButton(
@@ -104,12 +106,18 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                     });
                   },
                   child: widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped
-                      ? Text("Skipped")  // Text to show when skipped
+                      ? const Text("Skipped")  // Text to show when skipped
                       : Text("Skip Task of ${widget.selectedDateforSkip.day} Date"),  // Text to show normally
                 ),
 
               ),
-              Text('Category: ${widget.habit.category}', style: const TextStyle(fontSize: 18)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text('Category: ${widget.habit.category}', style: const TextStyle(fontSize: 18)),
+                  Text('Habit Type: ${widget.habit.habitType.name}', style: const TextStyle(fontSize: 18)),
+                ],
+              ),
               const SizedBox(height: 16),
               Center(
                 child: Column(
@@ -123,8 +131,8 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                           CircularPercentIndicator(
                             radius: 100.0,
                             lineWidth: 20.0,
-                            percent:  Provider.of<HabitProvider>(context)
-                                .getMissedPercentageByCategory(widget.habit, widget.habit.category) / 100,
+                            percent: widget.habit.habitType == HabitType.build ? Provider.of<HabitProvider>(context)
+                                .getMissedPercentageByCategory(widget.habit, widget.habit.category) / 100 : 0.0,
                             backgroundColor: Colors.transparent,
                             progressColor: Colors.blue[700],
                             circularStrokeCap: CircularStrokeCap.round,
@@ -135,7 +143,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                           CircularPercentIndicator(
                             radius: 100.0,
                             lineWidth: 20.0,
-                            percent: completionPercentage / 100 + skippedPercentage / 100,
+                            percent: 0.0,
                             backgroundColor: Colors.grey[300]!,
                             progressColor: Colors.lightBlue[300],
                             circularStrokeCap: CircularStrokeCap.round,
@@ -151,7 +159,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                             circularStrokeCap: CircularStrokeCap.round,
                             center: Text(
                               '${completionPercentage.toStringAsFixed(1)} %',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -163,22 +171,24 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                 ),
               ),
 
-              SizedBox(height: 20,),
+              const SizedBox(height: 20,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   InfoTile(
                     color: Colors.blue[900]!,
-                    label: 'Completed',
+                    label: widget.habit.habitType == HabitType.build ? 'Success Rate' : 'Quit Success Rate',
                     value: '${completionPercentage.toStringAsFixed(1)} %',
                     icon: Icons.check,
                   ),
+
+                  widget.habit.habitType == HabitType.build ?
                   InfoTile(
                     color: Colors.blue[700]!,
                     label: 'Missed',
                     value:  '${missedPercentage.toStringAsFixed(1)} %',
                     icon: Icons.close,
-                  ),
+                  ) : const SizedBox(),
                   InfoTile(
                     color: Colors.lightBlue[300]!,
                     label: 'Skipped',

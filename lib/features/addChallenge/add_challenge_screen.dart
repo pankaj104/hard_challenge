@@ -11,6 +11,7 @@ import 'package:hard_challenge/utils/app_utils.dart';
 import 'package:hard_challenge/utils/colors.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
 import 'package:hard_challenge/widgets/custom_time_duration_picker.dart';
+import 'package:hard_challenge/widgets/habit_type.dart';
 import 'package:hard_challenge/widgets/headingH1_widget.dart';
 import 'package:hard_challenge/widgets/headingH2_widget.dart';
 import 'package:hard_challenge/widgets/label_changer.dart';
@@ -46,6 +47,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   String _selectedCategory = 'General';
   String _title = 'Test';
   TaskType _taskType = TaskType.task;
+  HabitType _habitType = HabitType.build;
   final RepeatType _repeatType = RepeatType.selectDays;
   int _taskValue = 5; // default value 5
   RepeatType _repeatSelectedItem = RepeatType.selectDays;
@@ -171,6 +173,12 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   void _onTabSelected(TaskType type) {
     setState(() {
       _taskType = type;
+    });
+  }
+
+  void _onHabitTypeSelected(HabitType type) {
+    setState(() {
+      _habitType = type;
     });
   }
 
@@ -1090,35 +1098,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     ),
                   ),
 
+                HeadingH1Widget("Habit Type"),
 
-
-                  // Column(
-                  //   children: [
-                  //     TableCalendar(
-                  //       focusedDay: DateTime.now(),
-                  //       firstDay: DateTime(2020),
-                  //       lastDay: DateTime(2030),
-                  //       calendarFormat: _calendarFormat,
-                  //       selectedDayPredicate: (day) => selectedDates.contains(day),
-                  //       onDaySelected: (selectedDay, focusedDay) {
-                  //         setState(() {
-                  //           if (selectedDates.contains(selectedDay)) {
-                  //             selectedDates.remove(selectedDay);
-                  //           } else {
-                  //             selectedDates.add(selectedDay);
-                  //           }
-                  //         });
-                  //       },
-                  //       onFormatChanged: (format) {
-                  //         setState(() {
-                  //           _calendarFormat = format;
-                  //         });
-                  //       },
-                  //     ),
-                  //   ],
-                  // ),
-
-
+                HabitTypeTabBar(onHabitTypeSelected: _onHabitTypeSelected,selectedHabitType : _habitType,),
 
                 Column(
                   children: [
@@ -1352,6 +1334,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         notificationTime: selectedTime,
         taskType: _taskType,
         repeatType: _repeatType,
+        habitType: _habitType,
         timer: _taskType == TaskType.time ? _timerDuration : null,
         value: _taskType == TaskType.count ? _taskValue : null,
         progressJson: {},
