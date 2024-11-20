@@ -77,7 +77,7 @@ class Habit {
   List<DateTime>? selectedDates;
   int? selectedTimesPerWeek;
   int? selectedTimesPerMonth;
-  DateTime? startDate;
+  DateTime startDate;
   DateTime? endDate;
   String? notes;
 
@@ -97,7 +97,7 @@ class Habit {
     this.selectedDates,
     this.selectedTimesPerWeek,
     this.selectedTimesPerMonth,
-    this.startDate,
+    required this.startDate,
     this.endDate,
     this.notes,
   });

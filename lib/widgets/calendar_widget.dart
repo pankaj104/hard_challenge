@@ -57,8 +57,6 @@ class _CalendarPageState extends State<CalendarPage> {
     DateTime nowWithUtc = DateTime.now().toUtc();
     DateTime now = DateTime.utc(nowWithUtc.year, nowWithUtc.month, nowWithUtc.day);
 
-    log('test now $now');
-
     DateTime habitStartDate = habit.startDate ?? now;
     DateTime startDate = DateTime.utc(habitStartDate.year, habitStartDate.month, habitStartDate.day);
 
@@ -143,11 +141,11 @@ class _CalendarPageState extends State<CalendarPage> {
                       height: 32,
                       width: 35,
                       decoration: BoxDecoration(
-                          color: const Color(0xff079455),
+                          color: widget.habit.habitType == HabitType.quit ?  Color(0xffD92D20) : Color(0xff079455),
                           borderRadius: BorderRadius.circular(9.6)
                       ),
 
-                      child: SvgPicture.asset(ImageResource.doneTick, height: 10, width: 10,)),
+                      child: SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.crossTick : ImageResource.doneTick, height: 10, width: 10,)),
                 );
               }
 
@@ -173,11 +171,11 @@ class _CalendarPageState extends State<CalendarPage> {
                       height: 32,
                       width: 35,
                       decoration: BoxDecoration(
-                          color: const Color(0xffD92D20),
+                          color: widget.habit.habitType == HabitType.quit ? Color(0xff079455) : Color(0xffD92D20)  ,
                           borderRadius: BorderRadius.circular(9.6)
                       ),
 
-                      child: SvgPicture.asset(ImageResource.crossTick, height: 10, width: 10,)),
+                      child: SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.doneTick : ImageResource.crossTick, height: 10, width: 10,)),
                 );
               }
 
@@ -190,15 +188,13 @@ class _CalendarPageState extends State<CalendarPage> {
                       height: 32,
                       width: 35,
                       decoration: BoxDecoration(
-                          color: const Color(0xff079455),
+                          color: widget.habit.habitType == HabitType.quit ?  Color(0xffD92D20) : Color(0xff079455),
                           borderRadius: BorderRadius.circular(9.6)
                       ),
 
-                      child: SvgPicture.asset(ImageResource.doneTick, height: 10, width: 10,)),
+                      child: SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.crossTick : ImageResource.doneTick, height: 10, width: 10,)),
                 );
               }
-
-
 
               if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
                 return Center(
@@ -220,11 +216,11 @@ class _CalendarPageState extends State<CalendarPage> {
                       height: 32,
                       width: 35,
                       decoration: BoxDecoration(
-                          color: const Color(0xffD92D20),
+                          color: widget.habit.habitType == HabitType.quit ? Color(0xff079455) : Color(0xffD92D20)  ,
                           borderRadius: BorderRadius.circular(9.6)
                       ),
 
-                      child: SvgPicture.asset(ImageResource.crossTick, height: 10, width: 10,)),
+                      child: SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.doneTick : ImageResource.crossTick, height: 10, width: 10,)),
                 );
               }
 
@@ -237,11 +233,12 @@ class _CalendarPageState extends State<CalendarPage> {
                       height: 32,
                       width: 35,
                       decoration: BoxDecoration(
-                          color: const Color(0xff079455),
+                          color: widget.habit.habitType == HabitType.quit ?  Color(0xffD92D20) : Color(0xff079455),
                           borderRadius: BorderRadius.circular(9.6)
                       ),
 
-                      child: SvgPicture.asset(ImageResource.doneTick, height: 10, width: 10,)),
+
+                      child: SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.crossTick : ImageResource.doneTick, height: 10, width: 10,)),
                 );
               }
 
@@ -267,11 +264,11 @@ class _CalendarPageState extends State<CalendarPage> {
                       height: 32,
                       width: 35,
                       decoration: BoxDecoration(
-                          color: const Color(0xffD92D20),
+                          color: widget.habit.habitType == HabitType.quit ? Color(0xff079455) : Color(0xffD92D20)  ,
                           borderRadius: BorderRadius.circular(9.6)
                       ),
 
-                      child: SvgPicture.asset(ImageResource.crossTick, height: 10, width: 10,)),
+                      child:  SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.doneTick : ImageResource.crossTick, height: 10, width: 10,)),
                 );
               }
 
