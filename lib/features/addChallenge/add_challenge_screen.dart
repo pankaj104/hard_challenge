@@ -1031,7 +1031,6 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     ),
                   ),
 
-
                 if (_repeatSelectedItem == RepeatType.selectedDate)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
