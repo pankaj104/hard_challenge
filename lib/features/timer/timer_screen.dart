@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hard_challenge/features/timer/dotted_circle_painter.dart';
 import 'package:hard_challenge/utils/constant.dart';
 import 'package:provider/provider.dart';
-import '../../../model/habit_model.dart';
+import '../../model/habit_model.dart';
 import '../../../provider/habit_provider.dart';
 
 class TimerScreen extends StatefulWidget {

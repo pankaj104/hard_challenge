@@ -1,32 +1,54 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:hard_challenge/database/database_helper.dart';
 import 'package:hard_challenge/utils/helpers.dart';
-import 'package:intl/intl.dart';
+import 'package:hive/hive.dart';
 import '../model/habit_model.dart';
 
 class HabitProvider with ChangeNotifier {
   List<Habit> _habits = [];
+  Box<Habit>? _habitBox;
+
+  HabitProvider() {
+    _openBox();
+  }
+  Future<void> _openBox() async {
+    // Open the Hive box for storing Habit objects
+    _habitBox = await Hive.openBox<Habit>('habitBox');
+    loadHabits();
+  }
+
+
+  // Load habits from Hive box into the provider
+  void loadHabits() {
+    if (_habitBox != null) {
+      _habits = _habitBox!.values.toList();
+      log('load Habits data: $habits');
+      notifyListeners();
+    }
+  }
 
   List<Habit> get habits => _habits;
 
-  void addHabit(Habit habit) {
+  void addHabit(Habit habit) async {
+    await _habitBox?.add(habit);
     _habits.add(habit);
     notifyListeners();
     log('All Habit data: $habits');
   }
 
-  void updateHabit(int index, Habit updatedHabit) {
+  void updateHabit(int index, Habit updatedHabit) async {
     if (index >= 0 && index < _habits.length) {
-      _habits[index] = updatedHabit;
+      await _habitBox?.putAt(index, updatedHabit);
+    _habits[index] = updatedHabit;
       notifyListeners();
     }
   }
 
-  void deleteHabit(int index) {
+  void deleteHabit(int index) async {
     if (index >= 0 && index < _habits.length) {
-      _habits.removeAt(index);
+      await _habitBox?.deleteAt(index);
+    _habits.removeAt(index);
       notifyListeners();
     }
   }
@@ -35,29 +57,76 @@ class HabitProvider with ChangeNotifier {
     return _habits[index];
   }
 
+  Future<void> clearHabits() async {
+    if (_habitBox != null) {
+      await _habitBox!.clear(); // Deletes all entries from the Hive box
+      _habits.clear();          // Clears the in-memory list
+      log('All habits cleared from database and memory');
+      notifyListeners();        // Notify listeners to update UI
+    } else {
+      log('Error: HabitBox is not initialized');
+    }
+  }
+
+
   List<Habit> getAllHabit() {
     return _habits;
   }
 
   double getAverageProgressForDate(DateTime date) {
-    // Calculate total progress for all habits, using 0.0 for habits without data for this date
-    double totalProgress = _habits.fold(0.0, (sum, habit) {
+    // Filter habits active on the specific date
+    log('getAverageProgressForDate $date');
+    List<Habit> activeHabits = _habits.where((habit) {
+      // Check if the habit is active on this date
+      DateTime dateOnly = DateTime(date.year, date.month, date.day);
+      DateTime endDateOnly = DateTime(habit.endDate!.year, habit.endDate!.month, habit.endDate!.day);
+
+      if (habit.habitType == HabitType.quit) {
+        // For quit habits, check if the date is within startDate and endDate (inclusive of endDate)
+        return date.isAfter(habit.startDate) &&
+            (habit.endDate == null || dateOnly.isBefore(endDateOnly) || dateOnly.isAtSameMomentAs(endDateOnly));
+      } else {
+        // For other habits, include all (check if date is after startDate, and before or same as endDate)
+        log('date.isAtSameMomentAs(habit.endDate!) ${date.isAtSameMomentAs(habit.endDate!)}');
+        log('(habit.endDate!) ${habit.endDate!}');
+        return date.isAfter(habit.startDate) &&
+            (habit.endDate == null || date.isBefore(habit.endDate!) || date.isAtSameMomentAs(habit.endDate!));
+      }
+    }).toList();
+
+
+
+    // Calculate total progress for all active habits
+    double totalProgress = activeHabits.fold(0.0, (sum, habit) {
       double progress = habit.progressJson[date]?.progress ?? 0.0;
+
+      if (habit.habitType == HabitType.quit) {
+        // For quit habits, count progress differently
+        if (progress > 0 && progress <= 1) {
+          return sum + (1 - progress); // Count 1 - progress
+        } else if (progress == 0 || habit.progressJson[date] == null) {
+          return sum + 1; // Count 1 for no progress or null
+        }
+      }
+
+      // Default behavior for other habit types
       return sum + progress;
     });
 
-    // Return average progress based on all habits
-    return _habits.isEmpty ? 0.0 : totalProgress / _habits.length;
+    // Return average progress based on the count of active habits
+    return activeHabits.isEmpty ? 0.0 : totalProgress / activeHabits.length;
   }
 
 
-  void loadHabits(List<Habit> habits) {
-    _habits = habits;
-    notifyListeners();
-  }
 
-  void markTaskAsSkipped(Habit habit, DateTime date, TaskStatus status) {
+  // void loadHabits(List<Habit> habits) {
+  //   _habits = habits;
+  //   notifyListeners();
+  // }
+
+  void markTaskAsSkipped(Habit habit, DateTime date, TaskStatus status) async {
     habit.progressJson[date] = ProgressWithStatus(status: status, progress: 0.0);
+    await _habitBox?.putAt(_habits.indexOf(habit), habit);
     notifyListeners(); // Notify listeners of data change
   }
 
@@ -146,18 +215,33 @@ class HabitProvider with ChangeNotifier {
 
   int countTotalDays(Habit habit) {
     int totalDays = 0;
-    DateTime? startDate = habit.startDate;
-    DateTime? endDate = habit.endDate;
+    DateTime? startDate = setSelectedDate(habit.startDate) ;
+    DateTime? endDate = setSelectedDate(habit.endDate!);
+
+    log('start date $startDate end date: $endDate');
 
     if (habit.repeatType == RepeatType.selectDays && startDate != null && endDate != null) {
       DateTime loopDate = startDate;
 
       while (loopDate.isBefore(endDate) || loopDate.isAtSameMomentAs(endDate)) {
-        if (habit.days!.contains(loopDate.weekday % 7)) {
+        int mappedWeekday = loopDate.weekday % 7;  // Sunday (7) maps to 0
+        // If mappedWeekday is 0, change it back to 7 for Sunday
+        if (mappedWeekday == 0) {
+          mappedWeekday = 7;
+        }
+
+        log('loopDate $loopDate, mappedWeekday: $mappedWeekday, habit.days: ${habit.days}');
+
+        if (habit.days!.contains(mappedWeekday)) {
+          log('total days count $totalDays');
           totalDays++;
         }
+
         loopDate = loopDate.add(const Duration(days: 1));
       }
+
+
+
     } else if (habit.repeatType == RepeatType.selectedDate) {
       totalDays = habit.selectedDates?.length ?? 1;
     } else if (habit.repeatType == RepeatType.weekly && startDate != null && endDate != null) {
@@ -200,7 +284,7 @@ class HabitProvider with ChangeNotifier {
     return habitsByDate;
   }
 
-  List<Habit> getHabitsForDate(DateTime date) {
+  Future<List<Habit>> getHabitsForDate(DateTime date) async {
     return _habits.where((habit) {
       // Check if the habit is within the date range
       if (habit.startDate != null && habit.endDate != null) {
@@ -278,14 +362,16 @@ class HabitProvider with ChangeNotifier {
     return isSameDate(startOfWeek1, startOfWeek2);
   }
 
-  void updateHabitProgress(Habit habit, DateTime date, double progressValue,TaskStatus status, Duration? timerHabitDuration) {
+  void updateHabitProgress(Habit habit, DateTime date, double progressValue,TaskStatus status, Duration? timerHabitDuration) async {
     int index = _habits.indexWhere((h) => h == habit);
     if (index != -1) {
       // if (_habits[index].progressJson.containsKey(date)) {
       //   _habits[index].progressJson[date]!.progress = progressValue;
       // } else {
         _habits[index].progressJson[date] = ProgressWithStatus(status: status, progress: progressValue, duration: timerHabitDuration ?? Duration());
-      // }
+        await _habitBox?.putAt(index, _habits[index]); // Save the updated habit to Hive
+
+    // }
       notifyListeners();
     }
   }
@@ -319,7 +405,8 @@ class HabitProvider with ChangeNotifier {
       while (currentDate.isBefore(DateTime.now()) || currentDate.isAtSameMomentAs(DateTime.now())) {
         // Get the progress for the current date if it exists
 
-        String formattedDate = formatStartDateToUtc(currentDate);
+        // String formattedDate = formatStartDateToUtc(currentDate);
+        String formattedDate = currentDate.toString();
         ProgressWithStatus? progress = categoryProgressJson[DateTime.parse(formattedDate)];
 
         log('Formatted currentDate: $formattedDate    $currentDate');
