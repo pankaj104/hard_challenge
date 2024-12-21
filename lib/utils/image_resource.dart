@@ -11,5 +11,7 @@ class ImageResource{
   static const String crossTick = 'assets/images/cross_tick.svg';
   static const String skipTick = 'assets/images/skip_tick.svg';
   static const String doneTick = 'assets/images/done_tick.svg';
+  static const String calenderLeft = 'assets/images/calender_left.svg';
+  static const String calenderRight = 'assets/images/calender_right.svg';
 
 }

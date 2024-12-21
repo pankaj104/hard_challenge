@@ -27,5 +27,7 @@ class ColorStrings{
   static const Color silverColor = Color(0xFFC0C0C0);
   static const Color grayColor = Color(0xFF808080);
   static const Color brownColor = Color(0xFFA52A2A);
+  static const Color yAxisRod = Color(0xFF45B8FF);
+  static const Color calenderBg = Color(0xFFECF8FF);
 
 }

@@ -2,9 +2,13 @@ import 'dart:developer';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 import '../model/habit_model.dart';
+import '../utils/colors.dart';
+import '../utils/image_resource.dart';
+import 'custom_tooltip.dart';
 
 class WeeklyAnalysisChart extends StatefulWidget {
   final Habit habit;
@@ -71,53 +75,115 @@ class _WeeklyAnalysisChartState extends State<WeeklyAnalysisChart> {
     return 0.0; // Return null if no progress found for the given date
   }
 
+  // BarChartGroupData _makeGroupData(int x, DateTime date) {
+  //   return BarChartGroupData(
+  //     x: x,
+  //     barRods: [
+  //       BarChartRodData(
+  //         toY: getProgressForDate(date)!,
+  //         color: widget.habit.habitType == HabitType.build ? _touchedIndex == x ? Colors.blueAccent : Colors.blue : _touchedIndex == x ? Colors.blue : Colors.red,
+  //         width: 16,
+  //       ),
+  //     ],
+  //   );
+  // }
+
   BarChartGroupData _makeGroupData(int x, DateTime date) {
     return BarChartGroupData(
       x: x,
       barRods: [
         BarChartRodData(
-          toY: getProgressForDate(date)!,
+          toY: getProgressForDate(date),
           color: widget.habit.habitType == HabitType.build ? _touchedIndex == x ? Colors.blueAccent : Colors.blue : _touchedIndex == x ? Colors.blue : Colors.red,
-          width: 16,
+          width: 12,
+          borderRadius:  const BorderRadius.only(
+            topLeft: Radius.circular(8), // Rounded top-left corner
+            topRight: Radius.circular(8), // Rounded top-right corner
+            bottomLeft: Radius.zero, // Flat bottom-left corner
+            bottomRight: Radius.zero, // Flat bottom-right corner
+          ), // Rounded bars
         ),
       ],
+      showingTooltipIndicators: [0], // Show tooltip for the first rod
     );
   }
 
+  // FlTitlesData _buildTitlesData() {
+  //   return FlTitlesData(
+  //     bottomTitles: AxisTitles(
+  //       sideTitles: SideTitles(
+  //         showTitles: true,
+  //         getTitlesWidget: (double value, TitleMeta meta) {
+  //           const style = TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14);
+  //           String text;
+  //           switch (value.toInt()) {
+  //             case 0:
+  //               text = 'Sun';
+  //               break;
+  //             case 1:
+  //               text = 'Mon';
+  //               break;
+  //             case 2:
+  //               text = 'Tue';
+  //               break;
+  //             case 3:
+  //               text = 'Wed';
+  //               break;
+  //             case 4:
+  //               text = 'Thu';
+  //               break;
+  //             case 5:
+  //               text = 'Fri';
+  //               break;
+  //             case 6:
+  //               text = 'Sat';
+  //               break;
+  //             default:
+  //               text = '';
+  //           }
+  //           return SideTitleWidget(child: Text(text, style: style), axisSide: meta.axisSide);
+  //         },
+  //       ),
+  //     ),
+  //     leftTitles: AxisTitles(
+  //       sideTitles: SideTitles(
+  //         showTitles: true,
+  //         interval: 20,
+  //         getTitlesWidget: (double value, TitleMeta meta) {
+  //           return FittedBox(
+  //             fit: BoxFit.scaleDown,
+  //             child: Text('${value.toInt()}%', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
+  //             ),
+  //           );
+  //         },
+  //       ),
+  //     ),
+  //     topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+  //     rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+  //   );
+  // }
   FlTitlesData _buildTitlesData() {
     return FlTitlesData(
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
           getTitlesWidget: (double value, TitleMeta meta) {
-            const style = TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14);
+            const style = TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12);
             String text;
             switch (value.toInt()) {
-              case 0:
-                text = 'Sun';
-                break;
-              case 1:
-                text = 'Mon';
-                break;
-              case 2:
-                text = 'Tue';
-                break;
-              case 3:
-                text = 'Wed';
-                break;
-              case 4:
-                text = 'Thu';
-                break;
-              case 5:
-                text = 'Fri';
-                break;
-              case 6:
-                text = 'Sat';
-                break;
-              default:
-                text = '';
+              case 0: text = 'Sun'; break;
+              case 1: text = 'Mon'; break;
+              case 2: text = 'Tue'; break;
+              case 3: text = 'Wed'; break;
+              case 4: text = 'Thu'; break;
+              case 5: text = 'Fri'; break;
+              case 6: text = 'Sat'; break;
+              default: text = '';
             }
-            return SideTitleWidget(child: Text(text, style: style), axisSide: meta.axisSide);
+            return Padding(
+              padding: EdgeInsets.only(left: 8, top: 2,right: 4),
+              child: SideTitleWidget(child: Text(text, style: style), axisSide: meta.axisSide),
+            );
           },
         ),
       ),
@@ -125,15 +191,22 @@ class _WeeklyAnalysisChartState extends State<WeeklyAnalysisChart> {
         sideTitles: SideTitles(
           showTitles: true,
           interval: 20,
-          getTitlesWidget: (double value, TitleMeta meta) {
-            return Text('${value.toInt()}%', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12));
-          },
+          reservedSize: 40,
+          getTitlesWidget: (value, meta) => Padding(
+            padding: const EdgeInsets.only(left: 2.0,right: 6.0),
+            child: Column(
+              children: [
+                Text('${value.toInt()}%', style: TextStyle(color: Colors.black, fontSize: 13, fontWeight: FontWeight.w600)),
+              ],
+            ),
+          ),
         ),
       ),
       topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
       rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -143,46 +216,88 @@ class _WeeklyAnalysisChartState extends State<WeeklyAnalysisChart> {
       height: 320,
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: _previousWeek,
+          const Padding(
+            padding: EdgeInsets.only(top: 16, bottom: 13),
+            child: Align(
+              alignment: Alignment.center,
+              child: Text("Analysis", style: TextStyle(color: ColorStrings.blackColor,
+                  fontWeight: FontWeight.w600,fontSize: 17),
               ),
-              Text(
-                _formatDateRange(_currentStartOfWeek, endOfWeek),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                icon: Icon(Icons.arrow_forward),
-                onPressed: _nextWeek,
-              ),
-            ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  onTap: _previousWeek,
+                  child: SvgPicture.asset(
+                    ImageResource.calenderLeft,
+                    // onPressed: _previousWeek,
+                  ),
+                ),
+                Text(
+                  _formatDateRange(_currentStartOfWeek, endOfWeek),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+                InkWell(
+                  onTap: _nextWeek,
+                  child: SvgPicture.asset(
+                    ImageResource.calenderRight,
+                    // onPressed: _nextWeek,
+                  ),
+                ),
+              ],
+            ),
           ),
           SizedBox(height: 20),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: BarChart(
+              child:
+              BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceBetween,
                   barGroups: _createBarGroups(),
                   titlesData: _buildTitlesData(),
                   borderData: FlBorderData(show: false),
+                  // gridData: FlGridData(
+                  //   show: true,
+                  //   horizontalInterval: 20,
+                  //   getDrawingHorizontalLine: (value) => FlLine(
+                  //     color: Colors.amber[300]!,
+                  //     strokeWidth: 1,
+                  //   ),
+                  // ),
                   gridData: FlGridData(
-                    show: true,
-                    horizontalInterval: 20,
-                    getDrawingHorizontalLine: (value) => FlLine(
-                      color: Colors.grey[300]!,
-                      strokeWidth: 1,
-                    ),
+                      show: true,
+                      horizontalInterval: 20,
+                      getDrawingHorizontalLine: (value) {
+                        // print("PercentValue: $value");
+                        if (value == 0 || value == 100){
+                          return FlLine(
+                            color: Colors.black, // Bold line color for 0% and 100%
+                            strokeWidth: 2, // Thicker lines for emphasis
+                          );
+                        }
+                        return FlLine(
+                          color: ColorStrings.yAxisRod.withOpacity(0.2), // Subtle grid lines
+                          strokeWidth: 1,
+                        );
+                      }
+                  ).copyWith(
+                      drawVerticalLine: false
                   ),
-                  barTouchData: BarTouchData(
+                  barTouchData:
+                  BarTouchData(
                     touchTooltipData: BarTouchTooltipData(
+                      fitInsideVertically: true,
                       // tooltipBgColor: Colors.blueAccent,
+                      tooltipRoundedRadius: 100,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        return BarTooltipItem(
+                        //here i am passing this CustomTooltip
+                        BarTooltipItem(
                           '${rod.toY}%',
                           TextStyle(color: Colors.white),
                         );
@@ -211,7 +326,7 @@ class _WeeklyAnalysisChartState extends State<WeeklyAnalysisChart> {
                 CircularProgressIndicator(
                   value: _createBarGroups()[_touchedIndex].barRods[0].toY / 100,
                   strokeWidth: 8,
-                  backgroundColor: Colors.grey[300],
+                  backgroundColor: Colors.amber,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
                 ),
               ],
