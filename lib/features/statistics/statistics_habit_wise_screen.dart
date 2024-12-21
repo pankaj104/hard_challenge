@@ -6,6 +6,7 @@ import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import '../../model/habit_model.dart';
+import '../../utils/colors.dart';
 import '../../utils/image_resource.dart';
 import '../../widgets/calendar_widget.dart';
 import '../../widgets/headingH2_widget.dart';
@@ -130,7 +131,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                           /// Missed percentage
                           CircularPercentIndicator(
                             radius: 100.0,
-                            lineWidth: 20.0,
+                            lineWidth: 23.0,
                             percent: widget.habit.habitType == HabitType.build ? Provider.of<HabitProvider>(context)
                                 .getMissedPercentageByCategory(widget.habit, widget.habit.category) / 100 : 0.0,
                             backgroundColor: Colors.transparent,
@@ -142,7 +143,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                           /// Skipped percentage
                           CircularPercentIndicator(
                             radius: 100.0,
-                            lineWidth: 20.0,
+                            lineWidth: 23.0,
                             percent: 0.0,
                             backgroundColor: Colors.grey[300]!,
                             progressColor: Colors.lightBlue[300],
@@ -152,7 +153,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                           /// completed percentage
                           CircularPercentIndicator(
                             radius: 100.0,
-                            lineWidth: 20.0,
+                            lineWidth: 23.0,
                             percent: completionPercentage / 100 ,
                             backgroundColor: Colors.transparent,
                             progressColor: Colors.blue[900],
@@ -172,32 +173,83 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
               ),
 
               const SizedBox(height: 20,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  InfoTile(
-                    color: Colors.blue[900]!,
-                    label: widget.habit.habitType == HabitType.build ? 'Success Rate' : 'Quit Success Rate',
-                    value: '${completionPercentage.toStringAsFixed(1)} %',
-                    icon: Icons.check,
-                  ),
-
-                  widget.habit.habitType == HabitType.build ?
-                  InfoTile(
-                    color: Colors.blue[700]!,
-                    label: 'Missed',
-                    value:  '${missedPercentage.toStringAsFixed(1)} %',
-                    icon: Icons.close,
-                  ) : const SizedBox(),
-                  InfoTile(
-                    color: Colors.lightBlue[300]!,
-                    label: 'Skipped',
-                    value: '${skippedPercentage.toStringAsFixed(1)} %',
-                    icon: Icons.double_arrow,
-                  ),
-                ],
+              Padding(
+                padding: EdgeInsets.only(bottom: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      height: 85,
+                      decoration: BoxDecoration(
+                        color: Colors.green!, // Set the background color
+                        borderRadius: BorderRadius.circular(12),
+                      ),// Set the radius
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        child: InfoTile(
+                          color: ColorStrings.whiteColor,
+                          label: widget.habit.habitType == HabitType.build ? 'Success ' : 'Quit ',
+                          value: '${completionPercentage.toStringAsFixed(1)} %',
+                          icon: Icons.done,
+                        ),
+                      ),
+                    ),
+                    widget.habit.habitType == HabitType.build ?
+                    Row(
+                      children: [
+                        SizedBox(width: 10,),
+                        Container(
+                          height: 85,
+                          decoration: BoxDecoration(
+                            color:Colors.redAccent!, // Set the background color
+                            borderRadius: BorderRadius.circular(12),
+                          ),// Set the radius
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: InfoTile(
+                              color: ColorStrings.whiteColor,
+                              label: 'Missed',
+                              value:  '${missedPercentage.toStringAsFixed(1)} %',
+                              icon: Icons.close,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10,),
+                      ],
+                    ) : const SizedBox(),
+                    Container(
+                      height: 85,
+                      decoration: BoxDecoration(
+                        color: Colors.amberAccent, // Set the background color
+                        borderRadius: BorderRadius.circular(12),
+                      ),// Set the radius
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: InfoTile(
+                          color: ColorStrings.whiteColor!,
+                          label: 'Skipped',
+                          value: '${skippedPercentage.toStringAsFixed(1)} %',
+                          icon: Icons.last_page,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              WeeklyAnalysisChart(habit: widget.habit,),
+              Container(
+                  decoration: BoxDecoration(
+                    color: ColorStrings.calenderBg,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFFECF8FF).withOpacity(0.2), // Adjust the shadow color and opacity as needed
+                        offset: Offset(0, 4), // x: 0, y: 4
+                        blurRadius: 4, // Blur radius
+                        spreadRadius: 0, // Spread radius
+                      ),
+                    ],
+                  ),
+                  child: WeeklyAnalysisChart(habit: widget.habit,)),
 
               CalendarPage(habit: widget.habit,)
 

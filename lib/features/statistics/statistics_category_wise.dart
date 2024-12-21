@@ -6,6 +6,7 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/habit_model.dart';
+import '../../utils/colors.dart';
 import '../../widgets/calendar_category_wise_widget.dart';
 import '../../widgets/info_tile_widget.dart';
 import '../../widgets/weekly_analysis_chart_category_wise.dart';
@@ -128,28 +129,62 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
                           ]
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        InfoTile(
-                          color: Colors.blue[900]!,
-                          label: 'Completed',
-                          value: '${(overallcompletionPercentage * 100).toStringAsFixed(1)} %',
-                          icon: Icons.check,
-                        ),
-                        InfoTile(
-                          color: Colors.blue[700]!,
-                          label: 'Missed',
-                          value:  '${(overallMissedPercentage * 100).toStringAsFixed(1)} %',
-                          icon: Icons.close,
-                        ),
-                        InfoTile(
-                          color: Colors.lightBlue[300]!,
-                          label: 'Skipped',
-                          value: '${(overallSkippedPercentage * 100).toStringAsFixed(1)} %',
-                          icon: Icons.double_arrow,
-                        ),
-                      ],
+                    const SizedBox(height: 20,),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 24, right: 10, left: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                              height: 85,
+                              decoration: BoxDecoration(
+                              color: Colors.green!, // Set the background color
+                              borderRadius: BorderRadius.circular(12),
+                              ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 18),
+                              child: InfoTile(
+                                color: ColorStrings.whiteColor,
+                                label: 'Completed',
+                                value: '${(overallcompletionPercentage * 100).toStringAsFixed(1)} %',
+                                icon: Icons.done,
+                              ),
+                            ),
+                          ),
+                          Container(
+                              height: 85,
+                              decoration: BoxDecoration(
+                                color:Colors.redAccent!, // Set the background color
+                              borderRadius: BorderRadius.circular(12),
+                              ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: InfoTile(
+                                color: ColorStrings.whiteColor,
+                                label: 'Missed',
+                                value:  '${(overallMissedPercentage * 100).toStringAsFixed(1)} %',
+                                icon: Icons.close,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: 85,
+                            decoration: BoxDecoration(
+                              color: Colors.amberAccent, // Set the background color
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: InfoTile(
+                                color: ColorStrings.whiteColor,
+                                label: 'Skipped',
+                                value: '${(overallSkippedPercentage * 100).toStringAsFixed(1)} %',
+                                icon: Icons.last_page,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
                     ///  WeeklyAnalysisChartCategoryWise

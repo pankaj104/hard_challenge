@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hard_challenge/model/habit_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../utils/colors.dart';
 import '../utils/image_resource.dart';
 
 class CalendarPage extends StatefulWidget {
@@ -102,6 +103,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: TableCalendar(
+          headerVisible: true,
           firstDay: DateTime.utc(2022, 1, 1),
           lastDay: DateTime.utc(2030, 12, 31),
           focusedDay: _focusedDay,
@@ -118,95 +120,199 @@ class _CalendarPageState extends State<CalendarPage> {
           onPageChanged: (focusedDay) {
             _focusedDay = focusedDay;
           },
-          calendarStyle: const CalendarStyle(
-            selectedDecoration: BoxDecoration(
-              color: Colors.blue,
-              shape: BoxShape.circle,
-            ),
+          calendarStyle:
+          CalendarStyle(
+
+            // selectedDecoration: BoxDecoration(
+            //   color: Colors.blue,
+            //   shape: BoxShape.circle,
+            //   // borderRadius: BorderRadius.circular(9.6),
+            // ),
           ),
           daysOfWeekStyle: const DaysOfWeekStyle(
             // Customize weekdays row
-            weekendStyle: TextStyle(color: Colors.red),
+            weekdayStyle: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
+            weekendStyle: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),
           ),
-          headerStyle: const HeaderStyle(
+          headerStyle:  HeaderStyle(
+            titleTextStyle: TextStyle(color: Colors.black,fontWeight: FontWeight.bold, fontSize: 16),
+            leftChevronIcon: SvgPicture.asset(
+              ImageResource.calenderLeft,
+            ),
+            rightChevronIcon: SvgPicture.asset(
+              ImageResource.calenderRight,
+            ),
             formatButtonVisible: false,
             titleCentered: true,
           ),
           // Customize day cell builders
           calendarBuilders: CalendarBuilders(
+            outsideBuilder: (context, date, events) {
+              // Custom decoration for the days of the previous or next month
+              return Center(
+                child: Container(
+                  height: 36,
+                  width: 36,
+                  decoration: BoxDecoration(
+                    color: ColorStrings.whiteColor, // Background color for days outside the current month
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                        spreadRadius: 0.4, // Light spread for subtle effect
+                        blurRadius: 1, // Smooth blur for softer shadow
+                        offset: Offset(0, 2), // Shadow slightly below the element
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${date.day}',
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400), // White text color for outside days
+                    ),
+                  ),
+                ),
+              );
+            },
             defaultBuilder: (context, date, events) {
+
               if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, date))) {
                 return Center(
                   child: Container(
-                      height: 32,
-                      width: 35,
+                      height: 36,
+                      width: 36,
                       decoration: BoxDecoration(
-                          color: widget.habit.habitType == HabitType.quit ?  Color(0xffD92D20) : Color(0xff079455),
-                          borderRadius: BorderRadius.circular(9.6)
+                          color: widget.habit.habitType == HabitType.quit ?  Colors.red : Colors.green,
+                          borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                            spreadRadius: 0.4, // Light spread for subtle effect
+                            blurRadius: 1, // Smooth blur for softer shadow
+                            offset: Offset(0, 2), // Shadow slightly below the element
+                          ),
+                        ],
                       ),
 
-                      child: SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.crossTick : ImageResource.doneTick, height: 10, width: 10,)),
+                      child: Icon(
+                          widget.habit.habitType == HabitType.quit ? Icons.close : Icons.done, color: ColorStrings.whiteColor, size: 18,)),
                 );
               }
-
-
 
                if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
                 return Center(
                   child: Container(
-                      height: 32,
-                      width: 35,
+                      height: 36,
+                      width: 36,
                       decoration: BoxDecoration(
-                          color: const Color(0xffF79009),
-                          borderRadius: BorderRadius.circular(9.6)
+                          color: Colors.amberAccent,
+                          borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                            spreadRadius: 0.4, // Light spread for subtle effect
+                            blurRadius: 1, // Smooth blur for softer shadow
+                            offset: Offset(0, 2), // Shadow slightly below the element
+                          ),
+                        ],
                       ),
 
-                      child: SvgPicture.asset(ImageResource.skipTick, height: 10, width: 10,)),
+                      child: Icon(Icons.last_page,color: ColorStrings.whiteColor,)
+                  ),
                 );
               }
 
                if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
                 return Center(
                   child: Container(
-                      height: 32,
-                      width: 35,
+                      height: 36,
+                      width: 36,
                       decoration: BoxDecoration(
-                          color: widget.habit.habitType == HabitType.quit ? Color(0xff079455) : Color(0xffD92D20)  ,
-                          borderRadius: BorderRadius.circular(9.6)
+                          color: widget.habit.habitType == HabitType.quit ? Colors.green : Colors.red  ,
+                          borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                            spreadRadius: 0.4, // Light spread for subtle effect
+                            blurRadius: 1, // Smooth blur for softer shadow
+                            offset: Offset(0, 2), // Shadow slightly below the element
+                          ),
+                        ],
                       ),
 
-                      child: SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.doneTick : ImageResource.crossTick, height: 10, width: 10,)),
+                      child: Icon(
+                          widget.habit.habitType == HabitType.quit ? Icons.done : Icons.close, color: ColorStrings.whiteColor, size: 18,)),
                 );
               }
 
-              return null;
+              return Center(
+                child: Container(
+                  height: 36,
+                  width: 36,
+                  decoration: BoxDecoration(
+                    color: ColorStrings.whiteColor, // Background color for days outside the current month
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                        spreadRadius: 0.4, // Light spread for subtle effect
+                        blurRadius: 1, // Smooth blur for softer shadow
+                        offset: Offset(0, 2), // Shadow slightly below the element
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${date.day}',
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400), // White text color for outside days
+                    ),
+                  ),
+                ),
+              );
             },
             todayBuilder: (context, date, events) {
               if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, date))) {
                 return Center(
                   child: Container(
-                      height: 32,
-                      width: 35,
+                      height: 36,
+                      width: 36,
                       decoration: BoxDecoration(
-                          color: widget.habit.habitType == HabitType.quit ?  Color(0xffD92D20) : Color(0xff079455),
-                          borderRadius: BorderRadius.circular(9.6)
+                          color: widget.habit.habitType == HabitType.quit ?  Colors.red : Colors.green,
+                          borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                            spreadRadius: 0.4, // Light spread for subtle effect
+                            blurRadius: 1, // Smooth blur for softer shadow
+                            offset: Offset(0, 2), // Shadow slightly below the element
+                          ),
+                        ],
                       ),
 
-                      child: SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.crossTick : ImageResource.doneTick, height: 10, width: 10,)),
+                      child: Icon(
+                          widget.habit.habitType == HabitType.quit ? Icons.close : Icons.done, color: ColorStrings.whiteColor, size: 18,)),
                 );
               }
 
               if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
                 return Center(
                   child: Container(
-                      height: 32,
-                      width: 35,
+                      height: 36,
+                      width: 36,
                       decoration: BoxDecoration(
-                          color: const Color(0xffF79009),
-                          borderRadius: BorderRadius.circular(9.6)
+                          color: Colors.amberAccent,
+                          borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                            spreadRadius: 0.4, // Light spread for subtle effect
+                            blurRadius: 1, // Smooth blur for softer shadow
+                            offset: Offset(0, 2), // Shadow slightly below the element
+                          ),
+                        ],
                       ),
 
-                      child: SvgPicture.asset(ImageResource.skipTick, height: 10, width: 10,)),
+                      child: Icon(Icons.last_page,color: ColorStrings.whiteColor,)),
                 );
               }
 
@@ -216,63 +322,142 @@ class _CalendarPageState extends State<CalendarPage> {
                       height: 32,
                       width: 35,
                       decoration: BoxDecoration(
-                          color: widget.habit.habitType == HabitType.quit ? Color(0xff079455) : Color(0xffD92D20)  ,
-                          borderRadius: BorderRadius.circular(9.6)
+                          color: widget.habit.habitType == HabitType.quit ? Colors.green : Colors.red ,
+                          borderRadius: BorderRadius.circular(9.6),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                            spreadRadius: 0.4, // Light spread for subtle effect
+                            blurRadius: 1, // Smooth blur for softer shadow
+                            offset: Offset(0, 2), // Shadow slightly below the element
+                          ),
+                        ],
                       ),
 
-                      child: SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.doneTick : ImageResource.crossTick, height: 10, width: 10,)),
+                      child: Icon(
+                          widget.habit.habitType == HabitType.quit ? Icons.close : Icons.done, color: ColorStrings.whiteColor, size: 18,)),
                 );
               }
 
-              return null;
+              return Center(
+                child: Container(
+                  height: 36,
+                  width: 36,
+                  decoration: BoxDecoration(
+                    color: ColorStrings.whiteColor, // Background color for days outside the current month
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                        spreadRadius: 0.4, // Light spread for subtle effect
+                        blurRadius: 1, // Smooth blur for softer shadow
+                        offset: Offset(0, 2), // Shadow slightly below the element
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${date.day}',
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600), // White text color for outside days
+                    ),
+                  ),
+                ),
+              );
             },
             selectedBuilder: (context, date, events) {
               if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, date))) {
                 return Center(
                   child: Container(
-                      height: 32,
-                      width: 35,
+                      height: 36,
+                      width: 36,
                       decoration: BoxDecoration(
-                          color: widget.habit.habitType == HabitType.quit ?  Color(0xffD92D20) : Color(0xff079455),
-                          borderRadius: BorderRadius.circular(9.6)
+                          color: widget.habit.habitType == HabitType.quit ?  Colors.red: Colors.green,
+                          borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                            spreadRadius: 0.4, // Light spread for subtle effect
+                            blurRadius: 1, // Smooth blur for softer shadow
+                            offset: Offset(0, 2), // Shadow slightly below the element
+                          ),
+                        ],
                       ),
 
 
-                      child: SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.crossTick : ImageResource.doneTick, height: 10, width: 10,)),
+                      child: Icon(
+                        widget.habit.habitType == HabitType.quit ? Icons.close : Icons.done, color: ColorStrings.whiteColor, size: 18,)),
                 );
               }
-
-
 
               if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
                 return Center(
                   child: Container(
-                      height: 32,
-                      width: 35,
+                      height: 36,
+                      width: 36,
                       decoration: BoxDecoration(
-                          color: const Color(0xffF79009),
-                          borderRadius: BorderRadius.circular(9.6)
+                          color: Colors.amberAccent,
+                          borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                            spreadRadius: 0.4, // Light spread for subtle effect
+                            blurRadius: 1, // Smooth blur for softer shadow
+                            offset: Offset(0, 2), // Shadow slightly below the element
+                          ),
+                        ],
                       ),
 
-                      child: SvgPicture.asset(ImageResource.skipTick, height: 10, width: 10,)),
+                      child: Icon(Icons.last_page,color: ColorStrings.whiteColor,)),
                 );
               }
 
               if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
                 return Center(
                   child: Container(
-                      height: 32,
-                      width: 35,
+                      height: 36,
+                      width: 36,
                       decoration: BoxDecoration(
                           color: widget.habit.habitType == HabitType.quit ? Color(0xff079455) : Color(0xffD92D20)  ,
-                          borderRadius: BorderRadius.circular(9.6)
+                          borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                            spreadRadius: 0.4, // Light spread for subtle effect
+                            blurRadius: 1, // Smooth blur for softer shadow
+                            offset: Offset(0, 2), // Shadow slightly below the element
+                          ),
+                        ],
                       ),
 
-                      child:  SvgPicture.asset(widget.habit.habitType == HabitType.quit ? ImageResource.doneTick : ImageResource.crossTick, height: 10, width: 10,)),
+                      child: Icon(
+                          widget.habit.habitType == HabitType.quit ? Icons.done : Icons.close, color: ColorStrings.whiteColor)),
                 );
               }
 
-              return null;
+              return Center(
+                child: Container(
+                  height: 36,
+                  width: 36,
+                  decoration: BoxDecoration(
+                    color: ColorStrings.cyanColor, // Background color for days outside the current month
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                        spreadRadius: 0.4, // Light spread for subtle effect
+                        blurRadius: 1, // Smooth blur for softer shadow
+                        offset: Offset(0, 2), // Shadow slightly below the element
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${date.day}',
+                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400), // White text color for outside days
+                    ),
+                  ),
+                ),
+              );
             },
 
           ),
