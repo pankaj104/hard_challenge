@@ -9,6 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/utils/app_utils.dart';
 import 'package:hard_challenge/utils/colors.dart';
+import 'package:hard_challenge/utils/helpers.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
 import 'package:hard_challenge/widgets/custom_time_duration_picker.dart';
 import 'package:hard_challenge/widgets/habit_type.dart';
@@ -16,6 +17,7 @@ import 'package:hard_challenge/widgets/headingH1_widget.dart';
 import 'package:hard_challenge/widgets/headingH2_widget.dart';
 import 'package:hard_challenge/widgets/label_changer.dart';
 import 'package:hard_challenge/widgets/number_picker.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -127,7 +129,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         if (newDate.isBefore(_startDate)) {
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            showFlushBar(
+            showFlushBarHelper(
               context,
               message: "End date cannot be before the start date.",
             );
@@ -636,7 +638,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                                    showFlushBar(
+                                    showFlushBarHelper(
                                       context,
                                       message: "Please Enter Habit name",
                                     );
@@ -1347,9 +1349,42 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       );
       log('New habbit added Data $newHabit');
       Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
+      // saveHabit(newHabit);
 
       Navigator.of(context).pop();
 
     }
   }
+
+
+  // void saveHabit(Habit habit) async {
+  //   var box = await Hive.openBox<Habit>('habitBox');
+  //   await box.add(habit);
+  //   await getHabit(1);
+  // }
+  //
+  // Future<Habit?> getHabit(int index) async {
+  //   var box = await Hive.openBox<Habit>('habitBox');
+  //   Habit? habit = box.get(index);
+  //
+  //   // If habit is not null, print its details
+  //   if (habit != null) {
+  //     log('test hii');
+  //     print('Habit Title: ${habit.title}');
+  //     print('Habit Category: ${habit.category}');
+  //     print('Habit Type: ${habit.habitType}');
+  //     print('Task Type: ${habit.taskType}');
+  //     print('Repeat Type: ${habit.repeatType}');
+  //     print('Start Date: ${habit.startDate}');
+  //     print('End Date: ${habit.endDate ?? 'N/A'}');
+  //     print('Progress: ${habit.progressJson}');
+  //     print('Notification Times: ${habit.notificationTime}');
+  //     print('Notes: ${habit.notes ?? 'N/A'}');
+  //   } else {
+  //     print('No Habit found at index: $index');
+  //   }
+  //
+  //   return habit;
+  // }
+
 }
