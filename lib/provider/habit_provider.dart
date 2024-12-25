@@ -181,24 +181,33 @@ class HabitProvider with ChangeNotifier {
     if (habit.repeatType == RepeatType.selectDays) {
       DateTime loopDate = habit.startDate!;
       DateTime endDate = habit.endDate!;
-      DateTime startDate = habit.startDate!;
+      DateTime now = DateTime.now();
+      now = DateTime(now.year, now.month, now.day); // Reset `now` to midnight
       log('habit.days: ${habit.days}');
-      while ((loopDate.isAfter(startDate) || loopDate.isAtSameMomentAs(startDate)) &&
-          (loopDate.isBefore(endDate.add(Duration(days: 1))) || loopDate.isAtSameMomentAs(endDate))) {
+
+      while (!loopDate.isAfter(endDate)) {
         int dayIndex = loopDate.weekday;
-        // Skip today's date
-        if (loopDate.isAtSameMomentAs(now)) {
-        } else if (habit.days!.contains(dayIndex)) {
-          if (!categoryProgressJson.containsKey(loopDate) ||
-              (categoryProgressJson[loopDate]!.status != TaskStatus.done &&
-                  categoryProgressJson[loopDate]!.status != TaskStatus.skipped)) {
-            missedDates.add(loopDate);
+
+        // Skip today's date and any date after today
+        if (loopDate.isBefore(now)) {
+          // Check if the loopDate is part of the selected days
+          if (habit.days!.contains(dayIndex)) {
+            if (!categoryProgressJson.containsKey(loopDate) ||
+                (categoryProgressJson[loopDate]!.status != TaskStatus.done &&
+                    categoryProgressJson[loopDate]!.status != TaskStatus.skipped)) {
+              missedDates.add(loopDate);
+            }
           }
         }
+
+        // Increment the loop date by one day
         loopDate = loopDate.add(const Duration(days: 1));
       }
-      log('missed list $missedDates');
+
+      log('Missed dates list: $missedDates');
     }
+
+
     else if (habit.repeatType == RepeatType.selectedDate && habit.selectedDates != null) {
       for (var date in habit.selectedDates!.where((date) => date.isBefore(now))) {
         if (!categoryProgressJson.containsKey(date) ||

@@ -53,43 +53,58 @@ class _CalendarPageState extends State<CalendarPage> {
     return habitSkippedDateList;
   }
 
-
   List<DateTime> habitMissedDateStore(Habit habit) {
     List<DateTime> habitMissedDateList = [];
-    DateTime now = setSelectedDate(DateTime.now());
+    DateTime now = DateTime.now();
+    now = DateTime(now.year, now.month, now.day); // Reset time to midnight
 
     DateTime habitStartDate = habit.startDate ?? now;
     DateTime startDate = habitStartDate;
-
-    // Use endDate as habit.endDate or now if not set
     DateTime endDate = habit.endDate ?? now;
+    for (DateTime date = startDate;
+    date.isBefore(endDate.add(const Duration(days: 1)));
+    date = date.add(const Duration(days: 1))) {
+      // Skip today's date and future dates
+      if (date.isAfter(now) || date.isAtSameMomentAs(now)) {
+        continue;
+      }
 
-    // Iterate over the date range from startDate to endDate (inclusive)
-    for (DateTime date = startDate; date.isBefore(endDate.add(const Duration(days: 1))); date = date.add(const Duration(days: 1))) {
       bool isValidDate = false;
+      switch (habit.repeatType) {
+        case RepeatType.selectDays:
+          if (habit.days != null && habit.days!.contains(date.weekday)) {
+            isValidDate = true;
+          }
+          break;
 
-      // Check based on repeat type
-      if (habit.repeatType == RepeatType.selectDays) {
-        // Use date.weekday directly
-        if (habit.days!.contains(date.weekday)) {
-          isValidDate = true;
-        }
-      } else if (habit.repeatType == RepeatType.selectedDate) {
-        if (habit.selectedDates != null && habit.selectedDates!.contains(date)) {
-          isValidDate = true;
-        }
-      } else if (habit.repeatType == RepeatType.weekly) {
-        isValidDate = habit.days!.contains(date.weekday % 7);
-      } else if (habit.repeatType == RepeatType.monthly) {
-        if (habit.selectedDates != null && habit.selectedDates!.any((d) => d.month == date.month && d.day == date.day)) {
-          isValidDate = true;
-        }
+        case RepeatType.selectedDate:
+          if (habit.selectedDates != null && habit.selectedDates!.contains(date)) {
+            isValidDate = true;
+          }
+          break;
+
+        case RepeatType.weekly:
+          if (habit.days != null && habit.days!.contains(date.weekday % 7)) {
+            isValidDate = true;
+          }
+          break;
+
+        case RepeatType.monthly:
+          if (habit.selectedDates != null &&
+              habit.selectedDates!.any((d) => d.month == date.month && d.day == date.day)) {
+            isValidDate = true;
+          }
+          break;
+
+        default:
+          break;
       }
 
       // If the date is valid and missed, add it to the list
-      if (isValidDate && (!habit.progressJson.containsKey(date) ||
-          (habit.progressJson[date]!.status != TaskStatus.done &&
-              habit.progressJson[date]!.status != TaskStatus.skipped))) {
+      if (isValidDate &&
+          (!habit.progressJson.containsKey(date) ||
+              (habit.progressJson[date]!.status != TaskStatus.done &&
+                  habit.progressJson[date]!.status != TaskStatus.skipped))) {
         habitMissedDateList.add(date);
       }
     }
