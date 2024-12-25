@@ -17,7 +17,7 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  // CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
@@ -69,10 +69,13 @@ class _CalendarPageState extends State<CalendarPage> {
 
       // Check based on repeat type
       if (habit.repeatType == RepeatType.selectDays) {
-        if (habit.days!.contains(date.weekday % 7)) {
+        // Use date.weekday directly
+        if (habit.days!.contains(date.weekday)) {
           isValidDate = true;
         }
-      } else if (habit.repeatType == RepeatType.selectedDate) {
+      }
+
+      else if (habit.repeatType == RepeatType.selectedDate) {
         if (habit.selectedDates != null && habit.selectedDates!.contains(date)) {
           isValidDate = true;
         }
@@ -120,15 +123,15 @@ class _CalendarPageState extends State<CalendarPage> {
           onPageChanged: (focusedDay) {
             _focusedDay = focusedDay;
           },
-          calendarStyle:
-          CalendarStyle(
-
-            // selectedDecoration: BoxDecoration(
-            //   color: Colors.blue,
-            //   shape: BoxShape.circle,
-            //   // borderRadius: BorderRadius.circular(9.6),
-            // ),
-          ),
+          // calendarStyle:
+          // CalendarStyle(
+          //
+          //   // selectedDecoration: BoxDecoration(
+          //   //   color: Colors.blue,
+          //   //   shape: BoxShape.circle,
+          //   //   // borderRadius: BorderRadius.circular(9.6),
+          //   // ),
+          // ),
           daysOfWeekStyle: const DaysOfWeekStyle(
             // Customize weekdays row
             weekdayStyle: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
@@ -175,6 +178,28 @@ class _CalendarPageState extends State<CalendarPage> {
               );
             },
             defaultBuilder: (context, date, events) {
+              if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
+                return Center(
+                  child: Container(
+                      height: 36,
+                      width: 36,
+                      decoration: BoxDecoration(
+                        color: widget.habit.habitType == HabitType.quit ? Colors.green : Colors.red  ,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                            spreadRadius: 0.4, // Light spread for subtle effect
+                            blurRadius: 1, // Smooth blur for softer shadow
+                            offset: Offset(0, 2), // Shadow slightly below the element
+                          ),
+                        ],
+                      ),
+
+                      child: Icon(
+                        widget.habit.habitType == HabitType.quit ? Icons.done : Icons.close, color: ColorStrings.whiteColor, size: 18,)),
+                );
+              }
 
               if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, date))) {
                 return Center(
@@ -222,28 +247,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }
 
-               if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
-                return Center(
-                  child: Container(
-                      height: 36,
-                      width: 36,
-                      decoration: BoxDecoration(
-                          color: widget.habit.habitType == HabitType.quit ? Colors.green : Colors.red  ,
-                          borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                            spreadRadius: 0.4, // Light spread for subtle effect
-                            blurRadius: 1, // Smooth blur for softer shadow
-                            offset: Offset(0, 2), // Shadow slightly below the element
-                          ),
-                        ],
-                      ),
 
-                      child: Icon(
-                          widget.habit.habitType == HabitType.quit ? Icons.done : Icons.close, color: ColorStrings.whiteColor, size: 18,)),
-                );
-              }
 
               return Center(
                 child: Container(
