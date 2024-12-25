@@ -70,61 +70,66 @@ class ProgressWithStatus {
 
 @HiveType(typeId: 1)
 class Habit {
+
   @HiveField(0)
-  String title;
+  String id; // Unique identifier for the habit
 
   @HiveField(1)
-  String category;
+  String title;
 
   @HiveField(2)
-  IconData habitIcon;
+  String category;
 
   @HiveField(3)
-  Color iconBgColor;
+  IconData habitIcon;
 
   @HiveField(4)
-  List<String> notificationTime;
+  Color iconBgColor;
 
   @HiveField(5)
-  TaskType taskType;
+  List<String> notificationTime;
 
   @HiveField(6)
-  RepeatType repeatType;
+  TaskType taskType;
 
   @HiveField(7)
-  HabitType habitType;
+  RepeatType repeatType;
 
   @HiveField(8)
-  Duration? timer;
+  HabitType habitType;
 
   @HiveField(9)
-  int? value;
+  Duration? timer;
 
   @HiveField(10)
-  Map<DateTime, ProgressWithStatus> progressJson;
+  int? value;
 
   @HiveField(11)
-  List<int>? days;
+  Map<DateTime, ProgressWithStatus> progressJson;
 
   @HiveField(12)
-  List<DateTime>? selectedDates;
+  List<int>? days;
 
   @HiveField(13)
-  int? selectedTimesPerWeek;
+  List<DateTime>? selectedDates;
 
   @HiveField(14)
-  int? selectedTimesPerMonth;
+  int? selectedTimesPerWeek;
 
   @HiveField(15)
-  DateTime startDate;
+  int? selectedTimesPerMonth;
 
   @HiveField(16)
-  DateTime? endDate;
+  DateTime startDate;
 
   @HiveField(17)
+  DateTime? endDate;
+
+  @HiveField(18)
   String? notes;
 
   Habit({
+    required this.id,
     required this.title,
     required this.category,
     required this.habitIcon,
@@ -147,7 +152,7 @@ class Habit {
 
   @override
   String toString() {
-    return 'Habit(title: $title, category: $category,  habitIcon: $habitIcon, IconBgColor: $iconBgColor notificationTime: $notificationTime, '
+    return 'Habit(id: $id title: $title, category: $category,  habitIcon: $habitIcon, IconBgColor: $iconBgColor notificationTime: $notificationTime, '
         'taskType: $taskType, habitType: $habitType, repeatType: $repeatType, timer: $timer, value: $value, '
         'progress: $progressJson, days: $days, startDate: $startDate, endDate: $endDate, selectedDates: $selectedDates, '
         'selectedTimesPerWeek: $selectedTimesPerWeek, selectedTimesPerMonth: $selectedTimesPerMonth, notes: $notes)';

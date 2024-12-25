@@ -12,9 +12,11 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int currentIndex = 0;
+  // List<Habit> get_all_habit = habitProvider.getAllHabit();
+
   final List<Widget> screens = [
     HomeScreen(),
-    AddChallengeScreen(),
+    AddChallengeScreen(isFromEdit: false,),
     StatisticsCategoryWise(habit: [],),
   ];
 

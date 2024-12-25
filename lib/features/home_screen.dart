@@ -62,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daily Habits'),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [
@@ -78,12 +79,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          IconButton(onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                                StatisticsCategoryWise(habit: get_all_habit,)));
-                          },
-                              icon: const Icon(
-                                Icons.add_chart, size: 40, color: Colors.blue,)),
+                          // IconButton(onPressed: () {
+                          //   Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                          //       StatisticsCategoryWise(habit: get_all_habit,)));
+                          // },
+                          //     icon: const Icon(
+                          //       Icons.add_chart, size: 40, color: Colors.blue,)),
                           Container(
                             child: Column(
                               children: [
@@ -98,11 +99,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                           ),
-                          IconButton(onPressed: () {
-                            setState(() async {
-                              await habitProvider.clearHabits();
-                            });
-                          }, icon: Icon(Icons.clear))
+                          // IconButton(onPressed: () {
+                          //   setState(() async {
+                          //     await habitProvider.clearHabits();
+                          //   });
+                          // }, icon: Icon(Icons.clear))
                         ],
                       ),
                       Container(

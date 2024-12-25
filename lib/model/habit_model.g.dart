@@ -57,66 +57,69 @@ class HabitAdapter extends TypeAdapter<Habit> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Habit(
-      title: fields[0] as String,
-      category: fields[1] as String,
-      habitIcon: fields[2] as IconData,
-      iconBgColor: fields[3] as Color,
-      notificationTime: (fields[4] as List).cast<String>(),
-      taskType: fields[5] as TaskType,
-      habitType: fields[7] as HabitType,
-      repeatType: fields[6] as RepeatType,
-      timer: fields[8] as Duration?,
-      value: fields[9] as int?,
-      progressJson: (fields[10] as Map).cast<DateTime, ProgressWithStatus>(),
-      days: (fields[11] as List?)?.cast<int>(),
-      selectedDates: (fields[12] as List?)?.cast<DateTime>(),
-      selectedTimesPerWeek: fields[13] as int?,
-      selectedTimesPerMonth: fields[14] as int?,
-      startDate: fields[15] as DateTime,
-      endDate: fields[16] as DateTime?,
-      notes: fields[17] as String?,
+      id: fields[0] as String,
+      title: fields[1] as String,
+      category: fields[2] as String,
+      habitIcon: fields[3] as IconData,
+      iconBgColor: fields[4] as Color,
+      notificationTime: (fields[5] as List).cast<String>(),
+      taskType: fields[6] as TaskType,
+      habitType: fields[8] as HabitType,
+      repeatType: fields[7] as RepeatType,
+      timer: fields[9] as Duration?,
+      value: fields[10] as int?,
+      progressJson: (fields[11] as Map).cast<DateTime, ProgressWithStatus>(),
+      days: (fields[12] as List?)?.cast<int>(),
+      selectedDates: (fields[13] as List?)?.cast<DateTime>(),
+      selectedTimesPerWeek: fields[14] as int?,
+      selectedTimesPerMonth: fields[15] as int?,
+      startDate: fields[16] as DateTime,
+      endDate: fields[17] as DateTime?,
+      notes: fields[18] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Habit obj) {
     writer
-      ..writeByte(18)
+      ..writeByte(19)
       ..writeByte(0)
-      ..write(obj.title)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.category)
+      ..write(obj.title)
       ..writeByte(2)
-      ..write(obj.habitIcon)
+      ..write(obj.category)
       ..writeByte(3)
-      ..write(obj.iconBgColor)
+      ..write(obj.habitIcon)
       ..writeByte(4)
-      ..write(obj.notificationTime)
+      ..write(obj.iconBgColor)
       ..writeByte(5)
-      ..write(obj.taskType)
+      ..write(obj.notificationTime)
       ..writeByte(6)
-      ..write(obj.repeatType)
+      ..write(obj.taskType)
       ..writeByte(7)
-      ..write(obj.habitType)
+      ..write(obj.repeatType)
       ..writeByte(8)
-      ..write(obj.timer)
+      ..write(obj.habitType)
       ..writeByte(9)
-      ..write(obj.value)
+      ..write(obj.timer)
       ..writeByte(10)
-      ..write(obj.progressJson)
+      ..write(obj.value)
       ..writeByte(11)
-      ..write(obj.days)
+      ..write(obj.progressJson)
       ..writeByte(12)
-      ..write(obj.selectedDates)
+      ..write(obj.days)
       ..writeByte(13)
-      ..write(obj.selectedTimesPerWeek)
+      ..write(obj.selectedDates)
       ..writeByte(14)
-      ..write(obj.selectedTimesPerMonth)
+      ..write(obj.selectedTimesPerWeek)
       ..writeByte(15)
-      ..write(obj.startDate)
+      ..write(obj.selectedTimesPerMonth)
       ..writeByte(16)
-      ..write(obj.endDate)
+      ..write(obj.startDate)
       ..writeByte(17)
+      ..write(obj.endDate)
+      ..writeByte(18)
       ..write(obj.notes);
   }
 

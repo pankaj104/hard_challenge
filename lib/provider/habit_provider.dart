@@ -37,21 +37,37 @@ class HabitProvider with ChangeNotifier {
     log('All Habit data: $habits');
   }
 
-  void updateHabit(int index, Habit updatedHabit) async {
+  void updateHabit(Habit updatedHabit) async {
+    int index = _habits.indexWhere((habit) => habit.id == updatedHabit.id);
     if (index >= 0 && index < _habits.length) {
+      /// we can enable this if we want to update existing progress.
+
+      // // Preserve existing progress data
+      // Map<DateTime, ProgressWithStatus> existingProgress =
+      //     _habits[index].progressJson;
+      // // Merge progress data into the updated habit
+      // updatedHabit.progressJson.addAll(existingProgress);
+
+      // Save the updated habit in the Hive box
       await _habitBox?.putAt(index, updatedHabit);
-    _habits[index] = updatedHabit;
+
+      _habits[index] = updatedHabit;
+
       notifyListeners();
     }
   }
 
-  void deleteHabit(int index) async {
-    if (index >= 0 && index < _habits.length) {
+
+  void deleteHabit(String habitId) async {
+    int index = _habits.indexWhere((habit) => habit.id == habitId);
+
+    if (index != -1) {
       await _habitBox?.deleteAt(index);
-    _habits.removeAt(index);
+      _habits.removeAt(index);
       notifyListeners();
     }
   }
+
 
   Habit getHabit(int index) {
     return _habits[index];

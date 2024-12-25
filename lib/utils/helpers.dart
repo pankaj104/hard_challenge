@@ -19,7 +19,7 @@ Flushbar showFlushBarHelper(
         ),
       ),
       // message: message,
-      backgroundColor: ColorStrings.greenColor,
+      backgroundColor: ColorStrings.redColor,
       duration: Duration(seconds: durationInSeconds),
       borderRadius: const BorderRadius.only(
         bottomLeft: Radius.circular(20),

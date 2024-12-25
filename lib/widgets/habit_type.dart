@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/model/habit_model.dart';
 import 'package:hard_challenge/utils/colors.dart';
 
-
 class HabitTypeTabBar extends StatefulWidget {
   final Function(HabitType) onHabitTypeSelected;
   final HabitType selectedHabitType;
@@ -24,12 +23,26 @@ class _HabitTypeTabBarState extends State<HabitTypeTabBar> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: HabitType.values.length, vsync: this);
-    _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
-        widget.onHabitTypeSelected(HabitType.values[_tabController.index]);
-      }
-    });
+    _tabController = TabController(
+      length: HabitType.values.length,
+      vsync: this,
+      initialIndex: HabitType.values.indexOf(widget.selectedHabitType),
+    );
+    _tabController.addListener(_handleTabSelection);
+  }
+
+  @override
+  void didUpdateWidget(HabitTypeTabBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedHabitType != widget.selectedHabitType) {
+      _tabController.index = HabitType.values.indexOf(widget.selectedHabitType);
+    }
+  }
+
+  void _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      widget.onHabitTypeSelected(HabitType.values[_tabController.index]);
+    }
   }
 
   @override
@@ -93,6 +106,7 @@ class _HabitTypeTabBarState extends State<HabitTypeTabBar> with SingleTickerProv
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabSelection);
     _tabController.dispose();
     super.dispose();
   }
