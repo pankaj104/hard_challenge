@@ -177,8 +177,6 @@ class _CalendarPageState extends State<CalendarPage> {
               );
             },
             defaultBuilder: (context, date, events) {
-              log('date check builder ${setSelectedDate(date)}');
-
             if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date))))  {
                 return Center(
                   child: Container(

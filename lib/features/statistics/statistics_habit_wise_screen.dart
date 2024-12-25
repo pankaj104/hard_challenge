@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hard_challenge/features/addChallenge/add_challenge_screen.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
@@ -58,12 +59,27 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
 
                   Expanded(
                     child: Center(
-                      child: HeadingH2Widget("Statistics Habit wise"),
+                      child: HeadingH2Widget("Habit wise"),
                     ),
                   ),
-                  SizedBox(
-                    width: 42.w,
-                  ),
+                  Row(children: [
+                    IconButton(onPressed: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddChallengeScreen(habit: widget.habit, isFromEdit: true,)),);
+
+                    }, icon: Icon(Icons.edit)),
+
+                    IconButton(onPressed: (){
+                      setState(() {
+                        Provider.of<HabitProvider>(context, listen: false).deleteHabit(widget.habit.id);
+                      });
+                      Navigator.pop(context);
+
+                    }, icon: Icon(Icons.delete))
+
+                  ],),
+
                 ],
               ),
 

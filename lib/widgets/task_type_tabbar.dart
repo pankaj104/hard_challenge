@@ -23,12 +23,26 @@ class _TaskTypeTabBarState extends State<TaskTypeTabBar> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: TaskType.values.length, vsync: this);
-    _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
-        widget.onTabSelected(TaskType.values[_tabController.index]);
-      }
-    });
+    _tabController = TabController(
+      length: TaskType.values.length,
+      vsync: this,
+      initialIndex: TaskType.values.indexOf(widget.selectedTaskType), // Initialize to the correct index
+    );
+    _tabController.addListener(_handleTabSelection);
+  }
+
+  @override
+  void didUpdateWidget(TaskTypeTabBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedTaskType != widget.selectedTaskType) {
+      _tabController.index = TaskType.values.indexOf(widget.selectedTaskType); // Update the index
+    }
+  }
+
+  void _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      widget.onTabSelected(TaskType.values[_tabController.index]); // Notify parent of the selection
+    }
   }
 
   @override
@@ -92,6 +106,7 @@ class _TaskTypeTabBarState extends State<TaskTypeTabBar> with SingleTickerProvid
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabSelection);
     _tabController.dispose();
     super.dispose();
   }

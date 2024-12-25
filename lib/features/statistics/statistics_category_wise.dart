@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:hard_challenge/utils/app_utils.dart';
-import 'package:hard_challenge/widgets/weekly_analysis_chart_overall_habit.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
-
 import '../../model/habit_model.dart';
 import '../../utils/colors.dart';
 import '../../widgets/calendar_category_wise_widget.dart';
 import '../../widgets/info_tile_widget.dart';
-import '../../widgets/weekly_analysis_chart_category_wise.dart';
 
 class StatisticsCategoryWise extends StatefulWidget {
   final List<Habit> habit;
@@ -45,6 +42,7 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Category wise Statistics'),
+          automaticallyImplyLeading: false,
         ),
         body: Padding(
           padding: const EdgeInsets.all(12.0),

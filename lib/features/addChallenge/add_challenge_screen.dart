@@ -18,10 +18,10 @@ import 'package:hard_challenge/widgets/headingH1_widget.dart';
 import 'package:hard_challenge/widgets/headingH2_widget.dart';
 import 'package:hard_challenge/widgets/label_changer.dart';
 import 'package:hard_challenge/widgets/number_picker.dart';
-import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:uuid/uuid.dart';
 import '../../model/habit_model.dart';
 import '../../provider/habit_provider.dart';
 import '../../service/notification_helper.dart';
@@ -29,7 +29,6 @@ import '../../widgets/counter_widget.dart';
 import '../../widgets/custom_category_list.dart';
 import '../../widgets/date_picker_bottom_sheet.dart';
 import '../../widgets/habit_custom_button.dart';
-import '../../widgets/icon_button_widget.dart';
 import '../../widgets/notification/add_reminder_button.dart';
 import '../../widgets/notification/notification_item.dart';
 import '../../widgets/notification/time_picker_bottom_sheet.dart';
@@ -37,7 +36,9 @@ import '../../widgets/task_type_tabbar.dart';
 import '../../widgets/weekday_chip.dart';
 
 class AddChallengeScreen extends StatefulWidget {
-  const AddChallengeScreen({super.key});
+  final Habit? habit;
+   bool isFromEdit = false;
+   AddChallengeScreen({super.key, this.habit, required this.isFromEdit});
 
   @override
   _AddChallengeScreenState createState() => _AddChallengeScreenState();
@@ -55,12 +56,14 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   int _taskValue = 5; // default value 5
   RepeatType _repeatSelectedItem = RepeatType.selectDays;
 
-  DateTime _startDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  DateTime _startDate = setSelectedDate(DateTime.now());
   DateTime? _endDate ;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   Color selectedColor = Colors.orange;
   int selectedTimesPerWeek = 1;
   int selectedTimesPerMonth = 1;
+  final uuid = Uuid();
+  String habitId = '';
 
   List<String> repeatItems = [
     RepeatType.selectDays.toString(),
@@ -70,6 +73,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   ];
 
   TextEditingController notecontroller = TextEditingController();
+  final TextEditingController habitNameController = TextEditingController();
+
   String? habitNote ;
 
   List<String> selectedTime = [];
@@ -83,6 +88,32 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     {'S': 6},
   ];
 
+  @override
+  void initState() {
+    print('Habit ID 43: ${uuid.v4()}'); // Debugging the generated ID
+    super.initState();
+    habitId = uuid.v4();
+    if (widget.habit != null) {
+       _selectedCategory = widget.habit?.category ?? 'General';
+      habitNameController.text = widget.habit?.title ?? '';
+      notecontroller.text = widget.habit?.notes ?? '';
+      _taskType = widget.habit?.taskType ?? TaskType.count;
+       _habitType= widget.habit?.habitType ?? HabitType.build;
+       // _repeatType= widget.habit?.repeatType ?? RepeatType.selectDays;
+       _repeatSelectedItem= widget.habit?.repeatType ?? RepeatType.selectDays;
+       _taskValue= widget.habit?.value ?? 5;
+       _startDate= widget.habit?.startDate ?? setSelectedDate(DateTime.now());
+       _endDate= widget.habit?.endDate;
+       selectedTimesPerMonth= widget.habit?.selectedTimesPerMonth ?? 1;
+       selectedTimesPerWeek= widget.habit?.selectedTimesPerWeek ?? 1;
+       selectedColor= widget.habit?.iconBgColor ?? Colors.orange;
+       habitNote= widget.habit?.notes ?? '';
+       _timerDuration= widget.habit?.timer ?? const Duration(minutes: 1);
+       _formattedDuration= _formatDuration(widget.habit?.timer ?? const Duration(minutes: 1)) ;
+       habitId = widget.habit?.id ?? habitId;
+    }
+    focusNode = FocusNode();
+  }
 
   void _addReminder(String time) {
     setState(() {
@@ -462,15 +493,12 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    focusNode = FocusNode();
-  }
 
   @override
   void dispose() {
     focusNode?.dispose();
+    notecontroller.dispose();
+    habitNameController.dispose();
     super.dispose();
   }
 
@@ -493,29 +521,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Center(
-                  child: HeadingH2Widget("New Habit"),
+                  child: widget.isFromEdit ? HeadingH2Widget("Edit"): HeadingH2Widget("New Habit") ,
                 ),
-            //     Row(
-            //       children: [
-            // //         IconButtonWidget(icon: ImageResource.closeIcon,
-            // //             onPressed: (){
-            // //           // Navigator.pop(context);
-            // //               Navigator.push(
-            // //                   context,
-            // //                   MaterialPageRoute(builder: (context) => MainScreen())
-            // //               );
-            // // } ),
-            //
-            //         Expanded(
-            //           child: Center(
-            //             child: HeadingH2Widget("New Habit"),
-            //           ),
-            //         ),
-            //         SizedBox(
-            //           width: 42.w,
-            //         ),
-            //       ],
-            //     ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -560,7 +567,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                _selectedCategory,
+                                _selectedCategory!,
                                 style: GoogleFonts.poppins(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w400,
@@ -639,6 +646,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             width: 250,
                             child: TextFormField(
                               focusNode: focusNode,
+                              controller: habitNameController,
                               decoration:   InputDecoration(
                                 hintText: 'Habit Name',
                                 border: InputBorder.none,  // Removes the default underline
@@ -761,7 +769,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 if (_taskType == TaskType.count)
 
                   Padding(
-                    padding: const EdgeInsets.only(right: 5, left: 5, top: 10),
+                    padding: const EdgeInsets.only(right: 2, left: 2, top: 10),
                     child: Row(
                       children: [
                         CounterWidget(
@@ -1238,7 +1246,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 ),
                 const SizedBox(height: 40,),
                 Center(
-                  child: HabitCustomButton(buttonText: 'Add Habit', onTap: _submitForm, color: ColorStrings.headingBlue, widthOfButton: double.infinity, buttonTextColor: Colors.white,)
+                  child: HabitCustomButton(buttonText: widget.isFromEdit == true ? 'Update Habit' : 'Add Habit', onTap: _submitForm, color: ColorStrings.headingBlue, widthOfButton: double.infinity, buttonTextColor: Colors.white,)
                 ),
                 const SizedBox(height: 90,)
               ],
@@ -1333,37 +1341,60 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     );
   }
   void _submitForm() {
+
+
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+      if (_endDate == null) {
+        showFlushBarHelper(
+          context,
+          message: "Please add end date",
+        );
+        return;  // Exit the method early
+      }
       final newHabit = Habit(
-        title: _title,
-        category: _selectedCategory,
+        id: habitId!,
+        title: _title!,
+        category: _selectedCategory!,
         habitIcon: iconSelected,
         iconBgColor: selectedColor,
         notificationTime: selectedTime,
         taskType: _taskType,
-        repeatType: _repeatType,
+        repeatType: _repeatSelectedItem,
         habitType: _habitType,
         timer: _taskType == TaskType.time ? _timerDuration : null,
         value: _taskType == TaskType.count ? _taskValue : null,
         progressJson: {},
-        days: _repeatType == RepeatType.selectDays ? selectedDays : null,
+        days: _repeatSelectedItem == RepeatType.selectDays ? selectedDays : null,
         startDate: _startDate,
         endDate: _endDate,
-        selectedDates: _repeatType == RepeatType.selectedDate ? selectedDates : null,
-        selectedTimesPerWeek: _repeatType == RepeatType.weekly ? selectedTimesPerWeek : null,
-        selectedTimesPerMonth: _repeatType == RepeatType.monthly ? selectedTimesPerMonth : null,
-        notes: habitNote
+        selectedDates: _repeatSelectedItem == RepeatType.selectedDate ? selectedDates : null,
+        selectedTimesPerWeek: _repeatSelectedItem == RepeatType.weekly ? selectedTimesPerWeek : null,
+        selectedTimesPerMonth: _repeatSelectedItem == RepeatType.monthly ? selectedTimesPerMonth : null,
+        notes: habitNote,
       );
-      log('New habbit added Data $newHabit');
-      Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
-      // saveHabit(newHabit);
+
+      log('${widget.habit != null ? "Updated" : "New"} habit added: $newHabit');
+
+      // Use addHabit for new habits, updateHabit for existing habits
+      if (widget.habit != null) {
+        Provider.of<HabitProvider>(context, listen: false).updateHabit(newHabit);
+      } else {
+        Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
+      }
 
       Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MainScreen())
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
       );
     }
+  }
+
+  static String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 
 
