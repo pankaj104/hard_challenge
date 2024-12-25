@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hard_challenge/features/mainScreen/main_screen.dart';
 import 'package:hard_challenge/utils/app_utils.dart';
 import 'package:hard_challenge/utils/colors.dart';
 import 'package:hard_challenge/utils/helpers.dart';
@@ -491,23 +492,30 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    IconButtonWidget(icon: ImageResource.closeIcon,
-                        onPressed: (){
-                      Navigator.pop(context);
-            } ),
-
-                    Expanded(
-                      child: Center(
-                        child: HeadingH2Widget("New Habit"),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 42.w,
-                    ),
-                  ],
+                Center(
+                  child: HeadingH2Widget("New Habit"),
                 ),
+            //     Row(
+            //       children: [
+            // //         IconButtonWidget(icon: ImageResource.closeIcon,
+            // //             onPressed: (){
+            // //           // Navigator.pop(context);
+            // //               Navigator.push(
+            // //                   context,
+            // //                   MaterialPageRoute(builder: (context) => MainScreen())
+            // //               );
+            // // } ),
+            //
+            //         Expanded(
+            //           child: Center(
+            //             child: HeadingH2Widget("New Habit"),
+            //           ),
+            //         ),
+            //         SizedBox(
+            //           width: 42.w,
+            //         ),
+            //       ],
+            //     ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1351,8 +1359,10 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
       // saveHabit(newHabit);
 
-      Navigator.of(context).pop();
-
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen())
+      );
     }
   }
 

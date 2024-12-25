@@ -1,22 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:hard_challenge/features/statistics/statistics_overall.dart';
-import 'package:hard_challenge/utils/helpers.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:hard_challenge/utils/colors.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
-import 'package:hard_challenge/features/statistics/statistics_habit_wise_screen.dart';
-import 'package:intl/intl.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
 import '../addChallenge/add_challenge_screen.dart';
-import '../../model/habit_model.dart';
-import '../../provider/habit_provider.dart';
+import '../home_screen.dart';
 import '../statistics/statistics_category_wise.dart';
-import '../timer/timer_screen.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -24,565 +12,79 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  late DateTime _selectedDate;
-  @override
-  void initState() {
-    super.initState();
-    _selectedDate = DateTime.now().toUtc();
-    _selectedDate = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
-    print('_selectedDate $_selectedDate'); // Output: 2024-11-10 00:00:00.000
-  }
-
-  String formatDate(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-    final tomorrow = today.add(const Duration(days: 1));
-    final selectedDate = DateTime(date.year, date.month, date.day);
-    if (selectedDate.isAtSameMomentAs(today)) {
-      return 'Today';
-    } else if (selectedDate.isAtSameMomentAs(yesterday)) {
-      return 'Yesterday';
-    } else if (selectedDate.isAtSameMomentAs(tomorrow)) {
-      return 'Tomorrow';
-    } else {
-      // Check if the selected date is in the same year
-      if (date.year == now.year) {
-        return DateFormat('d MMM').format(date); // Format without year
-      } else {
-        return DateFormat('d MMM yyyy').format(date); // Format with year
-      }
-    }
-  }
-
+   int currentIndex = 0;
+  final List<Widget> screens = [
+    HomeScreen(),
+    AddChallengeScreen(),
+    StatisticsCategoryWise(habit: [],),
+  ];
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daily Habits'),
-      ),
-      body: Column(
-        children: [
-          Consumer<HabitProvider>(
-      builder: (context, habitProvider, child) {
-        List<Habit> get_all_habit = habitProvider.getAllHabit();
-        // final Map<DateTime, double> taskCompletion; // Map of date to completion percentage
-        // double completion = taskCompletion[date] ?? 0.0;
-
-
-        return
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                        StatisticsCategoryWise(habit: get_all_habit,)));
-                  },
-                      icon: const Icon(
-                        Icons.add_chart, size: 40, color: Colors.blue,)),
-                  Container(
-                    child: Column(
-                      children: [
-                        Text(
-                          formatDate(_selectedDate),
-                          style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                 IconButton(onPressed: () {
-                   setState(() async {
-                    await habitProvider.clearHabits();
-                   });
-                 }, icon: Icon(Icons.clear))
-                ],
-              ),
-              Container(
-                clipBehavior: Clip.hardEdge,
-                margin: EdgeInsets.symmetric(horizontal: 14.w),
-                decoration: const BoxDecoration(
-                  color: Colors.transparent,
-                ),
-                child: Consumer<HabitProvider>(
-                  builder: (context, habitProvider, child) {
-                    return Consumer<HabitProvider>(
-                        builder: (context, habitProvider, child) {
-                          return TableCalendar(
-                            rowHeight: 55,
-                            firstDay: DateTime.utc(2020, 10, 16),
-                            lastDay: DateTime.utc(2030, 3, 14),
-                            focusedDay: _selectedDate,
-                            availableGestures: AvailableGestures.all,
-                            calendarFormat: CalendarFormat.week,
-                            daysOfWeekStyle: const DaysOfWeekStyle(
-                              weekdayStyle: TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
-                              weekendStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.w300, fontSize: 15),
-                            ),
-                            selectedDayPredicate: (day) {
-                              return isSameDay(_selectedDate, day);
-                            },
-                            headerStyle: const HeaderStyle(
-                              formatButtonVisible: false,
-                              leftChevronVisible: false,
-                              rightChevronVisible: false,
-                              headerPadding: EdgeInsets.only(left: 10, bottom: 5, top: 5),
-                              titleTextStyle: TextStyle(fontSize: 0),
-                            ),
-                            onDaySelected: (selectedDay, focusedDay) {
-                              setState(() {
-                                Provider.of<HabitProvider>(context, listen: false).loadHabits();
-                                _selectedDate = selectedDay;
-                                log('selected date from calender $_selectedDate');
-                              });
-                            },
-                            calendarBuilders: CalendarBuilders(
-                              defaultBuilder: (context, date, _) {
-                                double completion = habitProvider.getAverageProgressForDate(formatStartDateToUtc1(date)).clamp(0.0, 1.0);
-                                log("completion $completion");
-                                return Center(
-                                  child: CircularPercentIndicator(
-                                    radius: 20.0,
-                                    lineWidth: 5.0,
-                                    percent: completion,
-                                    center: Text(
-                                      "${date.day}",
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                    progressColor: completion == 1.0 ? Colors.green : Colors.blue,
-                                    backgroundColor: Colors.grey.shade300,
-                                  ),
-                                );
-                              },
-                              todayBuilder: (context, date, _) {
-                                double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
-                                return Center(
-                                  child: CircularPercentIndicator(
-                                    radius: 20.0,
-                                    lineWidth: 5.0,
-                                    percent: completion,
-                                    center: Text(
-                                      "${date.day}",
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                    progressColor: completion == 1.0 ? Colors.green : Colors.blue,
-                                    backgroundColor: Colors.grey.shade300,
-                                  ),
-                                );
-                              },
-                              selectedBuilder: (context, date, _) {
-                                double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
-                                return Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue,
-                                    borderRadius: BorderRadius.circular(100),
-                                  ),
-                                  child: Center(
-                                    child: CircularPercentIndicator(
-                                      radius: 20.0,
-                                      lineWidth: 5.0,
-                                      percent: completion,
-                                      center: Text(
-                                        "${date.day}",
-                                        style: const TextStyle(fontSize: 16, color: Colors.black),
-                                      ),
-                                      progressColor: completion == 1.0 ? Colors.green : Colors.red,
-                                      backgroundColor: Colors.white60,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      );
-
-                  },
-                )
-
-              ),
-            ],
-          );
-      }
+      body: screens[currentIndex],
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => const AddChallengeScreen()),
+      //     );
+      //   },
+      //   child: const Icon(Icons.add),
+      // ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30.0),
+            topRight: Radius.circular(30.0),
           ),
-          // Calendar
-          // Display habits for the selected date
-          Expanded(
-            child: Consumer<HabitProvider>(
-              builder: (context, habitProvider, child) {
-                return FutureBuilder<List<Habit>>(
-                  // Replace this with the actual method that fetches habits asynchronously
-                  future: habitProvider.getHabitsForDate(setSelectedDate(_selectedDate)),
-                  builder: (context, snapshot) {
-                    // Check if the Future has completed and whether there were any errors
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(child: Text('No habits available'));
-                    } else {
-                      // Get the habits list for the selected date
-                      List<Habit> habitsForSelectedDate = snapshot.data!;
-                      log('snapshot data $habitsForSelectedDate');
-
-                      return ListView.builder(
-                        itemCount: habitsForSelectedDate.length,
-                        itemBuilder: (context, index) {
-                          Habit habit = habitsForSelectedDate[index];
-                          double progress =
-                              habit.progressJson[_selectedDate]?.progress ?? 0.0;
-                          log('_selectedDate on top ${setSelectedDate(_selectedDate)}');
-                          bool isSkipped =
-                              habit.progressJson[_selectedDate]?.status ==
-                                  TaskStatus.skipped;
-
-                          return Padding(
-                            padding: EdgeInsets.only(top: 10.h, bottom: 5.h),
-                            child: Container(
-                              clipBehavior: Clip.hardEdge,
-                              margin: EdgeInsets.symmetric(horizontal: 14.w),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(15),
-                                boxShadow: [
-                                  BoxShadow(
-                                    offset: Offset(0.0, 4.0),
-                                    color: Colors.grey.withOpacity(0.5),
-                                    blurRadius: 2.0,
-                                    spreadRadius: 1.0,
-                                  ),
-                                ],
-                              ),
-                              height: 65,
-                              child: Stack(
-                                children: [
-                                  // Progress indicator background
-                                  Positioned.fill(
-                                    child: LinearProgressIndicator(
-                                      value: isSkipped ? 0.0 : progress,
-                                      color: Colors.blue.withOpacity(0.3),
-                                      backgroundColor: Colors.white,
-                                    ),
-                                  ),
-
-                                  // Content
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 15.w),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        // Icon container
-                                        Container(
-                                          height: 50,
-                                          width: 50,
-                                          decoration: BoxDecoration(
-                                            color: habit.iconBgColor,
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          child: Icon(habit.habitIcon, size: 24.sp, color: Colors.white),
-                                        ),
-
-                                        // Habit details
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => StatisticsHabitWiseScreen(
-                                                    habit: habit,
-                                                    selectedDateforSkip: _selectedDate,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            child: Padding(
-                                              padding: EdgeInsets.only(left: 12.w),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    habit.title,
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.w600,
-                                                      color: Colors.black,
-                                                      fontSize: 20.sp,
-                                                      overflow: TextOverflow.ellipsis,
-                                                    ),
-                                                    maxLines: 1,
-                                                  ),
-                                                  SizedBox(height: 2),
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        habit.progressJson[_selectedDate]?.status == TaskStatus.skipped
-                                                            ? 'Skipped'
-                                                            : habit.category,
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 13.sp,
-                                                        ),
-                                                      ),
-                                                      SizedBox(width: 5.w), // Dynamic width spacing for better responsiveness
-                                                      Container(
-                                                        height: 15.h, // Adjust height as needed
-                                                        width: 1, // Thin vertical line
-                                                        color: Colors.black, // Divider color
-                                                        margin: EdgeInsets.symmetric(horizontal: 5.w),
-                                                      ),
-                                                      Text(
-                                                        _buildTrailingString(context, habit),
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 13.sp,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-
-                                        // Trailing widget
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 0),
-                                          child: _buildTrailingWidget(context, habit, progress),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    }
-                  },
-                );
-              },
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0, -1), // x: 0, y: -1
+              blurRadius: 10, // Blur
+              spreadRadius: 0, // Spread// Shadow position (above the bottom nav bar)
             ),
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddChallengeScreen()),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  Widget _buildTrailingWidget(BuildContext context, Habit habit, double progress) {
-    // Check if the task status is skipped
-    if (habit.progressJson[_selectedDate]?.status == TaskStatus.skipped) {
-      return const SizedBox.shrink(); // Return an empty widget
-    }
-    switch (habit.taskType) {
-      case TaskType.time:
-        return GestureDetector(
-          onTap: (){
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TimerScreen(
-                  habit: habit,
-                  selectedDate: _selectedDate,
-                ),
-              ),
-            );
-            },          child: const Icon(Icons.play_arrow_rounded),
-        );
-      case TaskType.count:
-        return GestureDetector(
-          onTap: (){
-            _completeValueTask(context, habit);
-          },
-          child: Padding(
-              padding: EdgeInsets.only(left: 65.w),
-            child: (habit.progressJson[_selectedDate]?.progress ?? 0.0) < 1.0
-                ? Icon(Icons.add_rounded)
-                : Icon(Icons.check_rounded),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24.0),
+            topRight: Radius.circular(24.0),
           ),
-        );
-      case TaskType.task:
-        return GestureDetector(
-          onTap: (){
-            setState(() {
-              // Get the current progress and status for the selected date
-              double currentProgress = habit.progressJson[_selectedDate]?.progress ?? 0.0;
-              TaskStatus currentStatus = habit.progressJson[_selectedDate]?.status ?? TaskStatus.missed;
-              log('current status init $currentStatus');
-
-              double newProgress;
-              TaskStatus newStatus;
-
-              // Check the current status and toggle accordingly
-              if (currentStatus == TaskStatus.reOpen) {
-                // If the current status is 'reOpen', mark it as completed (done)
-                newProgress = 1.0; // Mark progress as 100% (or any other appropriate value)
-                newStatus = TaskStatus.done; // Change status to 'done'
-              } else if (currentStatus == TaskStatus.done) {
-                log('current status $currentStatus');
-                // If the task is already done, uncheck it (mark as skipped)
-                newProgress = 0.0; // Mark progress as 0%
-                newStatus = TaskStatus.reOpen; // Change status to 'skipped'
-              } else if (currentStatus == TaskStatus.skipped) {
-                // If the task was skipped, check it (mark as done)
-                newProgress = 1.0; // Mark progress as 100%
-                newStatus = TaskStatus.done; // Change status to 'done'
-              } else {
-                // Default case: Mark as 'reOpen' (progress is 0% initially)
-                newProgress = 0.0;
-                newStatus = TaskStatus.reOpen; // Set status to 'reOpen'
-              }
-
-              // Update the habit progress for the selected date with the new status and progress
-              Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, formatStartDateToUtc1(_selectedDate), newProgress, newStatus, null);
-            });
-
-
-          },
-          child: Padding(
-            padding: EdgeInsets.only(left: 65.w),
-            child: Checkbox(
-              value: habit.progressJson[_selectedDate]?.progress == 1.0,
-              onChanged: (bool? value) {
+          child: BottomNavigationBar(
+              // backgroundColor: Color(0xFFF9F9F9F0),
+              elevation: 5,
+              currentIndex: currentIndex,
+              onTap: (index){
                 setState(() {
-                  // Fetch the current status for the selected date
-                  TaskStatus? currentStatus = habit.progressJson[_selectedDate]?.status;
-
-                  // Log the current status (for debugging purposes)
-                  log('current status: $currentStatus');
-
-                  double newProgress = value == true ? 1.0 : 0.0;
-                  TaskStatus newStatus;
-
-                  // Check the current status and toggle accordingly
-                  if (currentStatus == TaskStatus.reOpen) {
-                    // If the current status is 'reOpen', mark it as completed (done)
-                    newProgress = 1.0; // Mark progress as 100%
-                    newStatus = TaskStatus.done; // Change status to 'done'
-                  } else if (currentStatus == TaskStatus.done) {
-                    // If the task is already done, uncheck it (mark as reOpen)
-                    newProgress = 0.0; // Mark progress as 0%
-                    newStatus = TaskStatus.reOpen; // Change status to 'reOpen'
-                  } else if (currentStatus == TaskStatus.skipped) {
-                    // If the task was skipped, check it (mark as done)
-                    newProgress = 1.0; // Mark progress as 100%
-                    newStatus = TaskStatus.done; // Change status to 'done'
-                  }
-                 else if (currentStatus == TaskStatus.missed) {
-                // If the task was skipped, check it (mark as done)
-                newProgress = 1.0; // Mark progress as 100%
-                newStatus = TaskStatus.done; // Change status to 'done'
-                }
-
-                  else {
-                    // Default case: Mark as 'done' (progress is 100% initially)
-                    newProgress = 1.0;
-                    newStatus = TaskStatus.done; // Set status to 'done'
-                  }
-
-                  // Update the habit progress for the selected date with the new status and progress
-                  Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, formatStartDateToUtc1(_selectedDate), newProgress, newStatus, null);
+                  currentIndex = index;
                 });
               },
-            ),
+              showSelectedLabels: false, // Hides the label for the selected item
+              showUnselectedLabels: false,// Hides the label for the unselected item
+              items:[
+                BottomNavigationBarItem(icon: 
+                    currentIndex == 0 ? SvgPicture.asset(ImageResource.clickedHomeIcon)
+                        : SvgPicture.asset(ImageResource.unclickedHomeIcon),
+                    label: ''),
+
+                BottomNavigationBarItem(icon:
+                currentIndex == 1 ? SvgPicture.asset(ImageResource.clickedAddIcon)
+                    : SvgPicture.asset(ImageResource.unclickedAddIcon),
+                    label: ''),
+
+                BottomNavigationBarItem(icon:
+                currentIndex == 2 ? SvgPicture.asset(ImageResource.clickedAnalyticsIcon)
+                    : SvgPicture.asset(ImageResource.unclickedAnalyticsIcon),
+                    label: ''),
+          ]
           ),
-        );
-      default:
-        return Container();
-
-    }
-  }
-
-  // String formatDuration(Duration duration) {
-  //   String twoDigits(int n) => n.toString().padLeft(2, '0');
-  //
-  //   int hours = duration.inHours;
-  //   String minutes = twoDigits(duration.inMinutes.remainder(60));
-  //   String seconds = twoDigits(duration.inSeconds.remainder(60));
-  //
-  //   if (hours > 0) {
-  //     return "$hours:$minutes:$seconds";  // Format as HH:MM:SS when hours > 0
-  //   } else {
-  //     return "$minutes:$seconds";  // Format as MM:SS when hours == 0
-  //   }
-  // }
-  String formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-
-    int hours = duration.inHours;
-    String minutes = twoDigits(duration.inMinutes.remainder(60));
-    String seconds = twoDigits(duration.inSeconds.remainder(60));
-
-    // Always return HH:MM:SS format
-    return "$hours:$minutes:$seconds";
-  }
-
-
-
-  String _buildTrailingString(BuildContext context, Habit habit) {
-    switch (habit.taskType) {
-      case TaskType.time:
-
-        Duration runningDuration = habit.progressJson[_selectedDate]?.duration ?? Duration();
-        return '${formatDuration(runningDuration)}/${formatDuration(habit.timer!)}';
-
-      case TaskType.count:
-        int multipliedProgress = ((habit.progressJson[_selectedDate]?.progress ?? 0.0) * (habit.value ?? 1.0)).toInt();
-        return '$multipliedProgress/${(habit.value!)}';
-      case TaskType.task:
-        return 'Task';
-      default:
-        return '';
-
-    }
-  }
-
-  void _completeValueTask(BuildContext context, Habit habit) {
-    log('Specific habit: $habit');
-
-    setState(() {
-      // Get the current progress for the selected date or default to 0.0 if not set
-      double currentProgress = habit.progressJson[_selectedDate]?.progress ?? 0.0;
-
-      // Increment progress by 1.0 and divide by habit.value, but keep it within a max of 1.0
-      double newProgress = ((currentProgress * (habit.value ?? 1.0)) + 1.0) / (habit.value ?? 1.0);
-
-      // Ensure newProgress doesn't exceed 1.0
-      newProgress = newProgress.clamp(0.0, 1.0);
-
-      // Update the habit's progress in HabitProvider with newProgress and status 'done'
-
-      if (newProgress >= 1.0){
-        Provider.of<HabitProvider>(context, listen: false)
-            .updateHabitProgress(habit, formatStartDateToUtc1(_selectedDate), newProgress, TaskStatus.done, null);
-      }
-      else{
-        Provider.of<HabitProvider>(context, listen: false)
-            .updateHabitProgress(habit, formatStartDateToUtc1(_selectedDate), newProgress, TaskStatus.goingOn , null);
-      }
-    });
+        ),
+      ),
+    );
   }
 
 }
