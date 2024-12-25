@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hard_challenge/utils/helpers.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -44,7 +45,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
           },
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {
-              selectedDate = selectedDay; // Update the selected date
+              selectedDate = setSelectedDate(selectedDay); // Update the selected date
               this.focusedDate = focusedDay;
             });
 

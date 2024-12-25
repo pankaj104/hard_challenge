@@ -74,27 +74,22 @@ class HabitProvider with ChangeNotifier {
   }
 
   double getAverageProgressForDate(DateTime date) {
-    // Filter habits active on the specific date
     log('getAverageProgressForDate $date');
     List<Habit> activeHabits = _habits.where((habit) {
-      // Check if the habit is active on this date
-      DateTime dateOnly = DateTime(date.year, date.month, date.day);
+      DateTime startDateOnly = DateTime(habit.startDate!.year, habit.startDate!.month, habit.startDate!.day);
       DateTime endDateOnly = DateTime(habit.endDate!.year, habit.endDate!.month, habit.endDate!.day);
 
       if (habit.habitType == HabitType.quit) {
-        // For quit habits, check if the date is within startDate and endDate (inclusive of endDate)
-        return date.isAfter(habit.startDate) &&
-            (habit.endDate == null || dateOnly.isBefore(endDateOnly) || dateOnly.isAtSameMomentAs(endDateOnly));
+        // For quit habits, include startDate and endDate (inclusive of endDate)
+        return (date.isAfter(startDateOnly) || date.isAtSameMomentAs(startDateOnly)) &&
+            (endDateOnly == null || date.isBefore(endDateOnly) || date.isAtSameMomentAs(endDateOnly));
       } else {
-        // For other habits, include all (check if date is after startDate, and before or same as endDate)
-        log('date.isAtSameMomentAs(habit.endDate!) ${date.isAtSameMomentAs(habit.endDate!)}');
-        log('(habit.endDate!) ${habit.endDate!}');
-        return date.isAfter(habit.startDate) &&
-            (habit.endDate == null || date.isBefore(habit.endDate!) || date.isAtSameMomentAs(habit.endDate!));
+        // For other habits, include startDate and endDate (inclusive of endDate)
+        log('date.isAtSameMomentAs(habit.endDate!) ${date.isAtSameMomentAs(endDateOnly)}');
+        return (date.isAfter(startDateOnly) || date.isAtSameMomentAs(startDateOnly)) &&
+            (endDateOnly == null || date.isBefore(endDateOnly) || date.isAtSameMomentAs(endDateOnly));
       }
     }).toList();
-
-
 
     // Calculate total progress for all active habits
     double totalProgress = activeHabits.fold(0.0, (sum, habit) {
@@ -160,6 +155,7 @@ class HabitProvider with ChangeNotifier {
   double getMissedPercentageByCategory(Habit habit, String category) {
     int missedCount = 0;
     DateTime now = DateTime.now();
+    now = DateTime(now.year, now.month, now.day); // Reset time to 00:00:00
     Map<DateTime, ProgressWithStatus> categoryProgressJson = Map.fromEntries(
       habit.progressJson.entries.where((entry) => habit.category == category),
     );
@@ -168,8 +164,12 @@ class HabitProvider with ChangeNotifier {
 
     if (habit.repeatType == RepeatType.selectDays) {
       DateTime loopDate = habit.startDate!;
+      log('habit.days: ${habit.days}');
       while (loopDate.isBefore(now) || loopDate.isAtSameMomentAs(now)) {
-        if (habit.days!.contains(loopDate.weekday % 7)) {
+        int dayIndex = loopDate.weekday;
+        // Skip today's date
+        if (loopDate.isAtSameMomentAs(now)) {
+        } else if (habit.days!.contains(dayIndex)) {
           if (!categoryProgressJson.containsKey(loopDate) ||
               (categoryProgressJson[loopDate]!.status != TaskStatus.done &&
                   categoryProgressJson[loopDate]!.status != TaskStatus.skipped)) {
@@ -178,7 +178,9 @@ class HabitProvider with ChangeNotifier {
         }
         loopDate = loopDate.add(const Duration(days: 1));
       }
-    } else if (habit.repeatType == RepeatType.selectedDate && habit.selectedDates != null) {
+      log('missed list $missedDates');
+    }
+    else if (habit.repeatType == RepeatType.selectedDate && habit.selectedDates != null) {
       for (var date in habit.selectedDates!.where((date) => date.isBefore(now))) {
         if (!categoryProgressJson.containsKey(date) ||
             (categoryProgressJson[date]!.status != TaskStatus.done &&
@@ -186,10 +188,14 @@ class HabitProvider with ChangeNotifier {
           missedDates.add(date);
         }
       }
-    } else if (habit.repeatType == RepeatType.weekly) {
+    }
+    else if (habit.repeatType == RepeatType.weekly) {
+      DateTime now = DateTime.now();
+      now = DateTime(now.year, now.month, now.day); // Reset time to midnight
       DateTime loopDate = habit.startDate!;
       while (loopDate.isBefore(now) || loopDate.isAtSameMomentAs(now)) {
-        if (habit.days!.contains(loopDate.weekday % 7)) {
+        // Use loopDate.weekday directly
+        if (habit.days!.contains(loopDate.weekday)) {
           if (!categoryProgressJson.containsKey(loopDate) ||
               (categoryProgressJson[loopDate]!.status != TaskStatus.done &&
                   categoryProgressJson[loopDate]!.status != TaskStatus.skipped)) {
@@ -198,7 +204,9 @@ class HabitProvider with ChangeNotifier {
         }
         loopDate = loopDate.add(const Duration(days: 1));
       }
-    } else if (habit.repeatType == RepeatType.monthly && habit.selectedDates != null) {
+    }
+
+    else if (habit.repeatType == RepeatType.monthly && habit.selectedDates != null) {
       for (var date in habit.selectedDates!.where((date) => date.isBefore(now))) {
         if (!categoryProgressJson.containsKey(date) ||
             (categoryProgressJson[date]!.status != TaskStatus.done &&
@@ -465,9 +473,11 @@ class HabitProvider with ChangeNotifier {
     for (Habit habit in _habits) {
       totalPercentage += getSkippedPercentageByCategory(habit, categoryName);
     }
+    log('totalPercentage skipped percentage across habits: $totalPercentage');
+
 
     double averageSkippedPercentage = totalPercentage / _habits.length;
-    log('Total skipped percentage across habits: $averageSkippedPercentage');
+    log('averageSkippedPercentage skipped percentage across habits: $averageSkippedPercentage');
     return averageSkippedPercentage;
   }
 

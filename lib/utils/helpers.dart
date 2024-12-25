@@ -28,30 +28,6 @@ Flushbar showFlushBarHelper(
       flushbarPosition: FlushbarPosition.TOP,
     )..show(context);
 
-String formatStartDateToUtc(DateTime startDate) {
-  // Convert the start date to UTC
-  DateTime currentDate = startDate.toUtc();
-
-  // Set the time to 00:00:00.000
-  currentDate = DateTime.utc(currentDate.year, currentDate.month, currentDate.day);
-
-  // Format the date to the desired format
-  String formattedDate = DateFormat("yyyy-MM-dd HH:mm:ss.SSS'Z'").format(currentDate);
-
-  return formattedDate;
-}
-
-DateTime formatStartDateToUtc1(DateTime startDate) {
-  // Convert the start date to UTC
-  DateTime currentDate = startDate.toUtc();
-
-  // Set the time to 00:00:00.000
-  currentDate = DateTime.utc(currentDate.year, currentDate.month, currentDate.day);
-
-  // Return the formatted DateTime in UTC
-  return currentDate;
-}
-
 
 DateTime setSelectedDate(DateTime date) {
   // Set _selectedDate to only the date part
