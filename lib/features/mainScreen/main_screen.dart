@@ -139,14 +139,14 @@ class _MainScreenState extends State<MainScreen> {
                             onDaySelected: (selectedDay, focusedDay) {
                               setState(() {
                                 Provider.of<HabitProvider>(context, listen: false).loadHabits();
-                                _selectedDate = selectedDay;
+                                _selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
                                 log('selected date from calender $_selectedDate');
                               });
                             },
                             calendarBuilders: CalendarBuilders(
                               defaultBuilder: (context, date, _) {
-                                double completion = habitProvider.getAverageProgressForDate(formatStartDateToUtc1(date)).clamp(0.0, 1.0);
-                                log("completion $completion");
+                                double completion = habitProvider.getAverageProgressForDate(setSelectedDate(date));
+                                log("completion on main screen $completion on date $date");
                                 return Center(
                                   child: CircularPercentIndicator(
                                     radius: 20.0,
@@ -162,7 +162,7 @@ class _MainScreenState extends State<MainScreen> {
                                 );
                               },
                               todayBuilder: (context, date, _) {
-                                double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
+                                double completion = habitProvider.getAverageProgressForDate(DateTime(date.year, date.month, date.day));
                                 return Center(
                                   child: CircularPercentIndicator(
                                     radius: 20.0,
@@ -178,7 +178,7 @@ class _MainScreenState extends State<MainScreen> {
                                 );
                               },
                               selectedBuilder: (context, date, _) {
-                                double completion = habitProvider.getAverageProgressForDate(date).clamp(0.0, 1.0);
+                                double completion = habitProvider.getAverageProgressForDate(DateTime(date.year, date.month, date.day));
                                 return Container(
                                   height: 50,
                                   width: 50,
@@ -221,7 +221,7 @@ class _MainScreenState extends State<MainScreen> {
               builder: (context, habitProvider, child) {
                 return FutureBuilder<List<Habit>>(
                   // Replace this with the actual method that fetches habits asynchronously
-                  future: habitProvider.getHabitsForDate(setSelectedDate(_selectedDate)),
+                  future: habitProvider.getHabitsForDate(_selectedDate),
                   builder: (context, snapshot) {
                     // Check if the Future has completed and whether there were any errors
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -393,9 +393,11 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildTrailingWidget(BuildContext context, Habit habit, double progress) {
     // Check if the task status is skipped
+
     if (habit.progressJson[_selectedDate]?.status == TaskStatus.skipped) {
       return const SizedBox.shrink(); // Return an empty widget
     }
+    log('_selectedDate format on main screen $_selectedDate');
     switch (habit.taskType) {
       case TaskType.time:
         return GestureDetector(
@@ -429,6 +431,7 @@ class _MainScreenState extends State<MainScreen> {
             setState(() {
               // Get the current progress and status for the selected date
               double currentProgress = habit.progressJson[_selectedDate]?.progress ?? 0.0;
+              log('_selectedDate in task  $_selectedDate');
               TaskStatus currentStatus = habit.progressJson[_selectedDate]?.status ?? TaskStatus.missed;
               log('current status init $currentStatus');
 
@@ -456,7 +459,7 @@ class _MainScreenState extends State<MainScreen> {
               }
 
               // Update the habit progress for the selected date with the new status and progress
-              Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, formatStartDateToUtc1(_selectedDate), newProgress, newStatus, null);
+              Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, _selectedDate, newProgress, newStatus, null);
             });
 
 
@@ -503,7 +506,7 @@ class _MainScreenState extends State<MainScreen> {
                   }
 
                   // Update the habit progress for the selected date with the new status and progress
-                  Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, formatStartDateToUtc1(_selectedDate), newProgress, newStatus, null);
+                  Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(habit, _selectedDate, newProgress, newStatus, null);
                 });
               },
             ),
@@ -576,11 +579,11 @@ class _MainScreenState extends State<MainScreen> {
 
       if (newProgress >= 1.0){
         Provider.of<HabitProvider>(context, listen: false)
-            .updateHabitProgress(habit, formatStartDateToUtc1(_selectedDate), newProgress, TaskStatus.done, null);
+            .updateHabitProgress(habit, _selectedDate, newProgress, TaskStatus.done, null);
       }
       else{
         Provider.of<HabitProvider>(context, listen: false)
-            .updateHabitProgress(habit, formatStartDateToUtc1(_selectedDate), newProgress, TaskStatus.goingOn , null);
+            .updateHabitProgress(habit, _selectedDate, newProgress, TaskStatus.goingOn , null);
       }
     });
   }

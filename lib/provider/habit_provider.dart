@@ -74,27 +74,22 @@ class HabitProvider with ChangeNotifier {
   }
 
   double getAverageProgressForDate(DateTime date) {
-    // Filter habits active on the specific date
     log('getAverageProgressForDate $date');
     List<Habit> activeHabits = _habits.where((habit) {
-      // Check if the habit is active on this date
-      DateTime dateOnly = DateTime(date.year, date.month, date.day);
+      DateTime startDateOnly = DateTime(habit.startDate!.year, habit.startDate!.month, habit.startDate!.day);
       DateTime endDateOnly = DateTime(habit.endDate!.year, habit.endDate!.month, habit.endDate!.day);
 
       if (habit.habitType == HabitType.quit) {
-        // For quit habits, check if the date is within startDate and endDate (inclusive of endDate)
-        return date.isAfter(habit.startDate) &&
-            (habit.endDate == null || dateOnly.isBefore(endDateOnly) || dateOnly.isAtSameMomentAs(endDateOnly));
+        // For quit habits, include startDate and endDate (inclusive of endDate)
+        return (date.isAfter(startDateOnly) || date.isAtSameMomentAs(startDateOnly)) &&
+            (endDateOnly == null || date.isBefore(endDateOnly) || date.isAtSameMomentAs(endDateOnly));
       } else {
-        // For other habits, include all (check if date is after startDate, and before or same as endDate)
-        log('date.isAtSameMomentAs(habit.endDate!) ${date.isAtSameMomentAs(habit.endDate!)}');
-        log('(habit.endDate!) ${habit.endDate!}');
-        return date.isAfter(habit.startDate) &&
-            (habit.endDate == null || date.isBefore(habit.endDate!) || date.isAtSameMomentAs(habit.endDate!));
+        // For other habits, include startDate and endDate (inclusive of endDate)
+        log('date.isAtSameMomentAs(habit.endDate!) ${date.isAtSameMomentAs(endDateOnly)}');
+        return (date.isAfter(startDateOnly) || date.isAtSameMomentAs(startDateOnly)) &&
+            (endDateOnly == null || date.isBefore(endDateOnly) || date.isAtSameMomentAs(endDateOnly));
       }
     }).toList();
-
-
 
     // Calculate total progress for all active habits
     double totalProgress = activeHabits.fold(0.0, (sum, habit) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hard_challenge/model/habit_model.dart';
+import 'package:hard_challenge/utils/helpers.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../utils/colors.dart';
@@ -187,7 +188,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
             );
           },
           defaultBuilder: (context, date, events) {
-            if (habitDoneDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+            if (habitDoneDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
               return Center(
                 child: Container(
                   height: 36,
@@ -222,7 +223,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
               //     style: TextStyle(color: Colors.white),
               //   ),
               // );
-            } else if (habitMissedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+            } else if (habitMissedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
               return Center(
                 child: Container(
                     height: 36,
@@ -244,7 +245,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                       size: 18,color: ColorStrings.whiteColor,),
                 ),
               );
-            } else if (habitSkippedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+            } else if (habitSkippedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
               return Center(
                 child: Container(
                     height: 36,
@@ -292,7 +293,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
             );
           },
           todayBuilder: (context, date, events) {
-            if (habitDoneDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+            if (habitDoneDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
               return Center(
                 child: Container(
                     height: 36,
@@ -327,7 +328,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
               //     style: TextStyle(color: Colors.white),
               //   ),
               // );
-            } else if (habitMissedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+            } else if (habitMissedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
               return Center(
                 child: Container(
                     height: 36,
@@ -348,7 +349,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     child: Icon( widget.habit == HabitType.quit ? Icons.close : Icons.done, size: 18,color: ColorStrings.whiteColor,),
                 ),
               );
-            } else if (habitSkippedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+            } else if (habitSkippedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
               return Center(
                 child: Container(
                     height: 36,
@@ -396,7 +397,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
             );
           },
           selectedBuilder: (context, date, events) {
-            if (habitDoneDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+            if (habitDoneDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
               return Center(
                 child: Container(
                     height: 36,
@@ -430,7 +431,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
               //     style: TextStyle(color: Colors.white),
               //   ),
               // );
-            } else if (habitMissedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+            } else if (habitMissedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
               return Center(
                 child: Container(
                     height: 36,
@@ -451,7 +452,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     child: Icon( widget.habit == HabitType.quit ? Icons.done : Icons.close, size: 18,color: ColorStrings.whiteColor,),
                 ),
               );
-            } else if (habitSkippedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, date))) {
+            } else if (habitSkippedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
               return Center(
                 child: Container(
                     height: 36,

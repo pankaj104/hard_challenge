@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hard_challenge/model/habit_model.dart';
+import 'package:hard_challenge/utils/helpers.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../utils/colors.dart';
@@ -55,11 +56,11 @@ class _CalendarPageState extends State<CalendarPage> {
 
   List<DateTime> habitMissedDateStore(Habit habit) {
     List<DateTime> habitMissedDateList = [];
-    DateTime nowWithUtc = DateTime.now().toUtc();
-    DateTime now = DateTime.utc(nowWithUtc.year, nowWithUtc.month, nowWithUtc.day);
+    // DateTime nowWithUtc = DateTime.now().toUtc();
+    DateTime now = setSelectedDate(DateTime.now());
 
     DateTime habitStartDate = habit.startDate ?? now;
-    DateTime startDate = DateTime.utc(habitStartDate.year, habitStartDate.month, habitStartDate.day);
+    DateTime startDate = habitStartDate;
 
     // DateTime endDate = habit.endDate ?? now;
 
@@ -178,7 +179,9 @@ class _CalendarPageState extends State<CalendarPage> {
               );
             },
             defaultBuilder: (context, date, events) {
-              if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
+              log('date check builder ${setSelectedDate(date)}');
+
+            if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date))))  {
                 return Center(
                   child: Container(
                       height: 36,
@@ -201,7 +204,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }
 
-              if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, date))) {
+              if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
                 return Center(
                   child: Container(
                       height: 36,
@@ -224,7 +227,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }
 
-               if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
+               if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date))))  {
                 return Center(
                   child: Container(
                       height: 36,
@@ -275,7 +278,7 @@ class _CalendarPageState extends State<CalendarPage> {
               );
             },
             todayBuilder: (context, date, events) {
-              if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, date))) {
+              if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
                 return Center(
                   child: Container(
                       height: 36,
@@ -298,7 +301,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }
 
-              if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
+              if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date))))  {
                 return Center(
                   child: Container(
                       height: 36,
@@ -320,7 +323,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }
 
-              if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
+              if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date))))  {
                 return Center(
                   child: Container(
                       height: 32,
@@ -369,7 +372,7 @@ class _CalendarPageState extends State<CalendarPage> {
               );
             },
             selectedBuilder: (context, date, events) {
-              if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, date))) {
+              if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
                 return Center(
                   child: Container(
                       height: 36,
@@ -393,7 +396,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }
 
-              if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
+              if   (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date))))  {
                 return Center(
                   child: Container(
                       height: 36,
@@ -415,7 +418,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }
 
-              if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, date)))  {
+              if   (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date))))  {
                 return Center(
                   child: Container(
                       height: 36,
