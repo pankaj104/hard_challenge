@@ -13,5 +13,11 @@ class ImageResource{
   static const String doneTick = 'assets/images/done_tick.svg';
   static const String calenderLeft = 'assets/images/calender_left.svg';
   static const String calenderRight = 'assets/images/calender_right.svg';
+  static const String unclickedHomeIcon = 'assets/images/unclicked_home_icon.svg';
+  static const String clickedHomeIcon = 'assets/images/clicked_home_icon.svg';
+  static const String unclickedAddIcon = 'assets/images/unclicked_add_icon.svg';
+  static const String clickedAddIcon = 'assets/images/clicked_add_icon.svg';
+  static const String unclickedAnalyticsIcon = 'assets/images/unclicked_analytics_icon.svg';
+  static const String clickedAnalyticsIcon = 'assets/images/clicked_analytics_icon.svg';
 
 }

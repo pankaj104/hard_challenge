@@ -164,8 +164,11 @@ class HabitProvider with ChangeNotifier {
 
     if (habit.repeatType == RepeatType.selectDays) {
       DateTime loopDate = habit.startDate!;
+      DateTime endDate = habit.endDate!;
+      DateTime startDate = habit.startDate!;
       log('habit.days: ${habit.days}');
-      while (loopDate.isBefore(now) || loopDate.isAtSameMomentAs(now)) {
+      while ((loopDate.isAfter(startDate) || loopDate.isAtSameMomentAs(startDate)) &&
+          (loopDate.isBefore(endDate.add(Duration(days: 1))) || loopDate.isAtSameMomentAs(endDate))) {
         int dayIndex = loopDate.weekday;
         // Skip today's date
         if (loopDate.isAtSameMomentAs(now)) {

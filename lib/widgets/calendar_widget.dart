@@ -56,16 +56,16 @@ class _CalendarPageState extends State<CalendarPage> {
 
   List<DateTime> habitMissedDateStore(Habit habit) {
     List<DateTime> habitMissedDateList = [];
-    // DateTime nowWithUtc = DateTime.now().toUtc();
     DateTime now = setSelectedDate(DateTime.now());
 
     DateTime habitStartDate = habit.startDate ?? now;
     DateTime startDate = habitStartDate;
 
-    // DateTime endDate = habit.endDate ?? now;
+    // Use endDate as habit.endDate or now if not set
+    DateTime endDate = habit.endDate ?? now;
 
-    // Iterate over the date range from startDate to one day before 'now'
-    for (DateTime date = startDate; date.isBefore(now); date = date.add(const Duration(days: 1))) {
+    // Iterate over the date range from startDate to endDate (inclusive)
+    for (DateTime date = startDate; date.isBefore(endDate.add(const Duration(days: 1))); date = date.add(const Duration(days: 1))) {
       bool isValidDate = false;
 
       // Check based on repeat type
@@ -74,9 +74,7 @@ class _CalendarPageState extends State<CalendarPage> {
         if (habit.days!.contains(date.weekday)) {
           isValidDate = true;
         }
-      }
-
-      else if (habit.repeatType == RepeatType.selectedDate) {
+      } else if (habit.repeatType == RepeatType.selectedDate) {
         if (habit.selectedDates != null && habit.selectedDates!.contains(date)) {
           isValidDate = true;
         }
@@ -95,9 +93,9 @@ class _CalendarPageState extends State<CalendarPage> {
         habitMissedDateList.add(date);
       }
     }
+
     return habitMissedDateList;
   }
-
 
 
 
