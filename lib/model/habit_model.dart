@@ -81,7 +81,7 @@ class Habit {
   String category;
 
   @HiveField(3)
-  IconData habitIcon;
+  String habitEmoji;
 
   @HiveField(4)
   Color iconBgColor;
@@ -132,7 +132,7 @@ class Habit {
     required this.id,
     required this.title,
     required this.category,
-    required this.habitIcon,
+    required this.habitEmoji,
     required this.iconBgColor,
     required this.notificationTime,
     required this.taskType,
@@ -152,7 +152,7 @@ class Habit {
 
   @override
   String toString() {
-    return 'Habit(id: $id title: $title, category: $category,  habitIcon: $habitIcon, IconBgColor: $iconBgColor notificationTime: $notificationTime, '
+    return 'Habit(id: $id title: $title, category: $category,  habitIcon: $habitEmoji, IconBgColor: $iconBgColor notificationTime: $notificationTime, '
         'taskType: $taskType, habitType: $habitType, repeatType: $repeatType, timer: $timer, value: $value, '
         'progress: $progressJson, days: $days, startDate: $startDate, endDate: $endDate, selectedDates: $selectedDates, '
         'selectedTimesPerWeek: $selectedTimesPerWeek, selectedTimesPerMonth: $selectedTimesPerMonth, notes: $notes)';

@@ -66,7 +66,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                     IconButton(onPressed: (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => AddChallengeScreen(habit: widget.habit, isFromEdit: true,)),);
+                        MaterialPageRoute(builder: (context) => AddChallengeScreen(habit: widget.habit, isFromEdit: true, isFromFilledHabbit: false,)),);
 
                     }, icon: Icon(Icons.edit)),
 

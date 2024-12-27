@@ -33,3 +33,21 @@ DateTime setSelectedDate(DateTime date) {
   // Set _selectedDate to only the date part
   return DateTime(date.year, date.month, date.day);
 }
+int convertToIconData(String iconDataString) {
+  // Extract the part after 'IconData(' and before ')'
+  final regex = RegExp(r'IconData\((U\+[0-9A-Fa-f]+)\)');
+  final match = regex.firstMatch(iconDataString);
+
+  if (match != null) {
+    // Get the Unicode part (e.g., U+0F810)
+    final unicode = match.group(1)!;
+
+    // Remove the 'U+' and convert the remaining part to an integer
+    return int.parse(unicode.replaceAll('U+', ''), radix: 16);
+  }
+
+  // Return a default value if no match found (error handling)
+  throw FormatException('Invalid IconData format');
+}
+
+

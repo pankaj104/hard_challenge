@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -38,7 +39,8 @@ import '../../widgets/weekday_chip.dart';
 class AddChallengeScreen extends StatefulWidget {
   final Habit? habit;
    bool isFromEdit = false;
-   AddChallengeScreen({super.key, this.habit, required this.isFromEdit});
+   bool isFromFilledHabbit = false;
+   AddChallengeScreen({super.key, this.habit, required this.isFromEdit , required this.isFromFilledHabbit});
 
   @override
   _AddChallengeScreenState createState() => _AddChallengeScreenState();
@@ -55,6 +57,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   final RepeatType _repeatType = RepeatType.selectDays;
   int _taskValue = 5; // default value 5
   RepeatType _repeatSelectedItem = RepeatType.selectDays;
+  TextEditingController emojiController = TextEditingController();
 
   DateTime _startDate = setSelectedDate(DateTime.now());
   DateTime? _endDate ;
@@ -64,6 +67,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   int selectedTimesPerMonth = 1;
   final uuid = Uuid();
   String habitId = '';
+  String emojiSelected = '💻';
 
   List<String> repeatItems = [
     RepeatType.selectDays.toString(),
@@ -94,6 +98,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     super.initState();
     habitId = uuid.v4();
     if (widget.habit != null) {
+      log('i am here');
        _selectedCategory = widget.habit?.category ?? 'General';
       habitNameController.text = widget.habit?.title ?? '';
       notecontroller.text = widget.habit?.notes ?? '';
@@ -111,6 +116,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
        _timerDuration= widget.habit?.timer ?? const Duration(minutes: 1);
        _formattedDuration= _formatDuration(widget.habit?.timer ?? const Duration(minutes: 1)) ;
        habitId = widget.habit?.id ?? habitId;
+      emojiSelected = widget.habit?.habitEmoji ?? '😁';
     }
     focusNode = FocusNode();
   }
@@ -215,106 +221,134 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       _habitType = type;
     });
   }
-
-  IconData iconSelected = FontAwesomeIcons.iceCream;
-  void _openColorPicker() async {
-    Color? pickedColor = await showDialog(
+  // String selectedEmoji = '😀';
+  void openPickerBottomSheet(BuildContext context) {
+    showModalBottomSheet(
       context: context,
-      builder: (context) {
-        Color tempSelectedColor = selectedColor;
-        IconData selectedIcon = iconSelected;
-
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (BuildContext context) {
         return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Pick a color and icon'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      IconData? newIcon = await showIconPicker(
-                          context,
-                          iconPackModes: [IconPack.fontAwesomeIcons]
-                      );
-
-                      if (newIcon != null) {
-                        setState(() {
-                          selectedIcon = newIcon;
-                          iconSelected = newIcon;
-                        });
-                      }
-                    },
-                    child: Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: tempSelectedColor,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.grey, width: 2),
-                      ),
-                      child: Icon(selectedIcon, color: Colors.black),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: predefinedColors.map((color) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            tempSelectedColor = color;
-                          });
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.circular(10),
+          builder: (BuildContext context, setStateBottomSheet) {
+            return SizedBox(
+              height: 650,
+              child: DefaultTabController(
+                length: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Top Row with Close Icon and Emoji Preview
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () {
+                              Navigator.pop(context); // Close the bottom sheet
+                            },
                           ),
+                          if (emojiSelected != null)
+                            Text(
+                              emojiSelected!,
+                              style: TextStyle(fontSize: 28),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // TabBar with smaller width
+                      SizedBox(
+                        width: 200, // Limit TabBar width
+                        child: TabBar(
+                          labelColor: Colors.black,
+                          indicatorColor: Theme.of(context).primaryColor,
+                          tabs: [
+                            Tab(text: 'Pick an Emoji'),
+                            Tab(text: 'Pick a Color'),
+                          ],
                         ),
-                      );
-                    }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            // Pick an Emoji Tab
+                            SizedBox(
+                              height: 300, // Set a fixed height for the emoji picker
+                              child: EmojiPicker(
+                                textEditingController: emojiController,
+                                onEmojiSelected: (category, emoji) {
+                                  setState(() {
+                                    emojiController.text += emoji.emoji;
+                                    emojiSelected = emoji.emoji;
+                                  });
+                                },
+                              ),
+                            ),
+                            // Pick a Color Tab
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Expanded(
+                                  child: ColorPicker(
+                                    pickerColor: selectedColor,
+                                    onColorChanged: (Color color) {
+                                      setState(() {
+                                        selectedColor = color;
+                                      });
+                                    },
+                                    showLabel: true,
+                                    pickerAreaHeightPercent: 0.8,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-
-                  SingleChildScrollView(
-                    child: ColorPicker(
-                      pickerColor: tempSelectedColor,
-                      onColorChanged: (color) {
-                        setState(() {
-                          tempSelectedColor = color;
-                        });
-                      },
-                      showLabel: false,
-                      enableAlpha: false,
-                      pickerAreaHeightPercent: 0.8,
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  child: const Text('Select'),
-                  onPressed: () {
-                    Navigator.of(context).pop(tempSelectedColor);
-                  },
                 ),
-              ],
+              ),
             );
           },
         );
       },
     );
-
-    if (pickedColor != null) {
-      setState(() {
-        selectedColor = pickedColor;
-      });
-    }
   }
+
+  void _showEmojiKeyboard(BuildContext context) {
+    TextEditingController emojiController = TextEditingController();
+    FocusScope.of(context).requestFocus(FocusNode());
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 300,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            child: Column(
+              children: [
+                // Emoji picker
+                EmojiPicker(
+                  textEditingController: emojiController,
+                  onEmojiSelected: (category, emoji) {
+                    emojiController.text += emoji.emoji;
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 
   void _showCategorySelector() {
     showModalBottomSheet(
@@ -627,16 +661,18 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       children: [
                         SizedBox(width: 10,),
                         GestureDetector(
-                          onTap: _openColorPicker,
+                          onTap: (){
+                            openPickerBottomSheet(context);
+                          },
                           child: Container(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(5.0),
                             decoration: BoxDecoration(
                                 color: selectedColor, // Background color for the icon
                                 shape: BoxShape.rectangle,
                                 borderRadius: BorderRadius.circular(8)
                             ),
 
-                            child: Icon(iconSelected, color: Colors.black),
+                            child: Center(child: Text(emojiSelected, style: TextStyle(fontSize: 18),)),
                           ),
                         ),
                         SizedBox(width: 10,),
@@ -1356,7 +1392,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         id: habitId!,
         title: _title!,
         category: _selectedCategory!,
-        habitIcon: iconSelected,
+        habitEmoji: emojiSelected,
         iconBgColor: selectedColor,
         notificationTime: selectedTime,
         taskType: _taskType,
@@ -1377,9 +1413,13 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       log('${widget.habit != null ? "Updated" : "New"} habit added: $newHabit');
 
       // Use addHabit for new habits, updateHabit for existing habits
-      if (widget.habit != null) {
+      if (widget.isFromEdit == true) {
         Provider.of<HabitProvider>(context, listen: false).updateHabit(newHabit);
-      } else {
+      }
+      else if (widget.isFromFilledHabbit == true) {
+        Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
+      }
+      else {
         Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
       }
 

@@ -291,7 +291,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                             color: habit.iconBgColor,
                                             borderRadius: BorderRadius.circular(10),
                                           ),
-                                          child: Icon(habit.habitIcon, size: 24.sp, color: Colors.white),
+                                          child: Center(child: Text(habit.habitEmoji , style: TextStyle(fontSize: 30),)),
+                                          //
+                                          // Icon(
+                                          //     IconData(convertToIconData(habit.habitEmoji.toString()), fontFamily: 'MaterialIcons')
+                                          //     ,  size: 24.sp, color: Colors.white),
                                         ),
 
                                         // Habit details

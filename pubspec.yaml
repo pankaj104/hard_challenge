@@ -56,9 +56,10 @@ dependencies:
   path: ^1.8.3
   flutter_local_notifications: ^17.2.2
   another_flushbar: ^1.12.30
-  win32: ^5.9.0
   hive: ^2.2.3
   path_provider: ^2.1.4
+  uuid: ^4.5.1
+  emoji_picker_flutter: ^2.1.1
 
 
 dev_dependencies:

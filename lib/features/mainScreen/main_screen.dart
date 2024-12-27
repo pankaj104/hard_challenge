@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hard_challenge/model/habit_model.dart';
+import 'package:hard_challenge/utils/app_utils.dart';
+import 'package:hard_challenge/utils/helpers.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
+import 'package:hard_challenge/widgets/auto_fill_habit_popup.dart';
+import 'package:path/path.dart';
 import '../addChallenge/add_challenge_screen.dart';
 import '../home_screen.dart';
 import '../statistics/statistics_category_wise.dart';
@@ -12,30 +17,18 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int currentIndex = 0;
-  // List<Habit> get_all_habit = habitProvider.getAllHabit();
-
-  final List<Widget> screens = [
+   List<Widget> screens = [
     HomeScreen(),
-    AddChallengeScreen(isFromEdit: false,),
+     AutoFillHabitPopup(),
     StatisticsCategoryWise(habit: [],),
   ];
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: screens[currentIndex],
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (context) => const AddChallengeScreen()),
-      //     );
-      //   },
-      //   child: const Icon(Icons.add),
-      // ),
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(30.0),
@@ -87,5 +80,4 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-
 }
