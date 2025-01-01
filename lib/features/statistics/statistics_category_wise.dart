@@ -47,7 +47,7 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
           title: Text('Category wise Statistics'),
         ),
         body: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 0),
           child: SingleChildScrollView(
             child: Consumer<HabitProvider>(
                 builder: (context, habitProvider, child){

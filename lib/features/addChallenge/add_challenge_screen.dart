@@ -483,7 +483,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         // title: const Text('Add Challenge'),
       ),
       body: Padding(
-        padding:  const EdgeInsets.all(16.0),
+        padding:  EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 0),
         child: Form(
           key: _formKey,
           child:
