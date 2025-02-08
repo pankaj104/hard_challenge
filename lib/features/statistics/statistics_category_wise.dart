@@ -21,10 +21,13 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
 
   final PageController _pageController = PageController(viewportFraction: 0.7);
   int _currentPage = 0;
+  List<String> categories = AppUtils.categories;
 
   @override
   void initState() {
     super.initState();
+    categories = AppUtils.categories;
+
     _pageController.addListener(() {
       int next = _pageController.page!.round();
       if (_currentPage != next) {

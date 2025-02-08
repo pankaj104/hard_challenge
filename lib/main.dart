@@ -30,6 +30,7 @@ void main() async {
   Hive.registerAdapter(DurationAdapter());
   Hive.registerAdapter(ColorAdapter());
   await NotificationService().init(); // Initialize the notification service
+  await Hive.openBox<String>('categoriesBox'); // Open a box for categories
   runApp(MyApp());
 }
 

@@ -1,0 +1,24 @@
+{
+  "Sport": [
+    { "name": "Walk" },
+    { "name": "Run" },
+    { "name": "Yoga" },
+    { "name": "Exercise" },
+    { "name": "Stretch" },
+    { "name": "Swim" },
+    { "name": "Cycling" },
+    { "name": "Dance" },
+    { "name": "Interval Training" }
+  ],
+  "Health": [
+    { "name": "Drink Water" },
+    { "name": "Eat Fruits" },
+    { "name": "Meditate" },
+    { "name": "Sleep Early" }
+  ],
+  "Thought": [
+    { "name": "Read Books" },
+    { "name": "Write Journal" },
+    { "name": "Practice Gratitude" }
+  ]
+}

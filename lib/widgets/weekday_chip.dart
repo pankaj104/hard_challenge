@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hard_challenge/utils/colors.dart';
 
 class WeekdayChip extends StatelessWidget {
   final String day;
@@ -31,27 +32,32 @@ class WeekdayChip extends StatelessWidget {
       child: ChoiceChip(
         labelPadding: EdgeInsets.zero,
         padding: EdgeInsets.zero,
-        label: SizedBox(
-            height: 38,
-            width: 38,
-            child: Center(child: Text(day))),
-        selected: isSelected,
-        selectedColor: Colors.blue,
-        showCheckmark: false,
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-          side: BorderSide(
-            color: isSelected ? Colors.blue : Colors.black12.withOpacity(0.05),
+        label: Container(
+          height: 25, // Adjust the size as needed
+          width: 25,  // Adjust the size as needed
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isSelected ? ColorStrings.headingBlue : Colors.white,
+          ),
+          child: Center(
+            child: Text(
+              day,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: isSelected ? Colors.white : Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
           ),
         ),
-        labelStyle: GoogleFonts.poppins(
-          color: isSelected ? Colors.white : Colors.black,
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
-        ),
+        selected: isSelected,
+        selectedColor: ColorStrings.headingBlue,
+        showCheckmark: false,
+        backgroundColor: Colors.transparent,
+        shape: const CircleBorder(), // Ensures the chip itself is circular
         onSelected: onSelected,
       ),
+
     );
   }
 }

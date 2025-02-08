@@ -1,0 +1,52 @@
+{
+  "Health": [
+    {
+      "id": "1",
+      "title": "Drink Water",
+      "category": "Health",
+      "habitEmoji": "🥛",
+      "iconBgColor": "#FF9800",
+      "notificationTime": ["12:58 PM"],
+      "taskType": "count",
+      "value": 10,
+      "habitType": "build",
+      "repeatType": "selectDays",
+      "progressJson": {},
+      "startDate": "2025-02-08T00:00:00.000Z"
+    }
+  ],
+  "Work": [
+    {
+      "id": "1",
+      "title": "Office work",
+      "category": "Work",
+      "habitEmoji": "🥛",
+      "iconBgColor": "#FF9800",
+      "notificationTime": ["12:58 PM"],
+      "taskType": "count",
+      "value": 10,
+      "habitType": "build",
+      "repeatType": "selectDays",
+      "progressJson": {},
+      "startDate": "2025-02-08T00:00:00.000Z"
+    }
+
+  ],
+
+  "Spiritual": [
+    {
+      "id": "1",
+      "title": "Meditation",
+      "category": "Work",
+      "habitEmoji": "🥛",
+      "iconBgColor": "#FF9800",
+      "notificationTime": ["12:58 PM"],
+      "taskType": "count",
+      "value": 10,
+      "habitType": "build",
+      "repeatType": "selectDays",
+      "progressJson": {},
+      "startDate": "2025-02-08T00:00:00.000Z"
+    }
+  ]
+}

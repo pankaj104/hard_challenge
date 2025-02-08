@@ -19,6 +19,7 @@ import 'package:hard_challenge/widgets/headingH1_widget.dart';
 import 'package:hard_challenge/widgets/headingH2_widget.dart';
 import 'package:hard_challenge/widgets/label_changer.dart';
 import 'package:hard_challenge/widgets/number_picker.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -92,11 +93,18 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     {'S': 6},
   ];
 
+  List<String> categories = AppUtils.categories;
+
+
   @override
   void initState() {
     print('Habit ID 43: ${uuid.v4()}'); // Debugging the generated ID
     super.initState();
     habitId = uuid.v4();
+    categories = AppUtils.categories;
+
+    log('tttt categories $categories');
+
     if (widget.habit != null) {
       log('i am here');
        _selectedCategory = widget.habit?.category ?? 'General';
@@ -361,50 +369,52 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       builder: (BuildContext context) {
         return Container(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-
-                  IconButton(icon: Icon(Icons.close), onPressed: (){
-                    Navigator.pop(context);
-                  },),
-
-                  const SizedBox(width: 30,),
-
-                  Center(
-                    child: Text(
-                      'Select Habit Category',
-                      style: GoogleFonts.poppins(
-                        color: Colors.black,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: categories.map((category) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedCategory = category;
-                      });
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+            
+                    IconButton(icon: Icon(Icons.close), onPressed: (){
                       Navigator.pop(context);
-                    },
-                    child: CustomCategoryList(
-                      categoryText: category,
-                      isSelected: _selectedCategory == category, // Check if it's selected
+                    },),
+            
+                    const SizedBox(width: 30,),
+            
+                    Center(
+                      child: Text(
+                        'Select Habit Category',
+                        style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  );
-                }).toList(),
-              ),
-
-            ],
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: categories.map((category) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedCategory = category;
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: CustomCategoryList(
+                        categoryText: category,
+                        isSelected: _selectedCategory == category, // Check if it's selected
+                      ),
+                    );
+                  }).toList(),
+                ),
+            
+              ],
+            ),
           ),
         );
       },
@@ -541,11 +551,11 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 0,
-        // title: const Text('Add Challenge'),
+        // toolbarHeight: 0,
+        title: widget.isFromEdit ? HeadingH2Widget("Edit"): HeadingH2Widget("New Habit") ,
       ),
       body: Padding(
-        padding:  const EdgeInsets.all(16.0),
+        padding:  const EdgeInsets.symmetric(horizontal: 15),
         child: Form(
           key: _formKey,
           child:
@@ -554,9 +564,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Center(
-                  child: widget.isFromEdit ? HeadingH2Widget("Edit"): HeadingH2Widget("New Habit") ,
-                ),
+                // Center(
+                //   child: widget.isFromEdit ? HeadingH2Widget("Edit"): HeadingH2Widget("New Habit") ,
+                // ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -712,36 +722,36 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     ),
                   ),
                 ),
-
-                HeadingH1Widget("Reminder"),
-
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ...selectedTime.map((time) {
-                      int index = selectedTime.indexOf(time);
-                      return GestureDetector(
-                        onTap: () {
-                          // Open the time picker with the currently selected time for editing
-                          CustomTimePickerBottomSheet.showTimePicker(context, (newTime) {
-                            _editReminder(index, newTime);
-                          });
-                        },
-                        child: NotificationItem(
-                          time: time,
-                          onRemove: () => _removeReminder(index),
-                        ),
-                      );
-                    }).toList(),
-                    AddReminderButton(
-                      onAdd: () {
-                        CustomTimePickerBottomSheet.showTimePicker(context, (selectedTime) {
-                          _addReminder(selectedTime);
-                        });
-                      },
-                    ),
-                  ],
-                ),
+                //
+                // HeadingH1Widget("Reminder"),
+                //
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     ...selectedTime.map((time) {
+                //       int index = selectedTime.indexOf(time);
+                //       return GestureDetector(
+                //         onTap: () {
+                //           // Open the time picker with the currently selected time for editing
+                //           CustomTimePickerBottomSheet.showTimePicker(context, (newTime) {
+                //             _editReminder(index, newTime);
+                //           });
+                //         },
+                //         child: NotificationItem(
+                //           time: time,
+                //           onRemove: () => _removeReminder(index),
+                //         ),
+                //       );
+                //     }).toList(),
+                //     AddReminderButton(
+                //       onAdd: () {
+                //         CustomTimePickerBottomSheet.showTimePicker(context, (selectedTime) {
+                //           _addReminder(selectedTime);
+                //         });
+                //       },
+                //     ),
+                //   ],
+                // ),
 
                 HeadingH1Widget("Goal"),
 
@@ -851,82 +861,84 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     ),
                   ),
 
-                HeadingH1Widget("Repeat Type"),
+                HeadingH1Widget("Frequency"),
 
-                Padding(
-                  padding: const EdgeInsets.only(top: 4, bottom: 2, right: 5, left: 5),
-                  child: GestureDetector(
-                    onTap: _showRepeatType, // Open bottom sheet on tap
-                    child: Container(
-                      height: 45,
-                      padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 5.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8.0,
-                            spreadRadius: 2.0,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 7, top: 7, bottom: 5),
-                        child: SizedBox(
-                          height: 50.h,
-                          width: double.infinity,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  _repeatSelectedItem.name,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                const Icon(Icons.keyboard_arrow_down_rounded, size: 25),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                /// to be later
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 4, bottom: 2, right: 5, left: 5),
+                //   child: GestureDetector(
+                //     onTap: _showRepeatType, // Open bottom sheet on tap
+                //     child: Container(
+                //       height: 45,
+                //       padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 5.0),
+                //       decoration: BoxDecoration(
+                //         color: Colors.white,
+                //         borderRadius: BorderRadius.circular(15.0),
+                //         boxShadow: [
+                //           BoxShadow(
+                //             color: Colors.black.withOpacity(0.1),
+                //             blurRadius: 8.0,
+                //             spreadRadius: 2.0,
+                //             offset: const Offset(0, 4),
+                //           ),
+                //         ],
+                //       ),
+                //       child: Padding(
+                //         padding: const EdgeInsets.only(left: 7, top: 7, bottom: 5),
+                //         child: SizedBox(
+                //           height: 50.h,
+                //           width: double.infinity,
+                //           child: Container(
+                //             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+                //             decoration: BoxDecoration(
+                //               borderRadius: BorderRadius.circular(8),
+                //             ),
+                //             child: Row(
+                //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //               crossAxisAlignment: CrossAxisAlignment.center,
+                //               children: [
+                //                 Text(
+                //                   _repeatSelectedItem.name,
+                //                   style: GoogleFonts.poppins(
+                //                     fontSize: 16.0,
+                //                     fontWeight: FontWeight.w400,
+                //                   ),
+                //                 ),
+                //                 const Icon(Icons.keyboard_arrow_down_rounded, size: 25),
+                //               ],
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
 
 
-                SizedBox(height: 20,),
+                // SizedBox(height: 10,),
                 if (_repeatSelectedItem == RepeatType.selectDays)
-                  Wrap(
-                    spacing: 6.0,
-                    children: daysOfWeek.map((dayMap) {
-                      String day = dayMap.keys.first;
-                      int dayValue = dayMap.values.first;
-
-                      return WeekdayChip(
-                        day: day,
-                        dayValue: dayValue,
-                        isSelected: selectedDays.contains(dayValue),
-                        onSelected: (selected) {
-                          setState(() {
-                            if (selected) {
-                              selectedDays.add(dayValue);
-                            } else {
-                              selectedDays.remove(dayValue);
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
+                  Center(
+                    child: Wrap(
+                      spacing: 0.0,
+                      children: daysOfWeek.map((dayMap) {
+                        String day = dayMap.keys.first;
+                        int dayValue = dayMap.values.first;
+                        return WeekdayChip(
+                          day: day,
+                          dayValue: dayValue,
+                          isSelected: selectedDays.contains(dayValue),
+                          onSelected: (selected) {
+                            setState(() {
+                              if (selected) {
+                                selectedDays.add(dayValue);
+                              } else {
+                                selectedDays.remove(dayValue);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
                   ),
 
                 if (_repeatSelectedItem == RepeatType.weekly)
@@ -1105,8 +1117,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                           return GestureDetector(
                             onTap: () => toggleDateSelection(day),
                             child: Container(
-                              height: 30,
-                              width: 30,
+                              height: 25,
+                              width: 25,
                               decoration: isSelected? BoxDecoration(
                                 color: Color(0xff079455),
                                 borderRadius: BorderRadius.circular(20),
@@ -1138,7 +1150,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                     day.toString(),
                                     style: GoogleFonts.poppins(
                                       color: isSelected ? Colors.white : Colors.black,
-                                      fontSize: 15,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w600
                                     ),
                                   ),
@@ -1158,7 +1170,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 16, bottom: 12),
+                      padding: const EdgeInsets.only(top: 1, bottom: 1),
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: SizedBox(
@@ -1282,9 +1294,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 ),
                 const SizedBox(height: 40,),
                 Center(
-                  child: HabitCustomButton(buttonText: widget.isFromEdit == true ? 'Update Habit' : 'Add Habit', onTap: _submitForm, color: ColorStrings.headingBlue, widthOfButton: double.infinity, buttonTextColor: Colors.white,)
+                  child: HabitCustomButton(buttonText: widget.isFromEdit == true ? 'Update Habit' : 'Add Habit', onTap: _submitForm, color: ColorStrings.headingBlue, widthOfButton: 180, buttonTextColor: Colors.white,)
                 ),
-                const SizedBox(height: 90,)
+                const SizedBox(height: 30),
               ],
             ),
           ),
@@ -1361,6 +1373,12 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             !categories.contains(newCategory)) {
                           categories.add(newCategory);
                           _selectedCategory = newCategory;
+                          // Save categories in Hive
+                          // var box = Hive.box<String>('categoriesBox');
+                          // box.put(newCategory, newCategory); // Use key-value pairs
+                          AppUtils.addCategory(newCategory); // Save to Hive
+                          log('category with added list $newCategory');
+
                         }
                       });
                       Navigator.of(context).pop();
