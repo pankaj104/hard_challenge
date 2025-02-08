@@ -3,8 +3,8 @@ import 'package:hard_challenge/features/addChallenge/add_challenge_screen.dart';
 import 'package:hard_challenge/model/habit_model.dart';
 import 'package:hard_challenge/utils/helpers.dart';
 
-class AutoFillHabitPopup extends StatelessWidget {
-  const AutoFillHabitPopup({super.key});
+class AddHabitScreen extends StatelessWidget {
+  const AddHabitScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

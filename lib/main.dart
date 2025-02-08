@@ -1,8 +1,10 @@
 // main.dart
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hard_challenge/model/habit_model.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
+import 'package:hard_challenge/routers/app_routes.gr.dart';
 import 'package:hard_challenge/service/notification_service.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -32,20 +34,26 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  final _appRouter = AppRoute();
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => HabitProvider(),
       child: ScreenUtilInit(
         // designSize: const Size(375, 812),
-        child: MaterialApp(
+        child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'Custom Challenge App',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: MainScreen(),
-        ),
+          routerDelegate: _appRouter.delegate(
+            navigatorObservers: () => [AutoRouteObserver()],
+            initialRoutes: [
+              const PageRouteInfo<dynamic>('MainScreen', path: '/'),
+            ],
+          ),
+          routeInformationParser: _appRouter.defaultRouteParser(),        ),
       ),
     );
   }

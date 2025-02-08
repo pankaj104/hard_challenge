@@ -1,10 +1,11 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hard_challenge/model/habit_model.dart';
 import 'package:hard_challenge/utils/app_utils.dart';
 import 'package:hard_challenge/utils/helpers.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
-import 'package:hard_challenge/widgets/auto_fill_habit_popup.dart';
+import 'package:hard_challenge/pages/add_habit_screen.dart';
 import 'package:path/path.dart';
 import '../addChallenge/add_challenge_screen.dart';
 import '../home_screen.dart';
@@ -19,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
   int currentIndex = 0;
    List<Widget> screens = [
     HomeScreen(),
-     AutoFillHabitPopup(),
+     AddHabitScreen(),
     StatisticsCategoryWise(habit: [],),
   ];
 
@@ -54,10 +55,12 @@ class _MainScreenState extends State<MainScreen> {
               currentIndex: currentIndex,
               onTap: (index) {
                 if (index == 1) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AutoFillHabitPopup()), // Navigate to new page
-                  );
+                      context.router.push(
+                        const PageRouteInfo<dynamic>(
+                          'AddHabitScreen',
+                          path: '/add-habit-screen',
+                        ),
+                      );
                 } else {
                   setState(() {
                     currentIndex = index; // Update index for other tabs
