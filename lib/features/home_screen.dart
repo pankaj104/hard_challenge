@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/features/statistics/statistics_category_wise.dart';
 import 'package:hard_challenge/features/statistics/statistics_overall.dart';
 import 'package:hard_challenge/features/timer/timer_screen.dart';
+import 'package:hard_challenge/routers/app_routes.gr.dart';
 import 'package:hard_challenge/utils/helpers.dart';
 import 'package:hard_challenge/utils/image_resource.dart';
 import 'package:hard_challenge/features/statistics/statistics_habit_wise_screen.dart';
@@ -291,20 +293,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                             color: habit.iconBgColor,
                                             borderRadius: BorderRadius.circular(10),
                                           ),
-                                          child: Icon(habit.habitIcon, size: 24.sp, color: Colors.white),
+                                          child: Center(child: Text(habit.habitEmoji , style: TextStyle(fontSize: 30),)),
+                                          //
+                                          // Icon(
+                                          //     IconData(convertToIconData(habit.habitEmoji.toString()), fontFamily: 'MaterialIcons')
+                                          //     ,  size: 24.sp, color: Colors.white),
                                         ),
 
                                         // Habit details
                                         Expanded(
                                           child: GestureDetector(
                                             onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => StatisticsHabitWiseScreen(
+                                              context.router.push(
+                                                 PageRouteInfo<dynamic>(
+                                                  'StatisticsHabitWiseScreen',
+                                                  path: '/statistics-habit-wise-screen',
+                                                  args: StatisticsHabitWiseScreenArgs(
                                                     habit: habit,
                                                     selectedDateforSkip: _selectedDate,
-                                                  ),
+                                                  )
                                                 ),
                                               );
                                             },

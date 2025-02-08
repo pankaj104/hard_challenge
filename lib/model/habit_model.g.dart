@@ -60,7 +60,7 @@ class HabitAdapter extends TypeAdapter<Habit> {
       id: fields[0] as String,
       title: fields[1] as String,
       category: fields[2] as String,
-      habitIcon: fields[3] as IconData,
+      habitEmoji: fields[3] as String,
       iconBgColor: fields[4] as Color,
       notificationTime: (fields[5] as List).cast<String>(),
       taskType: fields[6] as TaskType,
@@ -90,7 +90,7 @@ class HabitAdapter extends TypeAdapter<Habit> {
       ..writeByte(2)
       ..write(obj.category)
       ..writeByte(3)
-      ..write(obj.habitIcon)
+      ..write(obj.habitEmoji)
       ..writeByte(4)
       ..write(obj.iconBgColor)
       ..writeByte(5)

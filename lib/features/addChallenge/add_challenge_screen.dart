@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -18,6 +19,7 @@ import 'package:hard_challenge/widgets/headingH1_widget.dart';
 import 'package:hard_challenge/widgets/headingH2_widget.dart';
 import 'package:hard_challenge/widgets/label_changer.dart';
 import 'package:hard_challenge/widgets/number_picker.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -38,7 +40,8 @@ import '../../widgets/weekday_chip.dart';
 class AddChallengeScreen extends StatefulWidget {
   final Habit? habit;
    bool isFromEdit = false;
-   AddChallengeScreen({super.key, this.habit, required this.isFromEdit});
+   bool isFromFilledHabbit = false;
+   AddChallengeScreen({super.key, this.habit, required this.isFromEdit , required this.isFromFilledHabbit});
 
   @override
   _AddChallengeScreenState createState() => _AddChallengeScreenState();
@@ -55,6 +58,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   final RepeatType _repeatType = RepeatType.selectDays;
   int _taskValue = 5; // default value 5
   RepeatType _repeatSelectedItem = RepeatType.selectDays;
+  TextEditingController emojiController = TextEditingController();
 
   DateTime _startDate = setSelectedDate(DateTime.now());
   DateTime? _endDate ;
@@ -64,6 +68,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   int selectedTimesPerMonth = 1;
   final uuid = Uuid();
   String habitId = '';
+  String emojiSelected = '💻';
 
   List<String> repeatItems = [
     RepeatType.selectDays.toString(),
@@ -88,12 +93,20 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     {'S': 6},
   ];
 
+  List<String> categories = AppUtils.categories;
+
+
   @override
   void initState() {
     print('Habit ID 43: ${uuid.v4()}'); // Debugging the generated ID
     super.initState();
     habitId = uuid.v4();
+    categories = AppUtils.categories;
+
+    log('tttt categories $categories');
+
     if (widget.habit != null) {
+      log('i am here');
        _selectedCategory = widget.habit?.category ?? 'General';
       habitNameController.text = widget.habit?.title ?? '';
       notecontroller.text = widget.habit?.notes ?? '';
@@ -111,6 +124,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
        _timerDuration= widget.habit?.timer ?? const Duration(minutes: 1);
        _formattedDuration= _formatDuration(widget.habit?.timer ?? const Duration(minutes: 1)) ;
        habitId = widget.habit?.id ?? habitId;
+      emojiSelected = widget.habit?.habitEmoji ?? '😁';
     }
     focusNode = FocusNode();
   }
@@ -215,106 +229,134 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       _habitType = type;
     });
   }
-
-  IconData iconSelected = FontAwesomeIcons.iceCream;
-  void _openColorPicker() async {
-    Color? pickedColor = await showDialog(
+  // String selectedEmoji = '😀';
+  void openPickerBottomSheet(BuildContext context) {
+    showModalBottomSheet(
       context: context,
-      builder: (context) {
-        Color tempSelectedColor = selectedColor;
-        IconData selectedIcon = iconSelected;
-
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (BuildContext context) {
         return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Pick a color and icon'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      IconData? newIcon = await showIconPicker(
-                          context,
-                          iconPackModes: [IconPack.fontAwesomeIcons]
-                      );
-
-                      if (newIcon != null) {
-                        setState(() {
-                          selectedIcon = newIcon;
-                          iconSelected = newIcon;
-                        });
-                      }
-                    },
-                    child: Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: tempSelectedColor,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.grey, width: 2),
-                      ),
-                      child: Icon(selectedIcon, color: Colors.black),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: predefinedColors.map((color) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            tempSelectedColor = color;
-                          });
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.circular(10),
+          builder: (BuildContext context, setStateBottomSheet) {
+            return SizedBox(
+              height: 650,
+              child: DefaultTabController(
+                length: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Top Row with Close Icon and Emoji Preview
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () {
+                              Navigator.pop(context); // Close the bottom sheet
+                            },
                           ),
+                          if (emojiSelected != null)
+                            Text(
+                              emojiSelected!,
+                              style: TextStyle(fontSize: 28),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // TabBar with smaller width
+                      SizedBox(
+                        width: 200, // Limit TabBar width
+                        child: TabBar(
+                          labelColor: Colors.black,
+                          indicatorColor: Theme.of(context).primaryColor,
+                          tabs: [
+                            Tab(text: 'Pick an Emoji'),
+                            Tab(text: 'Pick a Color'),
+                          ],
                         ),
-                      );
-                    }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            // Pick an Emoji Tab
+                            SizedBox(
+                              height: 300, // Set a fixed height for the emoji picker
+                              child: EmojiPicker(
+                                textEditingController: emojiController,
+                                onEmojiSelected: (category, emoji) {
+                                  setState(() {
+                                    emojiController.text += emoji.emoji;
+                                    emojiSelected = emoji.emoji;
+                                  });
+                                },
+                              ),
+                            ),
+                            // Pick a Color Tab
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Expanded(
+                                  child: ColorPicker(
+                                    pickerColor: selectedColor,
+                                    onColorChanged: (Color color) {
+                                      setState(() {
+                                        selectedColor = color;
+                                      });
+                                    },
+                                    showLabel: true,
+                                    pickerAreaHeightPercent: 0.8,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-
-                  SingleChildScrollView(
-                    child: ColorPicker(
-                      pickerColor: tempSelectedColor,
-                      onColorChanged: (color) {
-                        setState(() {
-                          tempSelectedColor = color;
-                        });
-                      },
-                      showLabel: false,
-                      enableAlpha: false,
-                      pickerAreaHeightPercent: 0.8,
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  child: const Text('Select'),
-                  onPressed: () {
-                    Navigator.of(context).pop(tempSelectedColor);
-                  },
                 ),
-              ],
+              ),
             );
           },
         );
       },
     );
-
-    if (pickedColor != null) {
-      setState(() {
-        selectedColor = pickedColor;
-      });
-    }
   }
+
+  void _showEmojiKeyboard(BuildContext context) {
+    TextEditingController emojiController = TextEditingController();
+    FocusScope.of(context).requestFocus(FocusNode());
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 300,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            child: Column(
+              children: [
+                // Emoji picker
+                EmojiPicker(
+                  textEditingController: emojiController,
+                  onEmojiSelected: (category, emoji) {
+                    emojiController.text += emoji.emoji;
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 
   void _showCategorySelector() {
     showModalBottomSheet(
@@ -327,50 +369,52 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       builder: (BuildContext context) {
         return Container(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-
-                  IconButton(icon: Icon(Icons.close), onPressed: (){
-                    Navigator.pop(context);
-                  },),
-
-                  const SizedBox(width: 30,),
-
-                  Center(
-                    child: Text(
-                      'Select Habit Category',
-                      style: GoogleFonts.poppins(
-                        color: Colors.black,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: categories.map((category) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedCategory = category;
-                      });
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+            
+                    IconButton(icon: Icon(Icons.close), onPressed: (){
                       Navigator.pop(context);
-                    },
-                    child: CustomCategoryList(
-                      categoryText: category,
-                      isSelected: _selectedCategory == category, // Check if it's selected
+                    },),
+            
+                    const SizedBox(width: 30,),
+            
+                    Center(
+                      child: Text(
+                        'Select Habit Category',
+                        style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  );
-                }).toList(),
-              ),
-
-            ],
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: categories.map((category) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedCategory = category;
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: CustomCategoryList(
+                        categoryText: category,
+                        isSelected: _selectedCategory == category, // Check if it's selected
+                      ),
+                    );
+                  }).toList(),
+                ),
+            
+              ],
+            ),
           ),
         );
       },
@@ -507,11 +551,11 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 0,
-        // title: const Text('Add Challenge'),
+        // toolbarHeight: 0,
+        title: widget.isFromEdit ? HeadingH2Widget("Edit"): HeadingH2Widget("New Habit") ,
       ),
       body: Padding(
-        padding:  const EdgeInsets.all(16.0),
+        padding:  const EdgeInsets.symmetric(horizontal: 15),
         child: Form(
           key: _formKey,
           child:
@@ -520,9 +564,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Center(
-                  child: widget.isFromEdit ? HeadingH2Widget("Edit"): HeadingH2Widget("New Habit") ,
-                ),
+                // Center(
+                //   child: widget.isFromEdit ? HeadingH2Widget("Edit"): HeadingH2Widget("New Habit") ,
+                // ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -627,16 +671,18 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                       children: [
                         SizedBox(width: 10,),
                         GestureDetector(
-                          onTap: _openColorPicker,
+                          onTap: (){
+                            openPickerBottomSheet(context);
+                          },
                           child: Container(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(5.0),
                             decoration: BoxDecoration(
                                 color: selectedColor, // Background color for the icon
                                 shape: BoxShape.rectangle,
                                 borderRadius: BorderRadius.circular(8)
                             ),
 
-                            child: Icon(iconSelected, color: Colors.black),
+                            child: Center(child: Text(emojiSelected, style: TextStyle(fontSize: 18),)),
                           ),
                         ),
                         SizedBox(width: 10,),
@@ -676,36 +722,36 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     ),
                   ),
                 ),
-
-                HeadingH1Widget("Reminder"),
-
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ...selectedTime.map((time) {
-                      int index = selectedTime.indexOf(time);
-                      return GestureDetector(
-                        onTap: () {
-                          // Open the time picker with the currently selected time for editing
-                          CustomTimePickerBottomSheet.showTimePicker(context, (newTime) {
-                            _editReminder(index, newTime);
-                          });
-                        },
-                        child: NotificationItem(
-                          time: time,
-                          onRemove: () => _removeReminder(index),
-                        ),
-                      );
-                    }).toList(),
-                    AddReminderButton(
-                      onAdd: () {
-                        CustomTimePickerBottomSheet.showTimePicker(context, (selectedTime) {
-                          _addReminder(selectedTime);
-                        });
-                      },
-                    ),
-                  ],
-                ),
+                //
+                // HeadingH1Widget("Reminder"),
+                //
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     ...selectedTime.map((time) {
+                //       int index = selectedTime.indexOf(time);
+                //       return GestureDetector(
+                //         onTap: () {
+                //           // Open the time picker with the currently selected time for editing
+                //           CustomTimePickerBottomSheet.showTimePicker(context, (newTime) {
+                //             _editReminder(index, newTime);
+                //           });
+                //         },
+                //         child: NotificationItem(
+                //           time: time,
+                //           onRemove: () => _removeReminder(index),
+                //         ),
+                //       );
+                //     }).toList(),
+                //     AddReminderButton(
+                //       onAdd: () {
+                //         CustomTimePickerBottomSheet.showTimePicker(context, (selectedTime) {
+                //           _addReminder(selectedTime);
+                //         });
+                //       },
+                //     ),
+                //   ],
+                // ),
 
                 HeadingH1Widget("Goal"),
 
@@ -815,82 +861,84 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     ),
                   ),
 
-                HeadingH1Widget("Repeat Type"),
+                HeadingH1Widget("Frequency"),
 
-                Padding(
-                  padding: const EdgeInsets.only(top: 4, bottom: 2, right: 5, left: 5),
-                  child: GestureDetector(
-                    onTap: _showRepeatType, // Open bottom sheet on tap
-                    child: Container(
-                      height: 45,
-                      padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 5.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8.0,
-                            spreadRadius: 2.0,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 7, top: 7, bottom: 5),
-                        child: SizedBox(
-                          height: 50.h,
-                          width: double.infinity,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  _repeatSelectedItem.name,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                const Icon(Icons.keyboard_arrow_down_rounded, size: 25),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                /// to be later
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 4, bottom: 2, right: 5, left: 5),
+                //   child: GestureDetector(
+                //     onTap: _showRepeatType, // Open bottom sheet on tap
+                //     child: Container(
+                //       height: 45,
+                //       padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 5.0),
+                //       decoration: BoxDecoration(
+                //         color: Colors.white,
+                //         borderRadius: BorderRadius.circular(15.0),
+                //         boxShadow: [
+                //           BoxShadow(
+                //             color: Colors.black.withOpacity(0.1),
+                //             blurRadius: 8.0,
+                //             spreadRadius: 2.0,
+                //             offset: const Offset(0, 4),
+                //           ),
+                //         ],
+                //       ),
+                //       child: Padding(
+                //         padding: const EdgeInsets.only(left: 7, top: 7, bottom: 5),
+                //         child: SizedBox(
+                //           height: 50.h,
+                //           width: double.infinity,
+                //           child: Container(
+                //             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+                //             decoration: BoxDecoration(
+                //               borderRadius: BorderRadius.circular(8),
+                //             ),
+                //             child: Row(
+                //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //               crossAxisAlignment: CrossAxisAlignment.center,
+                //               children: [
+                //                 Text(
+                //                   _repeatSelectedItem.name,
+                //                   style: GoogleFonts.poppins(
+                //                     fontSize: 16.0,
+                //                     fontWeight: FontWeight.w400,
+                //                   ),
+                //                 ),
+                //                 const Icon(Icons.keyboard_arrow_down_rounded, size: 25),
+                //               ],
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
 
 
-                SizedBox(height: 20,),
+                // SizedBox(height: 10,),
                 if (_repeatSelectedItem == RepeatType.selectDays)
-                  Wrap(
-                    spacing: 6.0,
-                    children: daysOfWeek.map((dayMap) {
-                      String day = dayMap.keys.first;
-                      int dayValue = dayMap.values.first;
-
-                      return WeekdayChip(
-                        day: day,
-                        dayValue: dayValue,
-                        isSelected: selectedDays.contains(dayValue),
-                        onSelected: (selected) {
-                          setState(() {
-                            if (selected) {
-                              selectedDays.add(dayValue);
-                            } else {
-                              selectedDays.remove(dayValue);
-                            }
-                          });
-                        },
-                      );
-                    }).toList(),
+                  Center(
+                    child: Wrap(
+                      spacing: 0.0,
+                      children: daysOfWeek.map((dayMap) {
+                        String day = dayMap.keys.first;
+                        int dayValue = dayMap.values.first;
+                        return WeekdayChip(
+                          day: day,
+                          dayValue: dayValue,
+                          isSelected: selectedDays.contains(dayValue),
+                          onSelected: (selected) {
+                            setState(() {
+                              if (selected) {
+                                selectedDays.add(dayValue);
+                              } else {
+                                selectedDays.remove(dayValue);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
                   ),
 
                 if (_repeatSelectedItem == RepeatType.weekly)
@@ -1069,8 +1117,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                           return GestureDetector(
                             onTap: () => toggleDateSelection(day),
                             child: Container(
-                              height: 30,
-                              width: 30,
+                              height: 25,
+                              width: 25,
                               decoration: isSelected? BoxDecoration(
                                 color: Color(0xff079455),
                                 borderRadius: BorderRadius.circular(20),
@@ -1102,7 +1150,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                     day.toString(),
                                     style: GoogleFonts.poppins(
                                       color: isSelected ? Colors.white : Colors.black,
-                                      fontSize: 15,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w600
                                     ),
                                   ),
@@ -1122,7 +1170,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 16, bottom: 12),
+                      padding: const EdgeInsets.only(top: 1, bottom: 1),
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: SizedBox(
@@ -1246,9 +1294,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 ),
                 const SizedBox(height: 40,),
                 Center(
-                  child: HabitCustomButton(buttonText: widget.isFromEdit == true ? 'Update Habit' : 'Add Habit', onTap: _submitForm, color: ColorStrings.headingBlue, widthOfButton: double.infinity, buttonTextColor: Colors.white,)
+                  child: HabitCustomButton(buttonText: widget.isFromEdit == true ? 'Update Habit' : 'Add Habit', onTap: _submitForm, color: ColorStrings.headingBlue, widthOfButton: 180, buttonTextColor: Colors.white,)
                 ),
-                const SizedBox(height: 90,)
+                const SizedBox(height: 30),
               ],
             ),
           ),
@@ -1325,6 +1373,12 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             !categories.contains(newCategory)) {
                           categories.add(newCategory);
                           _selectedCategory = newCategory;
+                          // Save categories in Hive
+                          // var box = Hive.box<String>('categoriesBox');
+                          // box.put(newCategory, newCategory); // Use key-value pairs
+                          AppUtils.addCategory(newCategory); // Save to Hive
+                          log('category with added list $newCategory');
+
                         }
                       });
                       Navigator.of(context).pop();
@@ -1356,7 +1410,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         id: habitId!,
         title: _title!,
         category: _selectedCategory!,
-        habitIcon: iconSelected,
+        habitEmoji: emojiSelected,
         iconBgColor: selectedColor,
         notificationTime: selectedTime,
         taskType: _taskType,
@@ -1377,9 +1431,13 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       log('${widget.habit != null ? "Updated" : "New"} habit added: $newHabit');
 
       // Use addHabit for new habits, updateHabit for existing habits
-      if (widget.habit != null) {
+      if (widget.isFromEdit == true) {
         Provider.of<HabitProvider>(context, listen: false).updateHabit(newHabit);
-      } else {
+      }
+      else if (widget.isFromFilledHabbit == true) {
+        Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
+      }
+      else {
         Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
       }
 

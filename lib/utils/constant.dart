@@ -1,4 +1,10 @@
 import 'dart:math';
+import 'dart:ui';
+
+import 'package:hard_challenge/model/habit_model.dart';
+import 'package:hard_challenge/utils/helpers.dart';
+
+
 
 class ConstantData {
   List<String> quotes = [
@@ -56,10 +62,384 @@ class ConstantData {
     "Success is what happens after you’ve survived all your mistakes.",
     "Little by little, one travels far."
   ];
-
-
   String getRandomQuote() {
     Random random = Random();
     return quotes[random.nextInt(quotes.length)];
   }
 }
+
+final List<Habit> preRecorededHabitList = [
+  Habit(
+    id: '1',
+    title: 'Walk',
+    category: 'Sport',
+    habitEmoji: '🚶',
+    iconBgColor: const Color(0xFF4CAF50),
+    notificationTime: ["7:00 AM"],
+    taskType: TaskType.count,
+    value: 10, // Steps
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '2',
+    title: 'Run',
+    category: 'Sport',
+    habitEmoji: '🏃',
+    iconBgColor: const Color(0xFFFF5722),
+    notificationTime: ["6:30 AM"],
+    taskType: TaskType.count,
+    value: 3, // Kilometers
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '3',
+    title: 'Yoga',
+    category: 'Sport',
+    habitEmoji: '🧘',
+    iconBgColor: const Color(0xFF9C27B0),
+    notificationTime: ["6:00 AM"],
+    taskType: TaskType.time,
+    value: 30, // Minutes
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '4',
+    title: 'Exercise',
+    category: 'Sport',
+    habitEmoji: '🏋️',
+    iconBgColor: const Color(0xFFFFC107),
+    notificationTime: ["7:30 AM"],
+    taskType: TaskType.count,
+    value: 15, // Sets
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '5',
+    title: 'Stretch',
+    category: 'Sport',
+    habitEmoji: '🤸',
+    iconBgColor: const Color(0xFF00BCD4),
+    notificationTime: ["8:00 AM"],
+    taskType: TaskType.time,
+    value: 10, // Minutes
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '6',
+    title: 'Swim',
+    category: 'Sport',
+    habitEmoji: '🏊',
+    iconBgColor: const Color(0xFF3F51B5),
+    notificationTime: ["5:30 PM"],
+    taskType: TaskType.count,
+    value: 20, // Laps
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '7',
+    title: 'Cycling',
+    category: 'Sport',
+    habitEmoji: '🚴',
+    iconBgColor: const Color(0xFF8BC34A),
+    notificationTime: ["6:00 AM"],
+    taskType: TaskType.count,
+    value: 10, // Kilometers
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '8',
+    title: 'Dance',
+    category: 'Sport',
+    habitEmoji: '💃',
+    iconBgColor: const Color(0xFFE91E63),
+    notificationTime: ["7:00 PM"],
+    taskType: TaskType.time,
+    timer: Duration(hours: 1),
+    // value: 30, // Minutes
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '9',
+    title: 'Jump Rope',
+    category: 'Sport',
+    habitEmoji: '🦘',
+    iconBgColor: const Color(0xFF795548),
+    notificationTime: ["6:15 AM"],
+    taskType: TaskType.count,
+    value: 500, // Jumps
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '10',
+    title: 'Push-Ups',
+    category: 'Sport',
+    habitEmoji: '🤸‍♂️',
+    iconBgColor: const Color(0xFF607D8B),
+    notificationTime: ["6:45 AM"],
+    taskType: TaskType.count,
+    value: 50, // Push-Ups
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+
+
+  /// Health related
+  ///
+  Habit(
+    id: '100',
+    title: 'Drink Water',
+    category: 'Health',
+    habitEmoji: '🥛',
+    iconBgColor: const Color(0xFF2196F3),
+    notificationTime: ["8:00 AM", "12:00 PM", "6:00 PM"],
+    taskType: TaskType.count,
+    value: 8, // Glasses per day
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '101',
+    title: 'Eat Fruits',
+    category: 'Health',
+    habitEmoji: '🍎',
+    iconBgColor: const Color(0xFFFF9800),
+    notificationTime: ["10:00 AM"],
+    taskType: TaskType.count,
+    value: 2, // Servings
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '102',
+    title: 'Eat Vegetables',
+    category: 'Health',
+    habitEmoji: '🥦',
+    iconBgColor: const Color(0xFF4CAF50),
+    notificationTime: ["1:00 PM", "7:00 PM"],
+    taskType: TaskType.count,
+    value: 3, // Servings
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '103',
+    title: 'No Sugar',
+    category: 'Health',
+    habitEmoji: '🚫🍬',
+    iconBgColor: const Color(0xFFFF5722),
+    notificationTime: ["9:00 AM"],
+    taskType: TaskType.task,
+    value: 1, // 1 means no sugar for the day
+    habitType: HabitType.quit,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '104',
+    title: 'Sleep Early',
+    category: 'Health',
+    habitEmoji: '🌙',
+    iconBgColor: const Color(0xFF673AB7),
+    notificationTime: ["10:00 PM"],
+    taskType: TaskType.time,
+    value: 8, // Hours
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '105',
+    title: 'Take Medicine',
+    category: 'Health',
+    habitEmoji: '💊',
+    iconBgColor: const Color(0xFF009688),
+    notificationTime: ["8:00 AM", "8:00 PM"],
+    taskType: TaskType.count,
+    value: 1, // Times per day
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '106',
+    title: 'No Alcohol',
+    category: 'Health',
+    habitEmoji: '🚫🍺',
+    iconBgColor: const Color(0xFFE91E63),
+    notificationTime: ["6:00 PM"],
+    taskType: TaskType.time,
+    value: 1, // 1 means no alcohol for the day
+    habitType: HabitType.quit,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '107',
+    title: "Don't Smoke",
+    category: 'Health',
+    habitEmoji: '🚭',
+    iconBgColor: const Color(0xFF795548),
+    notificationTime: ["9:00 AM"],
+    taskType: TaskType.task,
+    value: 1, // 1 means no smoking for the day
+    habitType: HabitType.quit,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+
+  /// Spiritual habits list
+  Habit(
+    id: '200',
+    title: 'Meditation',
+    category: 'Spiritual',
+    habitEmoji: '🧘',
+    iconBgColor: const Color(0xFF673AB7),
+    notificationTime: ["6:00 AM"],
+    taskType: TaskType.time,
+    value: 10, // Minutes per session
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '201',
+    title: 'Gratitude Journaling',
+    category: 'Spiritual',
+    habitEmoji: '📖',
+    iconBgColor: const Color(0xFFFF9800),
+    notificationTime: ["9:00 PM"],
+    taskType: TaskType.task,
+    value: 1, // Mark as done
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '202',
+    title: 'Affirmations',
+    category: 'Spiritual',
+    habitEmoji: '🔮',
+    iconBgColor: const Color(0xFF4CAF50),
+    notificationTime: ["7:00 AM"],
+    taskType: TaskType.task,
+    value: 1, // Mark as done
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '203',
+    title: 'Deep Breathing',
+    category: 'Spiritual',
+    habitEmoji: '🌬️',
+    iconBgColor: const Color(0xFF2196F3),
+    notificationTime: ["12:00 PM", "8:00 PM"],
+    taskType: TaskType.task,
+    value: 5, // Minutes per session
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '204',
+    title: 'Prayer',
+    category: 'Spiritual',
+    habitEmoji: '🙏',
+    iconBgColor: const Color(0xFFE91E63),
+    notificationTime: ["6:30 AM", "9:00 PM"],
+    taskType: TaskType.task,
+    value: 1, // Mark as done
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '205',
+    title: 'Reading Spiritual Books',
+    category: 'Spiritual',
+    habitEmoji: '📚',
+    iconBgColor: const Color(0xFF009688),
+    notificationTime: ["8:00 PM"],
+    taskType: TaskType.task,
+    value: 15, // Minutes per session
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '206',
+    title: 'Acts of Kindness',
+    category: 'Spiritual',
+    habitEmoji: '🤝',
+    iconBgColor: const Color(0xFFFFC107),
+    notificationTime: ["10:00 AM"],
+    taskType: TaskType.task,
+    value: 1, // Mark as done
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: '207',
+    title: 'Silent Reflection',
+    category: 'Spiritual',
+    habitEmoji: '🕊️',
+    iconBgColor: const Color(0xFF795548),
+    notificationTime: ["9:30 PM"],
+    taskType: TaskType.task,
+    value: 10, // Minutes per session
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+
+
+];
