@@ -53,94 +53,80 @@ class AutoFillHabitPopup extends StatelessWidget {
       ),
     ];
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add Habit'),
       ),
-      padding: EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Add",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () {
-                  // Navigator.pop();
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    margin: EdgeInsets.symmetric(vertical: 6),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Colors.blue.shade100,
+                        child: Text(item.habitEmoji, style: TextStyle(fontSize: 25),),
+                      ),
+                      title: Text(item.title),
+                      subtitle: Text(item.category),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddChallengeScreen(
+                              isFromEdit: false,
+                              habit: item,
+                              isFromFilledHabbit: true,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
                 },
               ),
-            ],
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  margin: EdgeInsets.symmetric(vertical: 6),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 24,
-                      backgroundColor: Colors.blue.shade100,
-                      child: Text(item.habitEmoji, style: TextStyle(fontSize: 25),),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 14),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddChallengeScreen(
+                      isFromEdit: false,
+                      isFromFilledHabbit: false,
                     ),
-                    title: Text(item.title),
-                    subtitle: Text(item.category),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddChallengeScreen(
-                            isFromEdit: false,
-                            habit: item,
-                            isFromFilledHabbit: true,
-                          ),
-                        ),
-                      );
-                    },
                   ),
                 );
               },
-            ),
-          ),
-          SizedBox(height: 16),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+              child: Text(
+                "Create Your Own",
+                style: TextStyle(fontSize: 16, color: Colors.white),
               ),
-              padding: EdgeInsets.symmetric(vertical: 14),
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddChallengeScreen(
-                    isFromEdit: false,
-                    isFromFilledHabbit: false,
-                  ),
-                ),
-              );
-            },
-            child: Text(
-              "Create Your Own",
-              style: TextStyle(fontSize: 16, color: Colors.white),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

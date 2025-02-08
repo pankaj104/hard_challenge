@@ -52,11 +52,19 @@ class _MainScreenState extends State<MainScreen> {
             // backgroundColor: Color(0xFFF9F9F9F0),
               elevation: 5,
               currentIndex: currentIndex,
-              onTap: (index){
-                setState(() {
-                  currentIndex = index;
-                });
+              onTap: (index) {
+                if (index == 1) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AutoFillHabitPopup()), // Navigate to new page
+                  );
+                } else {
+                  setState(() {
+                    currentIndex = index; // Update index for other tabs
+                  });
+                }
               },
+
               showSelectedLabels: false, // Hides the label for the selected item
               showUnselectedLabels: false,// Hides the label for the unselected item
               items:[
