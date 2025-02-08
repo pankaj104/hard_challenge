@@ -18,6 +18,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../model/habit_model.dart';
 import '../../provider/habit_provider.dart';
+import '../widgets/all_habit_display_with_progress_widget.dart';
 import 'addChallenge/add_challenge_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -63,8 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Daily Habits'),
-        automaticallyImplyLeading: false,
+     toolbarHeight: 0,
       ),
       body: Column(
         children: [
@@ -75,146 +75,153 @@ class _HomeScreenState extends State<HomeScreen> {
                 // double completion = taskCompletion[date] ?? 0.0;
 
 
-                return
-                  Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          // IconButton(onPressed: () {
-                          //   Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                          //       StatisticsCategoryWise(habit: get_all_habit,)));
-                          // },
-                          //     icon: const Icon(
-                          //       Icons.add_chart, size: 40, color: Colors.blue,)),
-                          Container(
-                            child: Column(
-                              children: [
-                                Text(
-                                  formatDate(_selectedDate),
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 20,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Column(
+
+                      children: [
+
+                         Row(
+                           mainAxisAlignment: MainAxisAlignment.spaceAround,
+                           crossAxisAlignment: CrossAxisAlignment.center,
+
+                           children: [
+                             IconButton(onPressed: () {
+                               showHabitBottomSheet(context);
+
+
+                             },
+                                 icon:  Icon(Icons.list_outlined, size: 30, color: Colors.black.withOpacity(0.85),)),
+                             Center(
+                               child: SizedBox(
+                                 width: 150,
+                                 child: Text(
+                                        formatDate(_selectedDate),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                   textAlign: TextAlign.center,
+                                      ),
+                               ),
+                             ),
+
+                            IconButton(onPressed: () {
+                              setState(() async {
+                                await habitProvider.clearHabits();
+                              });
+                            }, icon: const Icon(Icons.clear))
+                          ],
+                        ),
+                        Container(
+                            clipBehavior: Clip.hardEdge,
+                            margin: EdgeInsets.symmetric(horizontal: 14.w),
+                            decoration: const BoxDecoration(
+                              color: Colors.transparent,
                             ),
-                          ),
-                          // IconButton(onPressed: () {
-                          //   setState(() async {
-                          //     await habitProvider.clearHabits();
-                          //   });
-                          // }, icon: Icon(Icons.clear))
-                        ],
-                      ),
-                      Container(
-                          clipBehavior: Clip.hardEdge,
-                          margin: EdgeInsets.symmetric(horizontal: 14.w),
-                          decoration: const BoxDecoration(
-                            color: Colors.transparent,
-                          ),
-                          child: Consumer<HabitProvider>(
-                            builder: (context, habitProvider, child) {
-                              return Consumer<HabitProvider>(
-                                builder: (context, habitProvider, child) {
-                                  return TableCalendar(
-                                    rowHeight: 55,
-                                    firstDay: DateTime.utc(2020, 10, 16),
-                                    lastDay: DateTime.utc(2030, 3, 14),
-                                    focusedDay: _selectedDate,
-                                    availableGestures: AvailableGestures.all,
-                                    calendarFormat: CalendarFormat.week,
-                                    daysOfWeekStyle: const DaysOfWeekStyle(
-                                      weekdayStyle: TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
-                                      weekendStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.w300, fontSize: 15),
-                                    ),
-                                    selectedDayPredicate: (day) {
-                                      return isSameDay(_selectedDate, day);
-                                    },
-                                    headerStyle: const HeaderStyle(
-                                      formatButtonVisible: false,
-                                      leftChevronVisible: false,
-                                      rightChevronVisible: false,
-                                      headerPadding: EdgeInsets.only(left: 10, bottom: 5, top: 5),
-                                      titleTextStyle: TextStyle(fontSize: 0),
-                                    ),
-                                    onDaySelected: (selectedDay, focusedDay) {
-                                      setState(() {
-                                        Provider.of<HabitProvider>(context, listen: false).loadHabits();
-                                        _selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
-                                        log('selected date from calender $_selectedDate');
-                                      });
-                                    },
-                                    calendarBuilders: CalendarBuilders(
-                                      defaultBuilder: (context, date, _) {
-                                        double completion = habitProvider.getAverageProgressForDate(setSelectedDate(date));
-                                        log("completion on main screen $completion on date $date");
-                                        return Center(
-                                          child: CircularPercentIndicator(
-                                            radius: 20.0,
-                                            lineWidth: 5.0,
-                                            percent: completion,
-                                            center: Text(
-                                              "${date.day}",
-                                              style: const TextStyle(fontSize: 16),
-                                            ),
-                                            progressColor: completion == 1.0 ? Colors.green : Colors.blue,
-                                            backgroundColor: Colors.grey.shade300,
-                                          ),
-                                        );
+                            child: Consumer<HabitProvider>(
+                              builder: (context, habitProvider, child) {
+                                return Consumer<HabitProvider>(
+                                  builder: (context, habitProvider, child) {
+                                    return TableCalendar(
+                                      rowHeight: 55,
+                                      firstDay: DateTime.utc(2020, 10, 16),
+                                      lastDay: DateTime.utc(2030, 3, 14),
+                                      focusedDay: _selectedDate,
+                                      availableGestures: AvailableGestures.all,
+                                      calendarFormat: CalendarFormat.week,
+                                      daysOfWeekStyle: const DaysOfWeekStyle(
+                                        weekdayStyle: TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
+                                        weekendStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.w300, fontSize: 15),
+                                      ),
+                                      selectedDayPredicate: (day) {
+                                        return isSameDay(_selectedDate, day);
                                       },
-                                      todayBuilder: (context, date, _) {
-                                        double completion = habitProvider.getAverageProgressForDate(DateTime(date.year, date.month, date.day));
-                                        return Center(
-                                          child: CircularPercentIndicator(
-                                            radius: 20.0,
-                                            lineWidth: 5.0,
-                                            percent: completion,
-                                            center: Text(
-                                              "${date.day}",
-                                              style: const TextStyle(fontSize: 16),
-                                            ),
-                                            progressColor: completion == 1.0 ? Colors.green : Colors.blue,
-                                            backgroundColor: Colors.grey.shade300,
-                                          ),
-                                        );
+                                      headerStyle: const HeaderStyle(
+                                        formatButtonVisible: false,
+                                        leftChevronVisible: false,
+                                        rightChevronVisible: false,
+                                        headerPadding: EdgeInsets.only(left: 10, bottom: 5, top: 5),
+                                        titleTextStyle: TextStyle(fontSize: 0),
+                                      ),
+                                      onDaySelected: (selectedDay, focusedDay) {
+                                        setState(() {
+                                          Provider.of<HabitProvider>(context, listen: false).loadHabits();
+                                          _selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
+                                          log('selected date from calender $_selectedDate');
+                                        });
                                       },
-                                      selectedBuilder: (context, date, _) {
-                                        double completion = habitProvider.getAverageProgressForDate(DateTime(date.year, date.month, date.day));
-                                        return Container(
-                                          height: 50,
-                                          width: 50,
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue,
-                                            borderRadius: BorderRadius.circular(100),
-                                          ),
-                                          child: Center(
+                                      calendarBuilders: CalendarBuilders(
+                                        defaultBuilder: (context, date, _) {
+                                          double completion = habitProvider.getAverageProgressForDate(setSelectedDate(date));
+                                          log("completion on main screen $completion on date $date");
+                                          return Center(
                                             child: CircularPercentIndicator(
                                               radius: 20.0,
                                               lineWidth: 5.0,
                                               percent: completion,
                                               center: Text(
                                                 "${date.day}",
-                                                style: const TextStyle(fontSize: 16, color: Colors.black),
+                                                style: const TextStyle(fontSize: 16),
                                               ),
-                                              progressColor: completion == 1.0 ? Colors.green : Colors.red,
-                                              backgroundColor: Colors.white60,
+                                              progressColor: completion == 1.0 ? Colors.green : Colors.blue,
+                                              backgroundColor: Colors.grey.shade300,
                                             ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  );
-                                },
-                              );
+                                          );
+                                        },
+                                        todayBuilder: (context, date, _) {
+                                          double completion = habitProvider.getAverageProgressForDate(DateTime(date.year, date.month, date.day));
+                                          return Center(
+                                            child: CircularPercentIndicator(
+                                              radius: 20.0,
+                                              lineWidth: 5.0,
+                                              percent: completion,
+                                              center: Text(
+                                                "${date.day}",
+                                                style: const TextStyle(fontSize: 16),
+                                              ),
+                                              progressColor: completion == 1.0 ? Colors.green : Colors.blue,
+                                              backgroundColor: Colors.grey.shade300,
+                                            ),
+                                          );
+                                        },
+                                        selectedBuilder: (context, date, _) {
+                                          double completion = habitProvider.getAverageProgressForDate(DateTime(date.year, date.month, date.day));
+                                          return Container(
+                                            height: 50,
+                                            width: 50,
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue,
+                                              borderRadius: BorderRadius.circular(100),
+                                            ),
+                                            child: Center(
+                                              child: CircularPercentIndicator(
+                                                radius: 20.0,
+                                                lineWidth: 5.0,
+                                                percent: completion,
+                                                center: Text(
+                                                  "${date.day}",
+                                                  style: const TextStyle(fontSize: 16, color: Colors.black),
+                                                ),
+                                                progressColor: completion == 1.0 ? Colors.green : Colors.red,
+                                                backgroundColor: Colors.white60,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                );
 
-                            },
-                          )
+                              },
+                            )
 
-                      ),
-                    ],
-                  );
+                        ),
+                      ],
+                    ),
+                );
               }
           ),
           // Calendar
@@ -228,11 +235,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   builder: (context, snapshot) {
                     // Check if the Future has completed and whether there were any errors
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error: ${snapshot.error}'));
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(child: Text('No habits available'));
+                      return const Center(child: Text('No habits available'));
                     } else {
                       // Get the habits list for the selected date
                       List<Habit> habitsForSelectedDate = snapshot.data!;
@@ -259,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 borderRadius: BorderRadius.circular(15),
                                 boxShadow: [
                                   BoxShadow(
-                                    offset: Offset(0.0, 4.0),
+                                    offset: const Offset(0.0, 4.0),
                                     color: Colors.grey.withOpacity(0.5),
                                     blurRadius: 2.0,
                                     spreadRadius: 1.0,
@@ -293,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             color: habit.iconBgColor,
                                             borderRadius: BorderRadius.circular(10),
                                           ),
-                                          child: Center(child: Text(habit.habitEmoji , style: TextStyle(fontSize: 30),)),
+                                          child: Center(child: Text(habit.habitEmoji , style: const TextStyle(fontSize: 30),)),
                                           //
                                           // Icon(
                                           //     IconData(convertToIconData(habit.habitEmoji.toString()), fontFamily: 'MaterialIcons')
@@ -331,7 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     ),
                                                     maxLines: 1,
                                                   ),
-                                                  SizedBox(height: 2),
+                                                  const SizedBox(height: 2),
                                                   Row(
                                                     children: [
                                                       Text(
@@ -367,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                         // Trailing widget
                                         Padding(
-                                          padding: EdgeInsets.only(left: 0),
+                                          padding: const EdgeInsets.only(left: 0),
                                           child: _buildTrailingWidget(context, habit, progress),
                                         ),
                                       ],
@@ -420,8 +427,8 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Padding(
             padding: EdgeInsets.only(left: 65.w),
             child: (habit.progressJson[_selectedDate]?.progress ?? 0.0) < 1.0
-                ? Icon(Icons.add_rounded)
-                : Icon(Icons.check_rounded),
+                ? const Icon(Icons.add_rounded)
+                : const Icon(Icons.check_rounded),
           ),
         );
       case TaskType.task:
@@ -547,7 +554,7 @@ class _HomeScreenState extends State<HomeScreen> {
     switch (habit.taskType) {
       case TaskType.time:
 
-        Duration runningDuration = habit.progressJson[_selectedDate]?.duration ?? Duration();
+        Duration runningDuration = habit.progressJson[_selectedDate]?.duration ?? const Duration();
         return '${formatDuration(runningDuration)}/${formatDuration(habit.timer!)}';
 
       case TaskType.count:
@@ -585,6 +592,56 @@ class _HomeScreenState extends State<HomeScreen> {
             .updateHabitProgress(habit, _selectedDate, newProgress, TaskStatus.goingOn , null);
       }
     });
+  }
+
+
+  void showHabitBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.90,
+          minChildSize: 0.4,
+          maxChildSize: 0.9,
+          builder: (context, scrollController) {
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      const Text(
+                        'All Habits',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 40),
+                    ],
+                  ),
+                  const HabitTile ( ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
 }

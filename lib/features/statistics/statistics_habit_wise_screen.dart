@@ -42,7 +42,81 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 0,
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert), // Three-dot menu icon
+            onSelected: (value) {
+              if (value == 'edit') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddChallengeScreen(habit: widget.habit, isFromEdit: true, isFromFilledHabbit: false,)),);
+              } else if (value == 'skip') {
+
+                setState(() {
+
+                  // Check if the task is already skipped
+                  if (widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped) {
+                    // If it's skipped, mark it as 'reOpen' (task needs to be reopened)
+                    Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
+                        widget.habit,
+                        widget.selectedDateforSkip,
+                        0.0, // Reset progress to 0
+                        TaskStatus.reOpen,
+                        null
+                    );
+                  } else {
+                    // If it's not skipped, mark it as skipped
+                    Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
+                        widget.habit,
+                        widget.selectedDateforSkip,
+                        0.0, // Mark progress as 0% (skipped)
+                        TaskStatus.skipped, // Mark status as 'skipped'
+                        null
+                    );
+                  }
+
+                });
+
+              } else if (value == 'delete') {
+                setState(() {
+                  Provider.of<HabitProvider>(context, listen: false).deleteHabit(widget.habit.id);
+                });
+                Navigator.pop(context);              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit, color: Colors.black),
+                    SizedBox(width: 10),
+                    Text("Edit"),
+                  ],
+                ),
+              ),
+               PopupMenuItem(
+                value: 'skip',
+                child: Row(
+                  children: [
+                    Icon(Icons.skip_next, color: Colors.black),
+                    SizedBox(width: 10),
+                    (widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped) ? Text("Resume Session") : Text("Skip Session")
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete, color: Colors.red),
+                    SizedBox(width: 10),
+                    Text("Delete Habit"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -50,39 +124,6 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  IconButtonWidget(icon: ImageResource.backIcon,
-                      onPressed: (){
-                        Navigator.pop(context);
-                      } ),
-
-                  Expanded(
-                    child: Center(
-                      child: HeadingH2Widget("Habit wise"),
-                    ),
-                  ),
-                  Row(children: [
-                    IconButton(onPressed: (){
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AddChallengeScreen(habit: widget.habit, isFromEdit: true, isFromFilledHabbit: false,)),);
-
-                    }, icon: Icon(Icons.edit)),
-
-                    IconButton(onPressed: (){
-                      setState(() {
-                        Provider.of<HabitProvider>(context, listen: false).deleteHabit(widget.habit.id);
-                      });
-                      Navigator.pop(context);
-
-                    }, icon: Icon(Icons.delete))
-
-                  ],),
-
-                ],
-              ),
-
 
               Center(child: Text(' ${widget.habit.title}', style: const TextStyle(fontSize: 24))),
               widget.habit.notes != null ?  Column(
@@ -94,40 +135,40 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
               )
                : const SizedBox(),
               const SizedBox(height: 16),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-
-                      // Check if the task is already skipped
-                      if (widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped) {
-                        // If it's skipped, mark it as 'reOpen' (task needs to be reopened)
-                        Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
-                          widget.habit,
-                          widget.selectedDateforSkip,
-                          0.0, // Reset progress to 0
-                          TaskStatus.reOpen,
-                          null
-                        );
-                      } else {
-                        // If it's not skipped, mark it as skipped
-                        Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
-                          widget.habit,
-                          widget.selectedDateforSkip,
-                          0.0, // Mark progress as 0% (skipped)
-                          TaskStatus.skipped, // Mark status as 'skipped'
-                          null
-                        );
-                      }
-
-                    });
-                  },
-                  child: widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped
-                      ? const Text("Skipped")  // Text to show when skipped
-                      : Text("Skip Task of ${widget.selectedDateforSkip.day} Date"),  // Text to show normally
-                ),
-
-              ),
+              // Center(
+              //   child: ElevatedButton(
+              //     onPressed: () {
+              //       setState(() {
+              //
+              //         // Check if the task is already skipped
+              //         if (widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped) {
+              //           // If it's skipped, mark it as 'reOpen' (task needs to be reopened)
+              //           Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
+              //             widget.habit,
+              //             widget.selectedDateforSkip,
+              //             0.0, // Reset progress to 0
+              //             TaskStatus.reOpen,
+              //             null
+              //           );
+              //         } else {
+              //           // If it's not skipped, mark it as skipped
+              //           Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
+              //             widget.habit,
+              //             widget.selectedDateforSkip,
+              //             0.0, // Mark progress as 0% (skipped)
+              //             TaskStatus.skipped, // Mark status as 'skipped'
+              //             null
+              //           );
+              //         }
+              //
+              //       });
+              //     },
+              //     child: widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped
+              //         ? const Text("Skipped")  // Text to show when skipped
+              //         : Text("Skip Task of ${widget.selectedDateforSkip.day} Date"),  // Text to show normally
+              //   ),
+              //
+              // ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -190,7 +231,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
 
               const SizedBox(height: 20,),
               Padding(
-                padding: EdgeInsets.only(bottom: 24),
+                padding: const EdgeInsets.only(bottom: 24),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -213,7 +254,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                     widget.habit.habitType == HabitType.build ?
                     Row(
                       children: [
-                        SizedBox(width: 10,),
+                        const SizedBox(width: 10,),
                         Container(
                           height: 85,
                           decoration: BoxDecoration(
@@ -230,7 +271,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 10,),
+                        const SizedBox(width: 10,),
                       ],
                     ) : const SizedBox(),
                     Container(
@@ -258,8 +299,8 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xFFECF8FF).withOpacity(0.2), // Adjust the shadow color and opacity as needed
-                        offset: Offset(0, 4), // x: 0, y: 4
+                        color: const Color(0xFFECF8FF).withOpacity(0.2), // Adjust the shadow color and opacity as needed
+                        offset: const Offset(0, 4), // x: 0, y: 4
                         blurRadius: 4, // Blur radius
                         spreadRadius: 0, // Spread radius
                       ),

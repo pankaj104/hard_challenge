@@ -523,5 +523,18 @@ class HabitProvider with ChangeNotifier {
     return averageMissedPercentage;
   }
 
+  double getOverallTaskCompletionPercentage(Habit habit) {
+    int totalDays = countTotalDays(habit);
+    if (totalDays == 0) return 0.0;
+
+    double totalProgress = habit.progressJson.values
+        .map((progress) => progress.progress) // Assuming progress.value holds the completion percentage (0-1)
+        .fold(0.0, (sum, value) => sum + value);
+
+    return (totalProgress / totalDays) * 100;
+  }
+
+
+
 
 }
