@@ -68,6 +68,60 @@ class HabitProvider with ChangeNotifier {
     }
   }
 
+  void addFeedbackToHabit(String habitId, DateTime date, String feedback) async {
+    int index = _habits.indexWhere((habit) => habit.id == habitId);
+    if (index >= 0 && index < _habits.length) {
+      Habit habit = _habits[index];
+
+      // Preserve existing feedback data
+      habit.notesForReason ??= {}; // Initialize if null
+      habit.notesForReason![date] = feedback; // Add/Update feedback
+
+      // Save the updated habit in the Hive box
+      await _habitBox?.putAt(index, habit);
+
+      _habits[index] = habit;
+
+      notifyListeners();
+    }
+  }
+
+  void deleteFeedbackFromHabit(String habitId, DateTime date) async {
+    int index = _habits.indexWhere((habit) => habit.id == habitId);
+    if (index >= 0 && index < _habits.length) {
+      Habit habit = _habits[index];
+
+      // Remove the feedback for the specified date
+      habit.notesForReason?.remove(date);
+
+      // Save the updated habit in the Hive box
+      await _habitBox?.putAt(index, habit);
+
+      _habits[index] = habit;
+
+      notifyListeners();
+    }
+  }
+
+  // void _loadSortedNotes() {
+  //   sortedEntries = [];
+  //
+  //   if (widget.habit.notesForReason != null) {
+  //     sortedEntries.addAll(widget.habit.notesForReason!.entries);
+  //   }
+  //
+  //   sortedEntries.sort((a, b) => a.key.compareTo(b.key)); // Sort by newest first
+  // }
+
+  String? getNoteForDate(String habitId, DateTime date) {
+    int index = _habits.indexWhere((habit) => habit.id == habitId);
+    if (index >= 0 && index < _habits.length) {
+      Habit habit = _habits[index];
+      return habit.notesForReason?[date];
+    }
+    return null; // Return null if the habit or note doesn't exist
+  }
+
 
   Habit getHabit(int index) {
     return _habits[index];

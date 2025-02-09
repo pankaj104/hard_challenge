@@ -41,9 +41,9 @@ class ProgressWithStatusAdapter extends TypeAdapter<ProgressWithStatus> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is ProgressWithStatusAdapter &&
-              runtimeType == other.runtimeType &&
-              typeId == other.typeId;
+      other is ProgressWithStatusAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }
 
 class HabitAdapter extends TypeAdapter<Habit> {
@@ -76,13 +76,14 @@ class HabitAdapter extends TypeAdapter<Habit> {
       startDate: fields[16] as DateTime,
       endDate: fields[17] as DateTime?,
       notes: fields[18] as String?,
+      notesForReason: (fields[19] as Map?)?.cast<DateTime, String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Habit obj) {
     writer
-      ..writeByte(19)
+      ..writeByte(20)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -120,7 +121,9 @@ class HabitAdapter extends TypeAdapter<Habit> {
       ..writeByte(17)
       ..write(obj.endDate)
       ..writeByte(18)
-      ..write(obj.notes);
+      ..write(obj.notes)
+      ..writeByte(19)
+      ..write(obj.notesForReason);
   }
 
   @override

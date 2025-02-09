@@ -1,9 +1,12 @@
 import 'dart:developer';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hard_challenge/features/addChallenge/add_challenge_screen.dart';
+import 'package:hard_challenge/pages/habit_notes_reason_date_wise.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
+import 'package:hard_challenge/routers/app_routes.gr.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import '../../model/habit_model.dart';
@@ -14,6 +17,8 @@ import '../../widgets/headingH2_widget.dart';
 import '../../widgets/icon_button_widget.dart';
 import '../../widgets/info_tile_widget.dart';
 import '../../widgets/weekly_analysis_chart.dart';
+import '../../model/habit_model.dart' as status;
+
 
 class StatisticsHabitWiseScreen extends StatefulWidget {
   final Habit habit;
@@ -47,21 +52,28 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
             icon: const Icon(Icons.more_vert), // Three-dot menu icon
             onSelected: (value) {
               if (value == 'edit') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AddChallengeScreen(habit: widget.habit, isFromEdit: true, isFromFilledHabbit: false,)),);
+
+                context.router.push(
+                  PageRouteInfo<dynamic>(
+                      'AddChallengeScreen',
+                      path: '/add-challenge-screen',
+                      args: AddChallengeScreenArgs(
+                        habit: widget.habit, isFromEdit: true, isFromFilledHabbit: false,
+                      )
+                  ),
+                );
               } else if (value == 'skip') {
 
                 setState(() {
 
                   // Check if the task is already skipped
-                  if (widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped) {
+                  if (widget.habit.progressJson[widget.selectedDateforSkip]?.status == status.TaskStatus.skipped) {
                     // If it's skipped, mark it as 'reOpen' (task needs to be reopened)
                     Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
                         widget.habit,
                         widget.selectedDateforSkip,
                         0.0, // Reset progress to 0
-                        TaskStatus.reOpen,
+                        status.TaskStatus.reOpen,
                         null
                     );
                   } else {
@@ -70,7 +82,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                         widget.habit,
                         widget.selectedDateforSkip,
                         0.0, // Mark progress as 0% (skipped)
-                        TaskStatus.skipped, // Mark status as 'skipped'
+                        status.TaskStatus.skipped, // Mark status as 'skipped'
                         null
                     );
                   }
@@ -100,7 +112,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                   children: [
                     Icon(Icons.skip_next, color: Colors.black),
                     SizedBox(width: 10),
-                    (widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped) ? Text("Resume Session") : Text("Skip Session")
+                    (widget.habit.progressJson[widget.selectedDateforSkip]?.status == status.TaskStatus.skipped) ? Text("Resume Session") : Text("Skip Session")
                   ],
                 ),
               ),
@@ -308,7 +320,23 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                   ),
                   child: WeeklyAnalysisChart(habit: widget.habit,)),
 
-              CalendarPage(habit: widget.habit,)
+              CalendarPage(habit: widget.habit,),
+
+              SizedBox(height: 20,),
+              GestureDetector(
+                onTap: (){
+                  context.router.push(
+                    PageRouteInfo<dynamic>(
+                        'HabitNotesReasonDateWise',
+                        path: '/habit-notes-reason-date-wise',
+                        args: HabitNotesReasonDateWiseArgs(
+                          habit: widget.habit,
+                        )
+                    ),
+                  );
+                },
+                  child: HeadingH2Widget('Reason for missed habbit')),
+              SizedBox(height: 20,),
 
 
 

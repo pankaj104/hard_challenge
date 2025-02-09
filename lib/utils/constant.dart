@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:hard_challenge/model/habit_model.dart';
 import 'package:hard_challenge/utils/helpers.dart';
+import 'package:uuid/uuid.dart';
 
 
 
@@ -67,10 +68,11 @@ class ConstantData {
     return quotes[random.nextInt(quotes.length)];
   }
 }
+final Uuid uuid = Uuid();
 
 final List<Habit> preRecorededHabitList = [
   Habit(
-    id: '1',
+    id: uuid.v4(),
     title: 'Walk',
     category: 'Sport',
     habitEmoji: '🚶',
@@ -84,7 +86,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '2',
+    id: uuid.v4(),
     title: 'Run',
     category: 'Sport',
     habitEmoji: '🏃',
@@ -98,7 +100,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '3',
+    id: uuid.v4(),
     title: 'Yoga',
     category: 'Sport',
     habitEmoji: '🧘',
@@ -112,7 +114,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '4',
+    id: uuid.v4(),
     title: 'Exercise',
     category: 'Sport',
     habitEmoji: '🏋️',
@@ -126,7 +128,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '5',
+    id: uuid.v4(),
     title: 'Stretch',
     category: 'Sport',
     habitEmoji: '🤸',
@@ -140,7 +142,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '6',
+    id: uuid.v4(),
     title: 'Swim',
     category: 'Sport',
     habitEmoji: '🏊',
@@ -154,7 +156,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '7',
+    id: uuid.v4(),
     title: 'Cycling',
     category: 'Sport',
     habitEmoji: '🚴',
@@ -168,7 +170,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '8',
+    id: uuid.v4(),
     title: 'Dance',
     category: 'Sport',
     habitEmoji: '💃',
@@ -183,7 +185,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '9',
+    id: uuid.v4(),
     title: 'Jump Rope',
     category: 'Sport',
     habitEmoji: '🦘',
@@ -197,7 +199,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '10',
+    id: uuid.v4(),
     title: 'Push-Ups',
     category: 'Sport',
     habitEmoji: '🤸‍♂️',
@@ -215,7 +217,7 @@ final List<Habit> preRecorededHabitList = [
   /// Health related
   ///
   Habit(
-    id: '100',
+    id: uuid.v4(),
     title: 'Drink Water',
     category: 'Health',
     habitEmoji: '🥛',
@@ -229,7 +231,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '101',
+    id: uuid.v4(),
     title: 'Eat Fruits',
     category: 'Health',
     habitEmoji: '🍎',
@@ -243,7 +245,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '102',
+    id: uuid.v4(),
     title: 'Eat Vegetables',
     category: 'Health',
     habitEmoji: '🥦',
@@ -257,7 +259,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '103',
+    id: uuid.v4(),
     title: 'No Sugar',
     category: 'Health',
     habitEmoji: '🚫🍬',
@@ -271,7 +273,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '104',
+    id: uuid.v4(),
     title: 'Sleep Early',
     category: 'Health',
     habitEmoji: '🌙',
@@ -285,7 +287,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '105',
+    id: uuid.v4(),
     title: 'Take Medicine',
     category: 'Health',
     habitEmoji: '💊',
@@ -299,7 +301,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '106',
+    id: uuid.v4(),
     title: 'No Alcohol',
     category: 'Health',
     habitEmoji: '🚫🍺',
@@ -313,7 +315,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '107',
+    id: uuid.v4(),
     title: "Don't Smoke",
     category: 'Health',
     habitEmoji: '🚭',
@@ -329,7 +331,7 @@ final List<Habit> preRecorededHabitList = [
 
   /// Spiritual habits list
   Habit(
-    id: '200',
+    id: uuid.v4(),
     title: 'Meditation',
     category: 'Spiritual',
     habitEmoji: '🧘',
@@ -343,7 +345,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '201',
+    id: uuid.v4(),
     title: 'Gratitude Journaling',
     category: 'Spiritual',
     habitEmoji: '📖',
@@ -357,7 +359,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '202',
+    id: uuid.v4(),
     title: 'Affirmations',
     category: 'Spiritual',
     habitEmoji: '🔮',
@@ -371,7 +373,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '203',
+    id: uuid.v4(),
     title: 'Deep Breathing',
     category: 'Spiritual',
     habitEmoji: '🌬️',
@@ -385,7 +387,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '204',
+    id: uuid.v4(),
     title: 'Prayer',
     category: 'Spiritual',
     habitEmoji: '🙏',
@@ -399,7 +401,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '205',
+    id: uuid.v4(),
     title: 'Reading Spiritual Books',
     category: 'Spiritual',
     habitEmoji: '📚',
@@ -413,7 +415,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '206',
+    id: uuid.v4(),
     title: 'Acts of Kindness',
     category: 'Spiritual',
     habitEmoji: '🤝',
@@ -427,7 +429,7 @@ final List<Habit> preRecorededHabitList = [
     startDate: setSelectedDate(DateTime.now()),
   ),
   Habit(
-    id: '207',
+    id: uuid.v4(),
     title: 'Silent Reflection',
     category: 'Spiritual',
     habitEmoji: '🕊️',
@@ -440,6 +442,5 @@ final List<Habit> preRecorededHabitList = [
     progressJson: {},
     startDate: setSelectedDate(DateTime.now()),
   ),
-
 
 ];

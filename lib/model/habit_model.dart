@@ -22,11 +22,12 @@ enum HabitType {
 }
 
 enum TaskStatus {
+  none,
   done,
   missed,
   skipped,
+  goingOn,
   reOpen,
-  goingOn
 }
 
 @HiveType(typeId: 0)
@@ -128,6 +129,9 @@ class Habit {
   @HiveField(18)
   String? notes;
 
+  @HiveField(19)
+  Map<DateTime, String>? notesForReason; // Optional date-specific feedback
+
   Habit({
     required this.id,
     required this.title,
@@ -148,6 +152,7 @@ class Habit {
     required this.startDate,
     this.endDate,
     this.notes,
+    this.notesForReason
   });
 
   @override
@@ -155,6 +160,6 @@ class Habit {
     return 'Habit(id: $id title: $title, category: $category,  habitIcon: $habitEmoji, IconBgColor: $iconBgColor notificationTime: $notificationTime, '
         'taskType: $taskType, habitType: $habitType, repeatType: $repeatType, timer: $timer, value: $value, '
         'progress: $progressJson, days: $days, startDate: $startDate, endDate: $endDate, selectedDates: $selectedDates, '
-        'selectedTimesPerWeek: $selectedTimesPerWeek, selectedTimesPerMonth: $selectedTimesPerMonth, notes: $notes)';
+        'selectedTimesPerWeek: $selectedTimesPerWeek, selectedTimesPerMonth: $selectedTimesPerMonth, notes: $notes, notesForReason: $notesForReason)';
   }
 }
