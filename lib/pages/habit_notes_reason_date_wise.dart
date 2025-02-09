@@ -70,17 +70,20 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
     List<MapEntry<DateTime, String>> filteredNotes = _getFilteredNotes();
 
     return Scaffold(
+      backgroundColor:  Colors.grey[200],
+
       appBar: AppBar(
-        title: const Text('Notes & Feedback'),
+        title: const Text('Notes observation'),
+        backgroundColor: Colors.grey[200],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: Colors.purpleAccent.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: DropdownButtonHideUnderline(
@@ -114,50 +117,78 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
                 itemCount: filteredNotes.length,
                 itemBuilder: (context, index) {
                   final entry = filteredNotes[index];
-                  String formattedDate = DateFormat('yyyy-MM-dd').format(entry.key);
+                  String formattedDate = DateFormat('dd-MM-yyyy').format(entry.key);
                   TaskStatus status = _getStatusForDate(entry.key);
 
                   log('test status $status');
 
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 3,
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                      leading: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _getStatusColor(status).withOpacity(0.2),
-                        ),
-                        child: Icon(statusIcons[status], color: _getStatusColor(status)),
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white, // Adjust the background color if needed
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            spreadRadius: 1,
+                            blurRadius: 2,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
                       ),
-                      title: Text(
-                        formattedDate,
-                        style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
-                      ),
-                      subtitle: Text(
-                        entry.value,
-                        style: const TextStyle(fontSize: 16, color: Colors.black87,fontWeight: FontWeight.bold,),
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          setState(() {
-                            widget.habit.notesForReason?.remove(entry.key);
-                            DateTime date = entry.key;
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Leading Icon with Circle Background
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _getStatusColor(status).withOpacity(0.2),
+                            ),
+                            child: Icon(statusIcons[status], color: _getStatusColor(status)),
+                          ),
+                          const SizedBox(width: 12), // Spacing between icon and text
 
-                            Provider.of<HabitProvider>(context, listen: false).deleteFeedbackFromHabit(widget.habit.id, date);
+                          // Title & Subtitle (Column)
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  formattedDate,
+                                  style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 14),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  entry.value,
+                                  style: const TextStyle(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.bold),
+                                  maxLines: 10,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
 
-                            _loadSortedNotes();
-                          });
-                        },
+                          // Delete Button
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                widget.habit.notesForReason?.remove(entry.key);
+                                DateTime date = entry.key;
+                                Provider.of<HabitProvider>(context, listen: false).deleteFeedbackFromHabit(widget.habit.id, date);
+                                _loadSortedNotes();
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   );
+
                 },
               ),
             ),

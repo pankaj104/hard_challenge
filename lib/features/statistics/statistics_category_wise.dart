@@ -22,6 +22,7 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
   final PageController _pageController = PageController(viewportFraction: 0.7);
   int _currentPage = 0;
   List<String> categories = AppUtils.categories;
+  List<String> filteredCategories = AppUtils.categories;
 
   @override
   void initState() {
@@ -52,39 +53,49 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
           child: SingleChildScrollView(
             child: Consumer<HabitProvider>(
                 builder: (context, habitProvider, child){
+
                   List<Habit> allHabits = habitProvider.getAllHabit();
-                  double overallcompletionPercentage =  habitProvider.getOverallCompletionPercentage(categories[_currentPage]) / 100;
-                  double overallMissedPercentage =  habitProvider.getOverallMissedPercentage(categories[_currentPage]) /100;
-                  double overallSkippedPercentage =  habitProvider.getOverallSkippedPercentage(categories[_currentPage]) /100 ;
+                  filteredCategories = allHabits
+                      .map((habit) => habit.category) // Extract categories
+                      .toSet() // Remove duplicates
+                      .toList(); // Convert back to a list
+                  double overallcompletionPercentage =  habitProvider.getOverallCompletionPercentage(filteredCategories[_currentPage]) / 100;
+                  double overallMissedPercentage =  habitProvider.getOverallMissedPercentage(filteredCategories[_currentPage]) /100;
+                  double overallSkippedPercentage =  habitProvider.getOverallSkippedPercentage(filteredCategories[_currentPage]) /100 ;
+
+
+
+
                   return allHabits.isNotEmpty ?
                   Column(
                     children: [
                       Container(
-                        height: 200,
+                        height: 100,
                         child: PageView.builder(
                           controller: _pageController,
-                          itemCount: categories.length,
+                          itemCount: filteredCategories.length,
+                          physics: BouncingScrollPhysics(),
                           itemBuilder: (context, index) {
                             return _buildCard(index);
                           },
                         ),
                       ),
-                      Container(
-                        color: Colors.white, // Background color for the text area
-                        child: Center(
-                          child: Text(
-                            'Category: ${categories[_currentPage]}',
-                            style: TextStyle(
-                              fontSize: 24,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
+                      // Container(
+                      //   color: Colors.white, // Background color for the text area
+                      //   child: Center(
+                      //     child: Text(
+                      //       'Category: ${filteredCategories[_currentPage]}',
+                      //       style: TextStyle(
+                      //         fontSize: 24,
+                      //         color: Colors.black,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
 
-                      ElevatedButton(onPressed: (){
-                        habitProvider.getOverallCompletionPercentage(categories[_currentPage]);
-                      }, child: Text(allHabits[0].title)),
+                      // ElevatedButton(onPressed: (){
+                      //   habitProvider.getOverallCompletionPercentage(filteredCategories[_currentPage]);
+                      // }, child: Text(allHabits[0].title)),
 
                       SizedBox(height: 20,),
 
@@ -196,7 +207,7 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
 
                       // WeeklyAnalysisChartCategoryWise(habit: allHabits, selectedCategory: categories[_currentPage], ),
 
-                      CalendarCategoryWisePage(habit: allHabits, selectedCategory: categories[_currentPage],)
+                      CalendarCategoryWisePage(habit: allHabits, selectedCategory: filteredCategories[_currentPage],)
 
 
 
@@ -240,12 +251,13 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
+
           color: Colors.primaries[index % Colors.primaries.length], // Different color for each card
           borderRadius: BorderRadius.circular(20),
         ),
         child: Center(
           child: Text(
-            categories[_currentPage],
+            filteredCategories[_currentPage],
             style: TextStyle(
               color: Colors.white,
               fontSize: 24,

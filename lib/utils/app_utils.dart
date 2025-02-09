@@ -8,9 +8,10 @@ import 'package:hive/hive.dart';
 import 'package:hive/hive.dart';
 
 import 'package:hive/hive.dart';
+ final List<String> defaultCategories =  ['Universal','Sport', 'Health', 'Spiritual','Self-Care', 'Finance', 'Learning'];
 
 class AppUtils {
-  static final List<String> _defaultCategories = ['General', 'Sport', 'Health', 'Spiritual'];
+  static final List<String> _defaultCategories =  ['Universal','Sport', 'Health', 'Spiritual','Self-Care', 'Finance', 'Learning'];
 
   static List<String> get categories {
     var box = Hive.box<String>('categoriesBox');

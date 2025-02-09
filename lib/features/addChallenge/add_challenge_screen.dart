@@ -46,12 +46,11 @@ class AddChallengeScreen extends StatefulWidget {
   @override
   _AddChallengeScreenState createState() => _AddChallengeScreenState();
 }
-
 class _AddChallengeScreenState extends State<AddChallengeScreen> {
 
   final _formKey = GlobalKey<FormState>();
   DateTime today = DateTime.now();
-  String _selectedCategory = 'General';
+  String _selectedCategory = defaultCategories[0];
   String _title = 'Test';
   TaskType _taskType = TaskType.task;
   HabitType _habitType = HabitType.build;
