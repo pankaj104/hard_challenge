@@ -1,20 +1,15 @@
 import 'dart:developer';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hard_challenge/features/addChallenge/add_challenge_screen.dart';
-import 'package:hard_challenge/pages/habit_notes_reason_date_wise.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:hard_challenge/routers/app_routes.gr.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import '../../model/habit_model.dart';
 import '../../utils/colors.dart';
-import '../../utils/image_resource.dart';
 import '../../widgets/calendar_widget.dart';
 import '../../widgets/headingH2_widget.dart';
-import '../../widgets/icon_button_widget.dart';
 import '../../widgets/info_tile_widget.dart';
 import '../../widgets/weekly_analysis_chart.dart';
 import '../../model/habit_model.dart' as status;
@@ -44,9 +39,17 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
     double missedPercentage = Provider.of<HabitProvider>(context)
         .getMissedPercentageByCategory(widget.habit, widget.habit.category) ;
     log('data for statistics ${widget.habit}');
+    List<String> weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    List<int> daysList = [1,2,3,4,5,6,7];
+    // List<int> daysList = widget.habit?.days;
+
+
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF6E9E6), // Light peach background
+
       appBar: AppBar(
+        backgroundColor: const Color(0xFFF6E9E6), // Light peach background
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert), // Three-dot menu icon
@@ -110,9 +113,9 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                 value: 'skip',
                 child: Row(
                   children: [
-                    Icon(Icons.skip_next, color: Colors.black),
-                    SizedBox(width: 10),
-                    (widget.habit.progressJson[widget.selectedDateforSkip]?.status == status.TaskStatus.skipped) ? Text("Resume Session") : Text("Skip Session")
+                    const Icon(Icons.skip_next, color: Colors.black),
+                    const SizedBox(width: 10),
+                    (widget.habit.progressJson[widget.selectedDateforSkip]?.status == status.TaskStatus.skipped) ? const Text("Resume Session") : const Text("Skip Session")
                   ],
                 ),
               ),
@@ -136,58 +139,83 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 45,
+                    width: 45,
+                    decoration: BoxDecoration(
+                      color: widget.habit.iconBgColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(child: Text(widget.habit.habitEmoji , style: const TextStyle(fontSize: 20),)),
+                  ),
+                  const SizedBox(width: 20,),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('${widget.habit.title}', style: const TextStyle(fontSize: 20)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          widget.habit.repeatType == RepeatType.selectDays
+                              ? (widget.habit.days != null && List<int>.from(widget.habit.days as Iterable).toSet().containsAll(daysList)
+                              ? const Row(
+                                children: [
+                                  Text('Frequency: ', style: TextStyle(fontSize: 15, color: Colors.black),),
+                                  Text('Daily', style: TextStyle(fontSize: 15, color: Colors.blue),),
+                                ],
+                              )
+                              : Row(
+                                children: [
+                                  const Text('Frequency: ', style: TextStyle(fontSize: 15, color: Colors.black),),
 
-              Center(child: Text(' ${widget.habit.title}', style: const TextStyle(fontSize: 24))),
-              widget.habit.notes != null ?  Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Notes', style: TextStyle(fontSize: 24, color: Colors.deepOrange)),
-                  Text(' ${widget.habit.notes}', style: const TextStyle(fontSize: 20)),
+                                  Text(
+                                                              widget.habit.days != null
+                                    ? widget.habit.days!.map((day) => weekDays[day - 1]).join(', ')
+                                    : '',
+                                                              style: const TextStyle(fontSize: 15,color: Colors.blue),
+                                                            ),
+                                ],
+                              ))
+                              : const SizedBox(),
+                          //
+                          // const SizedBox(width: 5,),
+                          // const Padding(
+                          //   padding: EdgeInsets.symmetric(horizontal: 2),
+                          //   child: Text('.',style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          // ),
+                          // if (widget.habit.taskType == TaskType.task)
+                          //   const Text('Task', style: TextStyle(fontSize: 15)),
+                          // if (widget.habit.taskType == TaskType.time)
+                          //   Text(' ${widget.habit.timer}',
+                          //       style: const TextStyle(fontSize: 15)),
+                          // if (widget.habit.taskType == TaskType.count)
+                          //   Text(' ${widget.habit.value}',
+                          //       style: const TextStyle(fontSize: 15)),
+                        ],
+                      ),
+                    ],
+                  ),
                 ],
-              )
-               : const SizedBox(),
-              const SizedBox(height: 16),
-              // Center(
-              //   child: ElevatedButton(
-              //     onPressed: () {
-              //       setState(() {
-              //
-              //         // Check if the task is already skipped
-              //         if (widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped) {
-              //           // If it's skipped, mark it as 'reOpen' (task needs to be reopened)
-              //           Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
-              //             widget.habit,
-              //             widget.selectedDateforSkip,
-              //             0.0, // Reset progress to 0
-              //             TaskStatus.reOpen,
-              //             null
-              //           );
-              //         } else {
-              //           // If it's not skipped, mark it as skipped
-              //           Provider.of<HabitProvider>(context, listen: false).updateHabitProgress(
-              //             widget.habit,
-              //             widget.selectedDateforSkip,
-              //             0.0, // Mark progress as 0% (skipped)
-              //             TaskStatus.skipped, // Mark status as 'skipped'
-              //             null
-              //           );
-              //         }
-              //
-              //       });
-              //     },
-              //     child: widget.habit.progressJson[widget.selectedDateforSkip]?.status == TaskStatus.skipped
-              //         ? const Text("Skipped")  // Text to show when skipped
-              //         : Text("Skip Task of ${widget.selectedDateforSkip.day} Date"),  // Text to show normally
-              //   ),
-              //
+              )),
+              // widget.habit.notes != null ?  Column(
+              //   crossAxisAlignment: CrossAxisAlignment.start,
+              //   children: [
+              //     const Text('Notes', style: TextStyle(fontSize: 24, color: Colors.deepOrange)),
+              //     Text(' ${widget.habit.notes}', style: const TextStyle(fontSize: 20)),
+              //   ],
+              // )
+              //  : const SizedBox(),
+              const SizedBox(height: 20),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+              //   children: [
+              //     Text('Category: ${widget.habit.category}', style: const TextStyle(fontSize: 18)),
+              //     Text('Habit Type: ${widget.habit.habitType.name}', style: const TextStyle(fontSize: 18)),
+              //   ],
               // ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text('Category: ${widget.habit.category}', style: const TextStyle(fontSize: 18)),
-                  Text('Habit Type: ${widget.habit.habitType.name}', style: const TextStyle(fontSize: 18)),
-                ],
-              ),
               const SizedBox(height: 16),
               Center(
                 child: Column(
@@ -307,7 +335,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
               ),
               Container(
                   decoration: BoxDecoration(
-                    color: ColorStrings.calenderBg,
+                    color: ColorStrings.whiteColor,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
@@ -320,23 +348,73 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                   ),
                   child: WeeklyAnalysisChart(habit: widget.habit,)),
 
-              CalendarPage(habit: widget.habit,),
+              const SizedBox(height: 20,),
 
-              SizedBox(height: 20,),
               GestureDetector(
-                onTap: (){
-                  context.router.push(
-                    PageRouteInfo<dynamic>(
-                        'HabitNotesReasonDateWise',
-                        path: '/habit-notes-reason-date-wise',
-                        args: HabitNotesReasonDateWiseArgs(
-                          habit: widget.habit,
-                        )
+                  onTap: (){
+                    context.router.push(
+                      PageRouteInfo<dynamic>(
+                          'HabitNotesReasonDateWise',
+                          path: '/habit-notes-reason-date-wise',
+                          args: HabitNotesReasonDateWiseArgs(
+                            habit: widget.habit,
+                          )
+                      ),
+                    );
+                  },
+                  child: Center(
+                    child: Container(
+                      height: 35,
+                      width: 260,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 5,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Note observation',
+                            style: GoogleFonts.poppins(fontSize: 22,
+                              color: Colors.purpleAccent,
+                              fontWeight: FontWeight.w400,),),
+
+                          const SizedBox(width: 10,),
+                          const Icon(Icons.toc_rounded,color: Colors.purpleAccent, size: 28,
+                          ),
+
+                        ],
+                      ),
                     ),
-                  );
-                },
-                  child: HeadingH2Widget('Reason for missed habbit')),
-              SizedBox(height: 20,),
+                  )),
+              const SizedBox(height: 20,),
+
+              Container(
+                  height: 440,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 5,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: CalendarPage(habit: widget.habit,)),
+
+
+                  // HeadingH2Widget('Reason for missed habbit')),
+              const SizedBox(height: 20,),
 
 
 

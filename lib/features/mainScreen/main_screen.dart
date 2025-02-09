@@ -27,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
     StatisticsCategoryWise(habit: [],),
   ];
 
-  final List<String> defaultCategories = ['General', 'Sport', 'Health', 'Spiritual'];
+  final List<String> defaultCategories = ['Universal','Sport', 'Health', 'Spiritual','Self-Care', 'Finance', 'Learning'];
   List<String> categories = [];
 
   @override

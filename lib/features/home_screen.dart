@@ -210,6 +210,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           );
                                         },
+                                        outsideBuilder: (context,date, _){
+                                          double completion = habitProvider.getAverageProgressForDate(setSelectedDate(date));
+                                          log("completion on main screen $completion on date $date");
+                                          return Center(
+                                            child: CircularPercentIndicator(
+                                              radius: 20.0,
+                                              lineWidth: 5.0,
+                                              percent: completion,
+                                              center: Text(
+                                                "${date.day}",
+                                                style: const TextStyle(fontSize: 16),
+                                              ),
+                                              progressColor: completion == 1.0 ? Colors.green : Colors.blue,
+                                              backgroundColor: Colors.grey.shade300,
+                                            ),
+                                          );
+                                        }
                                       ),
                                     );
                                   },
