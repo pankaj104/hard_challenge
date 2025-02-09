@@ -5,6 +5,7 @@ import 'package:hard_challenge/features/mainScreen/main_screen.dart';
 import 'package:hard_challenge/features/statistics/statistics_category_wise.dart';
 import 'package:hard_challenge/features/statistics/statistics_habit_wise_screen.dart';
 import 'package:hard_challenge/pages/add_habit_screen.dart';
+import 'package:hard_challenge/pages/habit_notes_reason_date_wise.dart';
 
 
 @CupertinoAutoRouter(
@@ -15,6 +16,7 @@ import 'package:hard_challenge/pages/add_habit_screen.dart';
     AutoRoute<dynamic>(page: StatisticsHabitWiseScreen),
     AutoRoute<dynamic>(page: StatisticsCategoryWise),
     AutoRoute<dynamic>(page: AddChallengeScreen),
+    AutoRoute<dynamic>(page: HabitNotesReasonDateWise),
 
   ],
 )
