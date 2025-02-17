@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hard_challenge/model/habit_model.dart';
 import 'package:hard_challenge/utils/helpers.dart';
-import 'package:hard_challenge/widgets/diamond_progess_indicator.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../utils/colors.dart';
