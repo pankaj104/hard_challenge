@@ -18,11 +18,10 @@ class StatisticsCategoryWise extends StatefulWidget {
 }
 
 class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
-
   final PageController _pageController = PageController(viewportFraction: 0.7);
   int _currentPage = 0;
   List<String> categories = AppUtils.categories;
-  List<String> filteredCategories = AppUtils.categories;
+  List<String> filteredCategories = [];
 
   @override
   void initState() {
@@ -39,197 +38,136 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Category wise Statistics'),
-          automaticallyImplyLeading: false,
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: SingleChildScrollView(
-            child: Consumer<HabitProvider>(
-                builder: (context, habitProvider, child){
+      appBar: AppBar(
+        title: const Text('Category wise Statistics'),
+        automaticallyImplyLeading: false,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: SingleChildScrollView(
+          child: Consumer<HabitProvider>(
+            builder: (context, habitProvider, child) {
+              List<Habit> allHabits = habitProvider.getAllHabit();
+              filteredCategories = allHabits
+                  .map((habit) => habit.category) // Extract categories
+                  .toSet() // Remove duplicates
+                  .toList(); // Convert back to a list
 
-                  List<Habit> allHabits = habitProvider.getAllHabit();
-                  filteredCategories = allHabits
-                      .map((habit) => habit.category) // Extract categories
-                      .toSet() // Remove duplicates
-                      .toList(); // Convert back to a list
-                  double overallcompletionPercentage =  habitProvider.getOverallCompletionPercentage(filteredCategories[_currentPage]) / 100;
-                  double overallMissedPercentage =  habitProvider.getOverallMissedPercentage(filteredCategories[_currentPage]) /100;
-                  double overallSkippedPercentage =  habitProvider.getOverallSkippedPercentage(filteredCategories[_currentPage]) /100 ;
+              // Handle empty categories case
+              if (filteredCategories.isEmpty) {
+                return const Center(child: Text('No categories found'));
+              }
 
+              // Ensure _currentPage is within bounds
+              _currentPage = _currentPage.clamp(0, filteredCategories.length - 1);
 
+              // Get category-based statistics
+              String currentCategory = filteredCategories[_currentPage];
+              double overallCompletionPercentage = habitProvider.getOverallCompletionPercentage(currentCategory) / 100;
+              double overallMissedPercentage = habitProvider.getOverallMissedPercentage(currentCategory) / 100;
+              double overallSkippedPercentage = habitProvider.getOverallSkippedPercentage(currentCategory) / 100;
 
-
-                  return allHabits.isNotEmpty ?
-                  Column(
-                    children: [
-                      Container(
-                        height: 100,
-                        child: PageView.builder(
-                          controller: _pageController,
-                          itemCount: filteredCategories.length,
-                          physics: BouncingScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            return _buildCard(index);
-                          },
-                        ),
-                      ),
-                      // Container(
-                      //   color: Colors.white, // Background color for the text area
-                      //   child: Center(
-                      //     child: Text(
-                      //       'Category: ${filteredCategories[_currentPage]}',
-                      //       style: TextStyle(
-                      //         fontSize: 24,
-                      //         color: Colors.black,
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-
-                      // ElevatedButton(onPressed: (){
-                      //   habitProvider.getOverallCompletionPercentage(filteredCategories[_currentPage]);
-                      // }, child: Text(allHabits[0].title)),
-
-                      SizedBox(height: 20,),
-
-                      Center(
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  CircularPercentIndicator(
-                                    radius: 100.0,
-                                    lineWidth: 20.0,
-                                    percent: 1- (overallcompletionPercentage + overallSkippedPercentage),
-                                    backgroundColor: Colors.transparent,
-                                    progressColor: Colors.blue[700],
-                                    circularStrokeCap: CircularStrokeCap.round,
-                                  ),
-                                  CircularPercentIndicator(
-                                    radius: 100.0,
-                                    lineWidth: 20.0,
-                                    percent: overallcompletionPercentage + overallSkippedPercentage,
-                                    backgroundColor: Colors.grey[300]!,
-                                    progressColor: Colors.lightBlue[300],
-                                    circularStrokeCap: CircularStrokeCap.round,
-                                  ),
-
-                                  CircularPercentIndicator(
-                                    radius: 100.0,
-                                    lineWidth: 20.0,
-                                    percent: overallcompletionPercentage,
-                                    backgroundColor: Colors.transparent,
-                                    progressColor: Colors.blue[900],
-                                    circularStrokeCap: CircularStrokeCap.round,
-                                    center: Text(
-                                      '${(overallcompletionPercentage * 100).toStringAsFixed(1)} %',
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ]
-                        ),
-                      ),
-                      const SizedBox(height: 20,),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 24,),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              return Column(
+                children: [
+                  Container(
+                    height: 100,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: filteredCategories.length,
+                      physics: const BouncingScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return _buildCard(index);
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Stack(
+                          alignment: Alignment.center,
                           children: [
-                            Container(
-                                height: 85,
-                                decoration: BoxDecoration(
-                                color: Colors.green!, // Set the background color
-                                borderRadius: BorderRadius.circular(12),
-                                ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 18),
-                                child: InfoTile(
-                                  color: ColorStrings.whiteColor,
-                                  label: 'Completed',
-                                  value: '${(overallcompletionPercentage * 100).toStringAsFixed(1)} %',
-                                  icon: Icons.done,
-                                ),
-                              ),
+                            CircularPercentIndicator(
+                              radius: 100.0,
+                              lineWidth: 20.0,
+                              percent: 1 - (overallCompletionPercentage + overallSkippedPercentage),
+                              backgroundColor: Colors.transparent,
+                              progressColor: Colors.blue[700],
+                              circularStrokeCap: CircularStrokeCap.round,
                             ),
-                            const SizedBox(height: 10,),
-                            Container(
-                                height: 85,
-                                decoration: BoxDecoration(
-                                  color:Colors.redAccent!, // Set the background color
-                                borderRadius: BorderRadius.circular(12),
-                                ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 24),
-                                child: InfoTile(
-                                  color: ColorStrings.whiteColor,
-                                  label: 'Missed',
-                                  value:  '${(overallMissedPercentage * 100).toStringAsFixed(1)} %',
-                                  icon: Icons.close,
-                                ),
-                              ),
+                            CircularPercentIndicator(
+                              radius: 100.0,
+                              lineWidth: 20.0,
+                              percent: overallCompletionPercentage + overallSkippedPercentage,
+                              backgroundColor: Colors.grey[300]!,
+                              progressColor: Colors.lightBlue[300],
+                              circularStrokeCap: CircularStrokeCap.round,
                             ),
-                            const SizedBox(height: 10,),
-                            Container(
-                              height: 85,
-                              decoration: BoxDecoration(
-                                color: Colors.amberAccent, // Set the background color
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 24),
-                                child: InfoTile(
-                                  color: ColorStrings.whiteColor,
-                                  label: 'Skipped',
-                                  value: '${(overallSkippedPercentage * 100).toStringAsFixed(1)} %',
-                                  icon: Icons.last_page,
+                            CircularPercentIndicator(
+                              radius: 100.0,
+                              lineWidth: 20.0,
+                              percent: overallCompletionPercentage,
+                              backgroundColor: Colors.transparent,
+                              progressColor: Colors.blue[900],
+                              circularStrokeCap: CircularStrokeCap.round,
+                              center: Text(
+                                '${(overallCompletionPercentage * 100).toStringAsFixed(1)} %',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                      ),
-
-                      ///  WeeklyAnalysisChartCategoryWise
-
-                      // WeeklyAnalysisChartCategoryWise(habit: allHabits, selectedCategory: categories[_currentPage], ),
-
-                      CalendarCategoryWisePage(habit: allHabits, selectedCategory: filteredCategories[_currentPage],)
-
-
-
-                    ],
-
-
-
-
-
-                  ):
-
-                        Center(child: Text('No habit found'));
-
-
-
-                }
-
-            ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 24),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildInfoTile(
+                          color: Colors.green,
+                          label: 'Completed',
+                          value: '${(overallCompletionPercentage * 100).toStringAsFixed(1)} %',
+                          icon: Icons.done,
+                        ),
+                        _buildInfoTile(
+                          color: Colors.redAccent,
+                          label: 'Missed',
+                          value: '${(overallMissedPercentage * 100).toStringAsFixed(1)} %',
+                          icon: Icons.close,
+                        ),
+                        _buildInfoTile(
+                          color: Colors.amberAccent,
+                          label: 'Skipped',
+                          value: '${(overallSkippedPercentage * 100).toStringAsFixed(1)} %',
+                          icon: Icons.last_page,
+                        ),
+                      ],
+                    ),
+                  ),
+                  CalendarCategoryWisePage(
+                    habit: allHabits,
+                    selectedCategory: currentCategory,
+                  ),
+                ],
+              );
+            },
           ),
-        )
+        ),
+      ),
     );
   }
+
+  /// Builds the category selection card
   Widget _buildCard(int index) {
     return AnimatedBuilder(
       animation: _pageController,
@@ -249,16 +187,15 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
         );
       },
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
-
-          color: Colors.primaries[index % Colors.primaries.length], // Different color for each card
+          color: Colors.primaries[index % Colors.primaries.length],
           borderRadius: BorderRadius.circular(20),
         ),
         child: Center(
           child: Text(
-            filteredCategories[_currentPage],
-            style: TextStyle(
+            filteredCategories.isNotEmpty ? filteredCategories[index] : 'No Category',
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 24,
             ),
@@ -267,7 +204,24 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
       ),
     );
   }
+
+  /// Builds the info tile for completion, missed, and skipped
+  Widget _buildInfoTile({required Color color, required String label, required String value, required IconData icon}) {
+    return Container(
+      height: 85,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: InfoTile(
+          color: ColorStrings.whiteColor,
+          label: label,
+          value: value,
+          icon: icon,
+        ),
+      ),
+    );
+  }
 }
-
-
-

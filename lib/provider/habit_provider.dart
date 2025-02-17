@@ -342,6 +342,42 @@ class HabitProvider with ChangeNotifier {
     return totalDays;
   }
 
+  int countTotalDaysTillToday(Habit habit) {
+    int totalDays = 0;
+    DateTime? startDate = setSelectedDate(habit.startDate);
+    DateTime endDate = DateTime.now(); // Use today's date instead of habit.endDate
+
+    log('start date: $startDate, end date (today): $endDate');
+
+    if (habit.repeatType == RepeatType.selectDays && startDate != null) {
+      DateTime loopDate = startDate;
+
+      while (loopDate.isBefore(endDate) || loopDate.isAtSameMomentAs(endDate)) {
+        int mappedWeekday = loopDate.weekday % 7;
+        if (mappedWeekday == 0) {
+          mappedWeekday = 7;
+        }
+
+        log('loopDate: $loopDate, mappedWeekday: $mappedWeekday, habit.days: ${habit.days}');
+
+        if (habit.days!.contains(mappedWeekday)) {
+          log('total days count: $totalDays');
+          totalDays++;
+        }
+        loopDate = loopDate.add(const Duration(days: 1));
+      }
+    } else if (habit.repeatType == RepeatType.selectedDate) {
+      totalDays = habit.selectedDates?.where((date) => date.isBefore(endDate) || date.isAtSameMomentAs(endDate)).length ?? 1;
+    } else if (habit.repeatType == RepeatType.weekly && startDate != null) {
+      totalDays = countTaskDays(startDate, endDate, habit.selectedTimesPerWeek ?? 1);
+    } else if (habit.repeatType == RepeatType.monthly) {
+      totalDays = habit.selectedDates?.where((date) => date.isBefore(endDate) || date.isAtSameMomentAs(endDate)).length ?? 1;
+    }
+
+    return totalDays;
+  }
+
+
   int countTaskDays(DateTime startDate, DateTime endDate, int taskDays) {
     if (startDate.isAfter(endDate)) {
       throw ArgumentError('Start date must be before end date');

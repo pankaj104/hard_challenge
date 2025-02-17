@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:hard_challenge/routers/app_routes.gr.dart';
+import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import '../../model/habit_model.dart';
@@ -38,6 +39,11 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
         .getSkippedPercentageByCategory(widget.habit, widget.habit.category) ;
     double missedPercentage = Provider.of<HabitProvider>(context)
         .getMissedPercentageByCategory(widget.habit, widget.habit.category) ;
+
+    int totalDays = Provider.of<HabitProvider>(context)
+        .countTotalDays(widget.habit) ;
+    int countTotalDaysTillToday = Provider.of<HabitProvider>(context)
+        .countTotalDaysTillToday(widget.habit) ;
     log('data for statistics ${widget.habit}');
     List<String> weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     List<int> daysList = [1,2,3,4,5,6,7];
@@ -229,10 +235,9 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                           CircularPercentIndicator(
                             radius: 100.0,
                             lineWidth: 23.0,
-                            percent: widget.habit.habitType == HabitType.build ? Provider.of<HabitProvider>(context)
-                                .getMissedPercentageByCategory(widget.habit, widget.habit.category) / 100 : 0.0,
-                            backgroundColor: Colors.transparent,
-                            progressColor: Colors.blue[700],
+                            percent: (skippedPercentage + completionPercentage+ missedPercentage) / 100,
+                            backgroundColor: Colors.grey[300]!,
+                            progressColor: Colors.red,
                             circularStrokeCap: CircularStrokeCap.round,
                           ),
 
@@ -241,9 +246,9 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                           CircularPercentIndicator(
                             radius: 100.0,
                             lineWidth: 23.0,
-                            percent: 0.0,
-                            backgroundColor: Colors.grey[300]!,
-                            progressColor: Colors.lightBlue[300],
+                            percent: (skippedPercentage + completionPercentage) / 100,
+                            backgroundColor: Colors.transparent,
+                            progressColor: Colors.amberAccent,
                             circularStrokeCap: CircularStrokeCap.round,
                           ),
 
@@ -253,7 +258,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                             lineWidth: 23.0,
                             percent: completionPercentage / 100 ,
                             backgroundColor: Colors.transparent,
-                            progressColor: Colors.blue[900],
+                            progressColor: Colors.green,
                             circularStrokeCap: CircularStrokeCap.round,
                             center: Text(
                               '${completionPercentage.toStringAsFixed(1)} %',
@@ -270,6 +275,20 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
               ),
 
               const SizedBox(height: 20,),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey[100], // Light grey background
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DurationWidget(totalDays,countTotalDaysTillToday ),
+              ],
+            ),
+          ),
+              const SizedBox(height: 20,),
               Padding(
                 padding: const EdgeInsets.only(bottom: 24),
                 child: Row(
@@ -278,7 +297,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                     Container(
                       height: 85,
                       decoration: BoxDecoration(
-                        color: Colors.green!, // Set the background color
+                        color: Colors.green, // Set the background color
                         borderRadius: BorderRadius.circular(12),
                       ),// Set the radius
                       child: Padding(
@@ -425,5 +444,55 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
     );
   }
 
+  String formatDate(DateTime date) {
+    final now = DateTime.now();
+    final format = (date.year == now.year) ? 'd MMM' : 'd MMM yyyy';
+    return DateFormat(format).format(date);
+  }
+
+  Widget DurationWidget(int totalDays, int countTotalDaysTillToday) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Duration",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "${formatDate(widget.habit.startDate)} - ${formatDate(widget.habit.endDate!)}",
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+            Text(
+              "For $totalDays Days",
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: LinearProgressIndicator(
+            value: (totalDays / countTotalDaysTillToday) / 10,
+            minHeight: 8,
+            backgroundColor: Colors.grey[300],
+            valueColor: const AlwaysStoppedAnimation<Color>(Colors.teal),
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
 
 }
