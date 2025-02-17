@@ -241,7 +241,6 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                             circularStrokeCap: CircularStrokeCap.round,
                           ),
 
-
                           /// Skipped percentage
                           CircularPercentIndicator(
                             radius: 100.0,

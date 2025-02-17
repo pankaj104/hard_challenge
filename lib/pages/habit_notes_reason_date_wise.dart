@@ -47,8 +47,21 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
   }
 
   TaskStatus _getStatusForDate(DateTime date) {
-    return widget.habit.progressJson[date]?.status as TaskStatus? ?? TaskStatus.none;
+    // If the date is today or in the future, return TaskStatus.none if no progress is recorded.
+    if (date.isAfter(DateTime.now()) || date.isAtSameMomentAs(DateTime.now())) {
+      return widget.habit.progressJson[date]?.status ?? TaskStatus.none;
+    }
+
+    // For past dates without progress, return TaskStatus.missed
+    if (widget.habit.progressJson[date] == null) {
+      return TaskStatus.missed;
+    }
+
+    // Otherwise, return the status from progressJson for past dates with progress.
+    return widget.habit.progressJson[date]?.status ?? TaskStatus.none;
   }
+
+
 
   void _filterByStatus(TaskStatus status) {
     setState(() {

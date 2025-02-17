@@ -43,6 +43,16 @@ class _CalendarPageState extends State<CalendarPage> {
     return habitDoneDateList;
   }
 
+  List<DateTime> habitOngoingOnDateStore(Habit habit){
+    List<DateTime> habitOnGoingOnDateList = [];
+    habit.progressJson.forEach((date, progress) {
+      if(progress.status == TaskStatus.goingOn){
+        habitOnGoingOnDateList.add(date);
+      }
+    });
+    return habitOnGoingOnDateList;
+  }
+
 
   List<DateTime> habitSkippedDateStore(Habit habit){
     List<DateTime> habitSkippedDateList= [];
@@ -178,7 +188,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     width: 36,
                     decoration: BoxDecoration(
                       color: ColorStrings.silverColor.withOpacity(0.1), // Background color for days outside the current month
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(36),
                       // boxShadow: [
                       //   BoxShadow(
                       //     color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -214,11 +224,9 @@ class _CalendarPageState extends State<CalendarPage> {
                         Container(
                           height: 36,
                           width: 36,
-
-                          decoration:
-                          BoxDecoration(
+                          decoration: BoxDecoration(
                             color: color,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(36),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.25), // Subtle grey shadow
@@ -268,6 +276,71 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }
 
+              if (habitOngoingOnDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
+                ProgressWithStatus? progressStatus = widget.habit
+                    .progressJson[setSelectedDate(date)];
+                double progressValue = progressStatus?.progress ?? 0.0;
+                return GestureDetector(
+                  onTap: (){
+                    showNoteDialog(context, setSelectedDate(date));
+                  },
+                  child: Center(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          width: 36,
+                          height: 36,
+                          child: CircularProgressIndicator(
+                            value: progressValue,
+                            backgroundColor: Colors.grey.withOpacity(0.5),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.green),
+                            strokeWidth: 4,
+                          ),
+                        ),
+                        Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(36),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25), // Subtle grey shadow
+                                spreadRadius: 0.4,
+                                blurRadius: 1,
+                                offset: const Offset(0, 2), // Shadow slightly below
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${(progressValue*100).toInt()}%',
+                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w500, fontSize: 13), // White text color for outside days
+                            ),
+                          ),
+                        ),
+                        // Show orange dot if a note exists for the date
+                        if (widget.habit.notesForReason?.keys.any((d) => isSameDay(d, date)) ?? false)
+                          Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                height: 10,
+                                width: 10,
+                                decoration: BoxDecoration(
+                                  color: Colors.orange, // Badge color when notes exist
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white, width: 1),
+                                ),
+                              )),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
               return buildContainer(
                 color: ColorStrings.whiteColor,
                 child: Text(
@@ -294,7 +367,7 @@ class _CalendarPageState extends State<CalendarPage> {
                           width: 36,
                           decoration: BoxDecoration(
                             color: color,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(36),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.25), // Subtle grey shadow
@@ -344,6 +417,72 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }
 
+              if (habitOngoingOnDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
+                ProgressWithStatus? progressStatus = widget.habit
+                    .progressJson[setSelectedDate(date)];
+                double progressValue = progressStatus?.progress ?? 0.0;
+                return GestureDetector(
+                  onTap: (){
+                    showNoteDialog(context, setSelectedDate(date));
+                  },
+                  child: Center(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          width: 36,
+                          height: 36,
+                          child: CircularProgressIndicator(
+                            value: progressValue,
+                            backgroundColor: Colors.grey.withOpacity(0.5),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.green),
+                            strokeWidth: 4,
+                          ),
+                        ),
+                        Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(36),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25), // Subtle grey shadow
+                                spreadRadius: 0.4,
+                                blurRadius: 1,
+                                offset: const Offset(0, 2), // Shadow slightly below
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${(progressValue*100).toInt()}%',
+                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w500, fontSize: 13), // White text color for outside days
+                            ),
+                          ),
+                        ),
+                        // Show orange dot if a note exists for the date
+                        if (widget.habit.notesForReason?.keys.any((d) => isSameDay(d, date)) ?? false)
+                          Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                height: 10,
+                                width: 10,
+                                decoration: BoxDecoration(
+                                  color: Colors.orange, // Badge color when notes exist
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white, width: 1),
+                                ),
+                              )),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+
               return buildContainer(
                 color: ColorStrings.whiteColor,
                 child: Text(
@@ -370,7 +509,7 @@ class _CalendarPageState extends State<CalendarPage> {
                           width: 36,
                           decoration: BoxDecoration(
                             color: color,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(36),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -419,6 +558,72 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }
 
+              if (habitOngoingOnDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
+                ProgressWithStatus? progressStatus = widget.habit
+                    .progressJson[setSelectedDate(date)];
+                double progressValue = progressStatus?.progress ?? 0.0;
+                return GestureDetector(
+                  onTap: (){
+                    showNoteDialog(context, setSelectedDate(date));
+                  },
+                  child: Center(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          width: 36,
+                          height: 36,
+                          child: CircularProgressIndicator(
+                            value: progressValue,
+                            backgroundColor: Colors.grey.withOpacity(0.5),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.green),
+                            strokeWidth: 4,
+                          ),
+                        ),
+                        Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(36),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25), // Subtle grey shadow
+                                spreadRadius: 0.4,
+                                blurRadius: 1,
+                                offset: const Offset(0, 2), // Shadow slightly below
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${(progressValue*100).toInt()}%',
+                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w500, fontSize: 13), // White text color for outside days
+                            ),
+                          ),
+                        ),
+                        // Show orange dot if a note exists for the date
+                        if (widget.habit.notesForReason?.keys.any((d) => isSameDay(d, date)) ?? false)
+                          Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                height: 10,
+                                width: 10,
+                                decoration: BoxDecoration(
+                                  color: Colors.orange, // Badge color when notes exist
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white, width: 1),
+                                ),
+                              )),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+
               return buildContainer(
                 color: ColorStrings.cyanColor,
                 child: Text(
@@ -427,7 +632,6 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
               );
             },
-
           ),
         ),
 
@@ -502,11 +706,9 @@ class _CalendarPageState extends State<CalendarPage> {
                               ? null
                               : () {
                             String note = _noteController.text.trim();
-
                             habitProvider.addFeedbackToHabit(widget.habit.id, setSelectedDate(notesForThisDate), note);
-
                             Navigator.pop(context);
-                            print("Saved Note: $note for date: ${setSelectedDate(notesForThisDate)}");
+                            log("Saved Note: $note for date: ${setSelectedDate(notesForThisDate)}");
                           },
                           child: Text(existingNote.isEmpty ? 'Save' : 'Update', style: const TextStyle(color: Colors.white)),
                         );

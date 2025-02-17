@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hard_challenge/model/habit_model.dart';
 import 'package:hard_challenge/utils/helpers.dart';
+import 'package:hard_challenge/widgets/diamond_progess_indicator.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../utils/colors.dart';
@@ -168,15 +169,15 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                 width: 36,
                 decoration: BoxDecoration(
                   color: ColorStrings.whiteColor, // Background color for days outside the current month
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                      spreadRadius: 0.4, // Light spread for subtle effect
-                      blurRadius: 1, // Smooth blur for softer shadow
-                      offset: Offset(0, 2), // Shadow slightly below the element
-                    ),
-                  ],
+                  borderRadius: BorderRadius.circular(36),
+                  // boxShadow: [
+                  //   BoxShadow(
+                  //     color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                  //     spreadRadius: 0.4, // Light spread for subtle effect
+                  //     blurRadius: 1, // Smooth blur for softer shadow
+                  //     offset: Offset(0, 2), // Shadow slightly below the element
+                  //   ),
+                  // ],
                 ),
                 child: Center(
                   child: Text(
@@ -195,7 +196,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                   width: 36,
                   decoration: BoxDecoration(
                     color: widget.habit == HabitType.quit ?  Colors.red : Colors.green,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(36),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -208,7 +209,6 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
 
                     child: Icon(Icons.done, size: 18,color: ColorStrings.whiteColor,)
                 ),
-                    // SvgPicture.asset(ImageResource.doneTick, height: 10, width: 10,)),
               );
 
               //   Container(
@@ -230,7 +230,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     width: 36,
                     decoration: BoxDecoration(
                       color: widget.habit == HabitType.quit ? Colors.green : Colors.red  ,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(36),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -252,7 +252,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     width: 36,
                     decoration: BoxDecoration(
                       color: Colors.amberAccent,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(36),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -273,7 +273,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                 width: 36,
                 decoration: BoxDecoration(
                   color: ColorStrings.whiteColor, // Background color for days outside the current month
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(36),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -300,7 +300,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     width: 36,
                     decoration: BoxDecoration(
                       color: widget.habit == HabitType.quit ?  Colors.red : Colors.green,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(36),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -335,7 +335,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     width: 36,
                     decoration: BoxDecoration(
                       color: widget.habit == HabitType.quit ? Colors.green : Colors.red ,
-                      borderRadius: BorderRadius.circular(9.6),
+                      borderRadius: BorderRadius.circular(36),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -356,7 +356,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     width: 36,
                     decoration: BoxDecoration(
                       color: Colors.amberAccent,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(36),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -377,7 +377,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                 width: 36,
                 decoration: BoxDecoration(
                   color: ColorStrings.whiteColor, // Background color for days outside the current month
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(36),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -404,7 +404,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     width: 36,
                     decoration: BoxDecoration(
                       color: widget.habit == HabitType.quit ?  Colors.red: Colors.green,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(36),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -438,7 +438,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     width: 36,
                     decoration: BoxDecoration(
                       color: widget.habit == HabitType.quit ? Color(0xff079455) : Color(0xffD92D20)  ,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(36),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -459,7 +459,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                     width: 36,
                     decoration: BoxDecoration(
                       color: Colors.amberAccent,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(36),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
@@ -480,7 +480,7 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
                 width: 36,
                 decoration: BoxDecoration(
                   color: ColorStrings.cyanColor, // Background color for days outside the current month
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(36),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
