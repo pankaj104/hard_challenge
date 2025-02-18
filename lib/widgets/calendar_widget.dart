@@ -246,36 +246,6 @@ class _CalendarPageState extends State<CalendarPage> {
                   ),
                 );
               }
-
-              if (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
-                return buildContainer(
-                  color: widget.habit.habitType == HabitType.quit ? Colors.green : Colors.red,
-                  child: Icon(
-                    widget.habit.habitType == HabitType.quit ? Icons.done : Icons.close,
-                    color: ColorStrings.whiteColor,
-                    size: 18,
-                  ),
-                );
-              }
-
-              if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
-                return buildContainer(
-                  color: widget.habit.habitType == HabitType.quit ? Colors.red : Colors.green,
-                  child: Icon(
-                    widget.habit.habitType == HabitType.quit ? Icons.close : Icons.done,
-                    color: ColorStrings.whiteColor,
-                    size: 18,
-                  ),
-                );
-              }
-
-              if (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
-                return buildContainer(
-                  color: Colors.amberAccent,
-                  child: const Icon(Icons.last_page, color: ColorStrings.whiteColor),
-                );
-              }
-
               if (habitOngoingOnDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
                 ProgressWithStatus? progressStatus = widget.habit
                     .progressJson[setSelectedDate(date)];
@@ -341,6 +311,35 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
               }
 
+              if (habitMissedDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
+                return buildContainer(
+                  color: widget.habit.habitType == HabitType.quit ? Colors.green : Colors.red,
+                  child: Icon(
+                    widget.habit.habitType == HabitType.quit ? Icons.done : Icons.close,
+                    color: ColorStrings.whiteColor,
+                    size: 18,
+                  ),
+                );
+              }
+
+              if (habitDoneDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
+                return buildContainer(
+                  color: widget.habit.habitType == HabitType.quit ? Colors.red : Colors.green,
+                  child: Icon(
+                    widget.habit.habitType == HabitType.quit ? Icons.close : Icons.done,
+                    color: ColorStrings.whiteColor,
+                    size: 18,
+                  ),
+                );
+              }
+
+              if (habitSkippedDateStore(widget.habit).any((element) => isSameDay(element, setSelectedDate(date)))) {
+                return buildContainer(
+                  color: Colors.amberAccent,
+                  child: const Icon(Icons.last_page, color: ColorStrings.whiteColor),
+                );
+              }
+              
               return buildContainer(
                 color: ColorStrings.whiteColor,
                 child: Text(
