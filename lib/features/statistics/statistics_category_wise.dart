@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:hard_challenge/utils/app_utils.dart';
@@ -36,6 +38,7 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
         });
       }
     });
+
   }
 
   @override
@@ -66,6 +69,7 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
 
               // Get category-based statistics
               String currentCategory = filteredCategories[_currentPage];
+              log('currentCategory $currentCategory');
               double overallCompletionPercentage = habitProvider.getOverallCompletionPercentage(currentCategory) / 100;
               double overallMissedPercentage = habitProvider.getOverallMissedPercentage(currentCategory) / 100;
               double overallSkippedPercentage = habitProvider.getOverallSkippedPercentage(currentCategory) / 100;
@@ -155,6 +159,7 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
                     ),
                   ),
                   CalendarCategoryWisePage(
+                    key: ValueKey(currentCategory), // Forces rebuild when category changes
                     habit: allHabits,
                     selectedCategory: currentCategory,
                   ),
