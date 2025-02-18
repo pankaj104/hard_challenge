@@ -226,61 +226,50 @@ class HabitProvider with ChangeNotifier {
     int missedCount = 0;
     DateTime now = DateTime.now();
     now = DateTime(now.year, now.month, now.day); // Reset time to 00:00:00
-    Map<DateTime, ProgressWithStatus> categoryProgressJson = Map.fromEntries(
-      habit.progressJson.entries.where((entry) => habit.category == category),
-    );
+
+    // Ensure we only process habits that belong to the given category
+    if (habit.category != category) {
+      return 0.0; // If the habit is not in this category, return 0 missed percentage
+    }
 
     List<DateTime> missedDates = [];
 
     if (habit.repeatType == RepeatType.selectDays) {
-      DateTime loopDate = habit.startDate!;
-      DateTime endDate = habit.endDate!;
-      DateTime now = DateTime.now();
-      now = DateTime(now.year, now.month, now.day); // Reset `now` to midnight
+      DateTime loopDate = habit.startDate;
+      DateTime? endDate = habit.endDate;
+
       log('habit.days: ${habit.days}');
 
-      while (!loopDate.isAfter(endDate)) {
-        int dayIndex = loopDate.weekday;
-
-        // Skip today's date and any date after today
-        if (loopDate.isBefore(now)) {
-          // Check if the loopDate is part of the selected days
-          if (habit.days!.contains(dayIndex)) {
-            if (!categoryProgressJson.containsKey(loopDate) ||
-                (categoryProgressJson[loopDate]!.status != TaskStatus.done &&
-                    categoryProgressJson[loopDate]!.status != TaskStatus.skipped)) {
-              missedDates.add(loopDate);
-            }
+      while (!loopDate.isAfter(endDate ?? now)) {
+        if (loopDate.isBefore(now) && loopDate != now && (habit.days?.contains(loopDate.weekday) ?? false)) {
+          if (!habit.progressJson.containsKey(loopDate) ||
+              (habit.progressJson[loopDate]!.status != TaskStatus.done && habit.progressJson[loopDate]!.status != TaskStatus.goingOn &&
+                  habit.progressJson[loopDate]!.status != TaskStatus.skipped)) {
+            missedDates.add(loopDate);
           }
         }
-
-        // Increment the loop date by one day
         loopDate = loopDate.add(const Duration(days: 1));
       }
-
-      log('Missed dates list: $missedDates');
     }
 
-
     else if (habit.repeatType == RepeatType.selectedDate && habit.selectedDates != null) {
-      for (var date in habit.selectedDates!.where((date) => date.isBefore(now))) {
-        if (!categoryProgressJson.containsKey(date) ||
-            (categoryProgressJson[date]!.status != TaskStatus.done &&
-                categoryProgressJson[date]!.status != TaskStatus.skipped)) {
+      for (var date in habit.selectedDates!.where((date) => date.isBefore(now) && date != now)) {
+        if (!habit.progressJson.containsKey(date) ||
+            (habit.progressJson[date]!.status != TaskStatus.done &&
+                habit.progressJson[date]!.status != TaskStatus.skipped)) {
           missedDates.add(date);
         }
       }
     }
+
     else if (habit.repeatType == RepeatType.weekly) {
-      DateTime now = DateTime.now();
-      now = DateTime(now.year, now.month, now.day); // Reset time to midnight
-      DateTime loopDate = habit.startDate!;
-      while (loopDate.isBefore(now) || loopDate.isAtSameMomentAs(now)) {
-        // Use loopDate.weekday directly
-        if (habit.days!.contains(loopDate.weekday)) {
-          if (!categoryProgressJson.containsKey(loopDate) ||
-              (categoryProgressJson[loopDate]!.status != TaskStatus.done &&
-                  categoryProgressJson[loopDate]!.status != TaskStatus.skipped)) {
+      DateTime loopDate = habit.startDate;
+
+      while (!loopDate.isAfter(now)) {
+        if (loopDate.isBefore(now) && loopDate != now && (habit.days?.contains(loopDate.weekday) ?? false)) {
+          if (!habit.progressJson.containsKey(loopDate) ||
+              (habit.progressJson[loopDate]!.status != TaskStatus.done &&
+                  habit.progressJson[loopDate]!.status != TaskStatus.skipped)) {
             missedDates.add(loopDate);
           }
         }
@@ -289,17 +278,19 @@ class HabitProvider with ChangeNotifier {
     }
 
     else if (habit.repeatType == RepeatType.monthly && habit.selectedDates != null) {
-      for (var date in habit.selectedDates!.where((date) => date.isBefore(now))) {
-        if (!categoryProgressJson.containsKey(date) ||
-            (categoryProgressJson[date]!.status != TaskStatus.done &&
-                categoryProgressJson[date]!.status != TaskStatus.skipped)) {
+      for (var date in habit.selectedDates!.where((date) => date.isBefore(now) && date != now)) {
+        if (!habit.progressJson.containsKey(date) ||
+            (habit.progressJson[date]!.status != TaskStatus.done &&
+                habit.progressJson[date]!.status != TaskStatus.skipped)) {
           missedDates.add(date);
         }
       }
     }
+
     missedCount = missedDates.length;
     int totalDays = countTotalDays(habit);
     log('Missed count: $missedCount and total days: $totalDays');
+
     return totalDays > 0 ? (missedCount / totalDays) * 100 : 0.0;
   }
 
@@ -600,18 +591,22 @@ class HabitProvider with ChangeNotifier {
   }
 
   double getOverallMissedPercentage(String categoryName) {
-    if (_habits.isEmpty) return 0.0;
+    List<Habit> filteredHabits = _habits.where((habit) => habit.category == categoryName).toList();
+
+    if (filteredHabits.isEmpty) return 0.0; // No habits in this category, return 0
 
     double totalPercentage = 0.0;
 
-    for (Habit habit in _habits) {
+    for (Habit habit in filteredHabits) {
       totalPercentage += getMissedPercentageByCategory(habit, categoryName);
     }
 
-    double averageMissedPercentage = totalPercentage / _habits.length;
-    log('Total missed percentage across habits: $averageMissedPercentage');
+    double averageMissedPercentage = totalPercentage / filteredHabits.length;
+    log('Total missed percentage across habits in category "$categoryName": $averageMissedPercentage');
+
     return averageMissedPercentage;
   }
+
 
   double getOverallTaskCompletionPercentage(Habit habit) {
     int totalDays = countTotalDays(habit);

@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import '../../model/habit_model.dart';
 import '../../utils/colors.dart';
 import '../../widgets/calendar_widget.dart';
-import '../../widgets/headingH2_widget.dart';
 import '../../widgets/info_tile_widget.dart';
 import '../../widgets/weekly_analysis_chart.dart';
 import '../../model/habit_model.dart' as status;
@@ -61,7 +60,6 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
             icon: const Icon(Icons.more_vert), // Three-dot menu icon
             onSelected: (value) {
               if (value == 'edit') {
-
                 context.router.push(
                   PageRouteInfo<dynamic>(
                       'AddChallengeScreen',
@@ -161,7 +159,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('${widget.habit.title}', style: const TextStyle(fontSize: 20)),
+                      Text(widget.habit.title, style: const TextStyle(fontSize: 20)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -316,7 +314,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                         Container(
                           height: 85,
                           decoration: BoxDecoration(
-                            color:Colors.redAccent!, // Set the background color
+                            color:Colors.redAccent, // Set the background color
                             borderRadius: BorderRadius.circular(12),
                           ),// Set the radius
                           child: Padding(
@@ -341,7 +339,7 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: InfoTile(
-                          color: ColorStrings.whiteColor!,
+                          color: ColorStrings.whiteColor,
                           label: 'Skipped',
                           value: '${skippedPercentage.toStringAsFixed(1)} %',
                           icon: Icons.last_page,

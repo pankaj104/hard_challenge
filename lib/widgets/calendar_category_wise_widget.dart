@@ -9,9 +9,10 @@ import '../utils/image_resource.dart';
 
 class CalendarCategoryWisePage extends StatefulWidget {
   final List<Habit> habit;
-  final String selectedCategory; // Add a selected category
+  final String selectedCategory;
 
-  const CalendarCategoryWisePage({super.key, required this.habit, required this.selectedCategory}); // Include the selected category
+  const CalendarCategoryWisePage({super.key, required this.habit, required this.selectedCategory});
+
   @override
   _CalendarCategoryWisePageState createState() => _CalendarCategoryWisePageState();
 }
@@ -21,92 +22,135 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
+  late List<DateTime> habitDoneDates;
+  late List<DateTime> habitSkippedDates;
+  late List<DateTime> habitMissedDates;
+
   @override
   void initState() {
     super.initState();
-    habitDoneDateStore(widget.habit, widget.selectedCategory); // Pass the category
-    habitSkippedDateStore(widget.habit, widget.selectedCategory); // Pass the category
-    habitMissedDateStore(widget.habit, widget.selectedCategory); // Pass the category
+    habitDoneDates = _getFilteredHabitDates(TaskStatus.done);
+    habitSkippedDates = _getFilteredHabitDates(TaskStatus.skipped);
+    habitMissedDates = _getMissedHabitDates();
   }
 
-  List<DateTime> habitDoneDateStore(List<Habit> habits, String category) {
-    List<DateTime> habitDoneDateList = [];
-    for (var habit in habits) {
-      if (habit.category == category) { // Filter by category
+  List<DateTime> _getFilteredHabitDates(TaskStatus status) {
+    List<DateTime> filteredDates = [];
+    for (var habit in widget.habit) {
+      if (habit.category == widget.selectedCategory) {
         habit.progressJson.forEach((date, progress) {
-          if (progress.status == TaskStatus.done) {
-            habitDoneDateList.add(date);
+          if (progress.status == status) {
+            filteredDates.add(date);
           }
         });
       }
     }
-    return habitDoneDateList;
+    return filteredDates;
   }
 
-  List<DateTime> habitSkippedDateStore(List<Habit> habits, String category) {
-    List<DateTime> habitSkippedDateList = [];
-    for (var habit in habits) {
-      if (habit.category == category) { // Filter by category
-        habit.progressJson.forEach((date, progress) {
-          if (progress.status == TaskStatus.skipped) {
-            habitSkippedDateList.add(date);
-          }
-        });
-      }
-    }
-    return habitSkippedDateList;
-  }
-
-  List<DateTime> habitMissedDateStore(List<Habit> habits, String category) {
-    List<DateTime> habitMissedDateList = [];
+  List<DateTime> _getMissedHabitDates() {
+    List<DateTime> missedDates = [];
     DateTime now = DateTime.now();
 
-    for (var habit in habits) {
-      if (habit.category == category) {
+    for (var habit in widget.habit) {
+      if (habit.category == widget.selectedCategory) {
         DateTime startDate = habit.startDate ?? now;
         DateTime endDate = habit.endDate ?? now;
 
-        // Filter the progressJson based on the category
         Map<DateTime, ProgressWithStatus> categoryProgressJson = Map.fromEntries(
-          habit.progressJson.entries.where((entry) => habit.category == category),
+          habit.progressJson.entries.where((entry) => habit.category == widget.selectedCategory),
         );
 
-        // Iterate over the date range from startDate to endDate
         for (DateTime date = startDate; date.isBefore(now) || date.isAtSameMomentAs(now); date = date.add(const Duration(days: 1))) {
-          bool isValidDate = false;
+          bool isValidDate = _isValidDateForHabit(habit, date);
 
-          // Check based on repeat type
-          if (habit.repeatType == RepeatType.selectDays) {
-            if (habit.days!.contains(date.weekday % 7)) {
-              isValidDate = true;
-            }
-          } else if (habit.repeatType == RepeatType.selectedDate) {
-            if (habit.selectedDates != null && habit.selectedDates!.contains(date)) {
-              isValidDate = true;
-            }
-          } else if (habit.repeatType == RepeatType.weekly) {
-            isValidDate = habit.days!.contains(date.weekday % 7);
-          } else if (habit.repeatType == RepeatType.monthly) {
-            if (habit.selectedDates != null && habit.selectedDates!.any((d) => d.month == date.month && d.day == date.day)) {
-              isValidDate = true;
-            }
-          }
-
-          // If the date is valid and missed, add it to the list
-          if (isValidDate && (!categoryProgressJson.containsKey(date) ||
-              (categoryProgressJson[date]!.status != TaskStatus.done &&
-                  categoryProgressJson[date]!.status != TaskStatus.skipped))) {
-            habitMissedDateList.add(date);
+          if (isValidDate && !categoryProgressJson.containsKey(date)) {
+            missedDates.add(date);
           }
         }
       }
     }
 
-    return habitMissedDateList;
+    return missedDates;
+  }
+
+  bool _isValidDateForHabit(Habit habit, DateTime date) {
+    int weekday = date.weekday; // No need to use % 7, as Sunday is already 7 in Dart.
+    switch (habit.repeatType) {
+      case RepeatType.selectDays:
+        return habit.days!.contains(weekday); // Direct comparison without % 7
+      case RepeatType.selectedDate:
+        return habit.selectedDates != null && habit.selectedDates!.contains(date);
+      case RepeatType.weekly:
+        return habit.days!.contains(weekday);
+      case RepeatType.monthly:
+        return habit.selectedDates != null &&
+            habit.selectedDates!.any((d) => d.month == date.month && d.day == date.day);
+      default:
+        return false;
+    }
   }
 
 
+  Widget _buildDateWidget(DateTime date) {
+    if (habitDoneDates.any((element) => isSameDay(element, date))) {
+      return _buildStatusWidget(date, Colors.green, Icons.done);
+    } else if (habitMissedDates.any((element) => isSameDay(element, date))) {
+      return _buildStatusWidget(date, Colors.red, Icons.close);
+    } else if (habitSkippedDates.any((element) => isSameDay(element, date))) {
+      return _buildStatusWidget(date, Colors.amberAccent, Icons.last_page);
+    }
+    return _buildDefaultDateWidget(date);
+  }
 
+  Widget _buildStatusWidget(DateTime date, Color color, IconData icon) {
+    return Center(
+      child: Container(
+        height: 36,
+        width: 36,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(36),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.25),
+              spreadRadius: 0.4,
+              blurRadius: 1,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(icon, size: 18, color: ColorStrings.whiteColor),
+      ),
+    );
+  }
+
+  Widget _buildDefaultDateWidget(DateTime date) {
+    return Center(
+      child: Container(
+        height: 36,
+        width: 36,
+        decoration: BoxDecoration(
+          color: ColorStrings.whiteColor, // Background color for days outside the current month
+          borderRadius: BorderRadius.circular(36),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+              spreadRadius: 0.4, // Light spread for subtle effect
+              blurRadius: 1, // Smooth blur for softer shadow
+              offset: Offset(0, 2), // Shadow slightly below the element
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            '${date.day}',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400), // White text color for outside days
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,379 +168,32 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
         onDaySelected: (selectedDay, focusedDay) {
           setState(() {
             _selectedDay = selectedDay;
-            _focusedDay = focusedDay; // update `_focusedDay` here as well
+            _focusedDay = focusedDay;
           });
         },
-        // onFormatChanged: (format) {
-        //   if (_calendarFormat != format) {
-        //     setState(() {
-        //       _calendarFormat = format;
-        //     });
-        //   }
-        // },
         onPageChanged: (focusedDay) {
           _focusedDay = focusedDay;
         },
-        calendarStyle: const CalendarStyle(
-          // selectedDecoration: BoxDecoration(
-          //   color: Colors.blue,
-          //   shape: BoxShape.circle,
-          // ),
-        ),
-        daysOfWeekStyle: const DaysOfWeekStyle(
-          weekdayStyle: TextStyle(color: Colors.black,fontWeight: FontWeight.bold),
-          weekendStyle: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),
-        ),
-        headerStyle:  HeaderStyle(
-          titleTextStyle: TextStyle(color: Colors.black,fontWeight: FontWeight.bold, fontSize: 16),
-          leftChevronIcon: SvgPicture.asset(
-            ImageResource.calenderLeft,
-          ),
-          rightChevronIcon: SvgPicture.asset(
-            ImageResource.calenderRight,
-          ),
+        calendarStyle: const CalendarStyle(),
+        headerStyle: HeaderStyle(
+          titleTextStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+          leftChevronIcon: SvgPicture.asset(ImageResource.calenderLeft),
+          rightChevronIcon: SvgPicture.asset(ImageResource.calenderRight),
           formatButtonVisible: false,
           titleCentered: true,
         ),
-        calendarBuilders:
-        CalendarBuilders(
+        calendarBuilders: CalendarBuilders(
           outsideBuilder: (context, date, events) {
-            // Custom decoration for the days of the previous or next month
-            return Center(
-              child: Container(
-                height: 36,
-                width: 36,
-                decoration: BoxDecoration(
-                  color: ColorStrings.whiteColor, // Background color for days outside the current month
-                  borderRadius: BorderRadius.circular(36),
-                  // boxShadow: [
-                  //   BoxShadow(
-                  //     color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                  //     spreadRadius: 0.4, // Light spread for subtle effect
-                  //     blurRadius: 1, // Smooth blur for softer shadow
-                  //     offset: Offset(0, 2), // Shadow slightly below the element
-                  //   ),
-                  // ],
-                ),
-                child: Center(
-                  child: Text(
-                    '${date.day}',
-                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400), // White text color for outside days
-                  ),
-                ),
-              ),
-            );
+            return _buildDateWidget(date);
           },
           defaultBuilder: (context, date, events) {
-            if (habitDoneDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
-              return Center(
-                child: Container(
-                  height: 36,
-                  width: 36,
-                  decoration: BoxDecoration(
-                    color: widget.habit == HabitType.quit ?  Colors.red : Colors.green,
-                    borderRadius: BorderRadius.circular(36),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                        spreadRadius: 0.4, // Light spread for subtle effect
-                        blurRadius: 1, // Smooth blur for softer shadow
-                        offset: Offset(0, 2), // Shadow slightly below the element
-                      ),
-                    ],
-                  ),
-
-                    child: Icon(Icons.done, size: 18,color: ColorStrings.whiteColor,)
-                ),
-              );
-
-              //   Container(
-              //   margin: const EdgeInsets.all(6.0),
-              //   alignment: Alignment.center,
-              //   decoration: BoxDecoration(
-              //     color: Colors.green,
-              //     shape: BoxShape.circle,
-              //   ),
-              //   child: Text(
-              //     '${date.day}',
-              //     style: TextStyle(color: Colors.white),
-              //   ),
-              // );
-            } else if (habitMissedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
-              return Center(
-                child: Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                      color: widget.habit == HabitType.quit ? Colors.green : Colors.red  ,
-                      borderRadius: BorderRadius.circular(36),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                          spreadRadius: 0.4, // Light spread for subtle effect
-                          blurRadius: 1, // Smooth blur for softer shadow
-                          offset: Offset(0, 2), // Shadow slightly below the element
-                        ),
-                      ],
-                    ),
-
-                    child: Icon(widget.habit == HabitType.quit ? Icons.done : Icons.close,
-                      size: 18,color: ColorStrings.whiteColor,),
-                ),
-              );
-            } else if (habitSkippedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
-              return Center(
-                child: Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.amberAccent,
-                      borderRadius: BorderRadius.circular(36),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                          spreadRadius: 0.4, // Light spread for subtle effect
-                          blurRadius: 1, // Smooth blur for softer shadow
-                          offset: Offset(0, 2), // Shadow slightly below the element
-                        ),
-                      ],
-                    ),
-
-                    child: Icon(Icons.last_page, color: ColorStrings.whiteColor,),
-                ),
-              );
-            }
-            return Center(
-              child: Container(
-                height: 36,
-                width: 36,
-                decoration: BoxDecoration(
-                  color: ColorStrings.whiteColor, // Background color for days outside the current month
-                  borderRadius: BorderRadius.circular(36),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                      spreadRadius: 0.4, // Light spread for subtle effect
-                      blurRadius: 1, // Smooth blur for softer shadow
-                      offset: Offset(0, 2), // Shadow slightly below the element
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    '${date.day}',
-                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400), // White text color for outside days
-                  ),
-                ),
-              ),
-            );
+            return _buildDateWidget(date);
           },
           todayBuilder: (context, date, events) {
-            if (habitDoneDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
-              return Center(
-                child: Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                      color: widget.habit == HabitType.quit ?  Colors.red : Colors.green,
-                      borderRadius: BorderRadius.circular(36),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                          spreadRadius: 0.4, // Light spread for subtle effect
-                          blurRadius: 1, // Smooth blur for softer shadow
-                          offset: Offset(0, 2), // Shadow slightly below the element
-                        ),
-                      ],
-                    ),
-
-                    child:
-                    Icon( widget.habit == HabitType.quit ? Icons.close : Icons.done, size: 18,color: ColorStrings.whiteColor,),
-                ),
-              );
-
-              //   Container(
-              //   margin: const EdgeInsets.all(6.0),
-              //   alignment: Alignment.center,
-              //   decoration: BoxDecoration(
-              //     color: Colors.green,
-              //     shape: BoxShape.circle,
-              //   ),
-              //   child: Text(
-              //     '${date.day}',
-              //     style: TextStyle(color: Colors.white),
-              //   ),
-              // );
-            } else if (habitMissedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
-              return Center(
-                child: Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                      color: widget.habit == HabitType.quit ? Colors.green : Colors.red ,
-                      borderRadius: BorderRadius.circular(36),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                          spreadRadius: 0.4, // Light spread for subtle effect
-                          blurRadius: 1, // Smooth blur for softer shadow
-                          offset: Offset(0, 2), // Shadow slightly below the element
-                        ),
-                      ],
-                    ),
-
-                    child: Icon( widget.habit == HabitType.quit ? Icons.close : Icons.done, size: 18,color: ColorStrings.whiteColor,),
-                ),
-              );
-            } else if (habitSkippedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
-              return Center(
-                child: Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.amberAccent,
-                      borderRadius: BorderRadius.circular(36),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                          spreadRadius: 0.4, // Light spread for subtle effect
-                          blurRadius: 1, // Smooth blur for softer shadow
-                          offset: Offset(0, 2), // Shadow slightly below the element
-                        ),
-                      ],
-                    ),
-
-                    child: Icon(Icons.last_page, color: ColorStrings.whiteColor,),
-                ),
-              );
-            }
-            return Center(
-              child: Container(
-                height: 36,
-                width: 36,
-                decoration: BoxDecoration(
-                  color: ColorStrings.whiteColor, // Background color for days outside the current month
-                  borderRadius: BorderRadius.circular(36),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                      spreadRadius: 0.4, // Light spread for subtle effect
-                      blurRadius: 1, // Smooth blur for softer shadow
-                      offset: Offset(0, 2), // Shadow slightly below the element
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    '${date.day}',
-                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400), // White text color for outside days
-                  ),
-                ),
-              ),
-            );
+            return _buildDateWidget(date);
           },
           selectedBuilder: (context, date, events) {
-            if (habitDoneDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
-              return Center(
-                child: Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                      color: widget.habit == HabitType.quit ?  Colors.red: Colors.green,
-                      borderRadius: BorderRadius.circular(36),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                          spreadRadius: 0.4, // Light spread for subtle effect
-                          blurRadius: 1, // Smooth blur for softer shadow
-                          offset: Offset(0, 2), // Shadow slightly below the element
-                        ),
-                      ],
-                    ),
-
-                  child: Icon(widget.habit == HabitType.quit ? Icons.close : Icons.done, size: 18,),
-                ),
-              );
-
-              //   Container(
-              //   margin: const EdgeInsets.all(6.0),
-              //   alignment: Alignment.center,
-              //   decoration: BoxDecoration(
-              //     color: Colors.green,
-              //     shape: BoxShape.circle,
-              //   ),
-              //   child: Text(
-              //     '${date.day}',
-              //     style: TextStyle(color: Colors.white),
-              //   ),
-              // );
-            } else if (habitMissedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
-              return Center(
-                child: Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                      color: widget.habit == HabitType.quit ? Color(0xff079455) : Color(0xffD92D20)  ,
-                      borderRadius: BorderRadius.circular(36),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                          spreadRadius: 0.4, // Light spread for subtle effect
-                          blurRadius: 1, // Smooth blur for softer shadow
-                          offset: Offset(0, 2), // Shadow slightly below the element
-                        ),
-                      ],
-                    ),
-
-                    child: Icon( widget.habit == HabitType.quit ? Icons.done : Icons.close, size: 18,color: ColorStrings.whiteColor,),
-                ),
-              );
-            } else if (habitSkippedDateStore(widget.habit,widget.selectedCategory).any((element) => isSameDay(element, setSelectedDate(date)))) {
-              return Center(
-                child: Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.amberAccent,
-                      borderRadius: BorderRadius.circular(36),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                          spreadRadius: 0.4, // Light spread for subtle effect
-                          blurRadius: 1, // Smooth blur for softer shadow
-                          offset: Offset(0, 2), // Shadow slightly below the element
-                        ),
-                      ],
-                    ),
-
-                    child: Icon(Icons.last_page, size: 18,color: ColorStrings.whiteColor,),
-                ),
-              );
-            }
-            return Center(
-              child: Container(
-                height: 36,
-                width: 36,
-                decoration: BoxDecoration(
-                  color: ColorStrings.cyanColor, // Background color for days outside the current month
-                  borderRadius: BorderRadius.circular(36),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
-                      spreadRadius: 0.4, // Light spread for subtle effect
-                      blurRadius: 1, // Smooth blur for softer shadow
-                      offset: Offset(0, 2), // Shadow slightly below the element
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    '${date.day}',
-                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.w400), // White text color for outside days
-                  ),
-                ),
-              ),
-            );
+            return _buildDateWidget(date);
           },
         ),
       ),

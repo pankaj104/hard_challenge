@@ -94,17 +94,17 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
                             CircularPercentIndicator(
                               radius: 100.0,
                               lineWidth: 20.0,
-                              percent: 1 - (overallCompletionPercentage + overallSkippedPercentage),
-                              backgroundColor: Colors.transparent,
-                              progressColor: Colors.blue[700],
+                              percent: overallMissedPercentage + overallCompletionPercentage + overallSkippedPercentage,
+                              backgroundColor: Colors.grey[300]!,
+                              progressColor: Colors.red,
                               circularStrokeCap: CircularStrokeCap.round,
                             ),
                             CircularPercentIndicator(
                               radius: 100.0,
                               lineWidth: 20.0,
                               percent: overallCompletionPercentage + overallSkippedPercentage,
-                              backgroundColor: Colors.grey[300]!,
-                              progressColor: Colors.lightBlue[300],
+                              backgroundColor: Colors.transparent,
+                              progressColor: Colors.amberAccent,
                               circularStrokeCap: CircularStrokeCap.round,
                             ),
                             CircularPercentIndicator(
@@ -112,7 +112,7 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
                               lineWidth: 20.0,
                               percent: overallCompletionPercentage,
                               backgroundColor: Colors.transparent,
-                              progressColor: Colors.blue[900],
+                              progressColor: Colors.green,
                               circularStrokeCap: CircularStrokeCap.round,
                               center: Text(
                                 '${(overallCompletionPercentage * 100).toStringAsFixed(1)} %',
