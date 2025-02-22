@@ -132,14 +132,16 @@ class _CalendarPageState extends State<CalendarPage> {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: TableCalendar(
+          availableGestures: AvailableGestures.none,//this single code will solve
+          sixWeekMonthsEnforced: true,
           headerVisible: true,
           firstDay: DateTime.utc(2022, 1, 1),
           lastDay: DateTime.utc(2030, 12, 31),
           focusedDay: _focusedDay,
           calendarFormat: CalendarFormat.month,
-          selectedDayPredicate: (day) {
-            return isSameDay(_selectedDay, day);
-          },
+          // selectedDayPredicate: (day) {
+          //   return isSameDay(_selectedDay, day);
+          // },
           onDaySelected: (selectedDay, focusedDay) {
             setState(() {
               _selectedDay = selectedDay;
@@ -177,11 +179,8 @@ class _CalendarPageState extends State<CalendarPage> {
           // Customize day cell builders
           calendarBuilders: CalendarBuilders(
             outsideBuilder: (context, date, events) {
-              return GestureDetector(
-                onTap: () {
-                  // Move to the selected month
-                  // widget.calendarController.setSelectedDay(date, animate: true);
-                },
+              return IgnorePointer(
+                ignoring: true, // Prevents any interaction
                 child: Center(
                   child: Container(
                     height: 36,

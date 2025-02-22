@@ -129,7 +129,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       firstDay: DateTime.utc(2020, 10, 16),
                                       lastDay: DateTime.utc(2030, 3, 14),
                                       focusedDay: _selectedDate,
-                                      availableGestures: AvailableGestures.all,
                                       calendarFormat: CalendarFormat.week,
                                       daysOfWeekStyle: const DaysOfWeekStyle(
                                         weekdayStyle: TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
@@ -651,7 +650,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 40),
                     ],
                   ),
-                  const HabitTile ( ),
+                   HabitTile (isForCategoryWiseStatistics: false, ),
                 ],
               ),
             );

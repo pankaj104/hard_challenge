@@ -300,13 +300,15 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
       padding: const EdgeInsets.all(8.0),
       child: TableCalendar(
         headerVisible: true,
+        sixWeekMonthsEnforced: true,
+        availableGestures: AvailableGestures.none,//this single code will solve
         firstDay: DateTime.utc(2022, 1, 1),
         lastDay: DateTime.utc(2030, 12, 31),
         focusedDay: _focusedDay,
         calendarFormat: CalendarFormat.month,
-        selectedDayPredicate: (day) {
-          return isSameDay(_selectedDay, day);
-        },
+        // selectedDayPredicate: (day) {
+        //   return isSameDay(_selectedDay, day);
+        // },
         onDaySelected: (selectedDay, focusedDay) {
           setState(() {
             _selectedDay = selectedDay;
@@ -326,7 +328,33 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
         ),
         calendarBuilders: CalendarBuilders(
           outsideBuilder: (context, date, events) {
-            return _buildDateWidget(setSelectedDate(date));
+            return IgnorePointer(
+              ignoring: true, // Prevents any interaction
+              child: Center(
+                child: Container(
+                  height: 36,
+                  width: 36,
+                  decoration: BoxDecoration(
+                    color: ColorStrings.silverColor.withOpacity(0.1), // Background color for days outside the current month
+                    borderRadius: BorderRadius.circular(36),
+                    // boxShadow: [
+                    //   BoxShadow(
+                    //     color: Colors.black.withOpacity(0.25), // Subtle grey shadow with transparency
+                    //     spreadRadius: 0.4, // Light spread for subtle effect
+                    //     blurRadius: 1, // Smooth blur for softer shadow
+                    //     offset: const Offset(0, 2), // Shadow slightly below the element
+                    //   ),
+                    // ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${date.day}',
+                      style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w400), // White text color for outside days
+                    ),
+                  ),
+                ),
+              ),
+            );
           },
           defaultBuilder: (context, date, events) {
             return _buildDateWidget(setSelectedDate(date));

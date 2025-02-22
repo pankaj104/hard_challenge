@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:hard_challenge/routers/app_routes.gr.dart';
+import 'package:hard_challenge/widgets/streak_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +42,14 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
 
     int totalDays = Provider.of<HabitProvider>(context)
         .countTotalDays(widget.habit) ;
+
+    int currentStreak = Provider.of<HabitProvider>(context)
+        .getCurrentStreak(widget.habit) ;
+
+    int bestStreak = Provider.of<HabitProvider>(context)
+        .getBestStreak(widget.habit) ;
+
+
     int countTotalDaysTillToday = Provider.of<HabitProvider>(context)
         .countTotalDaysTillToday(widget.habit) ;
     log('data for statistics ${widget.habit}');
@@ -287,66 +296,97 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
           ),
               const SizedBox(height: 20,),
               Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      height: 85,
-                      decoration: BoxDecoration(
-                        color: Colors.green, // Set the background color
-                        borderRadius: BorderRadius.circular(12),
-                      ),// Set the radius
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: InfoTile(
-                          color: ColorStrings.whiteColor,
-                          label: widget.habit.habitType == HabitType.build ? 'Success ' : 'Quit ',
-                          value: '${completionPercentage.toStringAsFixed(1)} %',
-                          icon: Icons.done,
-                        ),
-                      ),
-                    ),
-                    widget.habit.habitType == HabitType.build ?
-                    Row(
-                      children: [
-                        const SizedBox(width: 10,),
-                        Container(
-                          height: 85,
-                          decoration: BoxDecoration(
-                            color:Colors.redAccent, // Set the background color
-                            borderRadius: BorderRadius.circular(12),
-                          ),// Set the radius
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: InfoTile(
-                              color: ColorStrings.whiteColor,
-                              label: 'Missed',
-                              value:  '${missedPercentage.toStringAsFixed(1)} %',
-                              icon: Icons.close,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10,),
-                      ],
-                    ) : const SizedBox(),
-                    Container(
-                      height: 85,
-                      decoration: BoxDecoration(
-                        color: Colors.amberAccent, // Set the background color
-                        borderRadius: BorderRadius.circular(12),
-                      ),// Set the radius
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: InfoTile(
-                          color: ColorStrings.whiteColor,
-                          label: 'Skipped',
-                          value: '${skippedPercentage.toStringAsFixed(1)} %',
-                          icon: Icons.last_page,
-                        ),
-                      ),
+                padding: const EdgeInsets.only(bottom: 20, right: 4,left: 4),
+                child: Container(
+                  decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 5,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 2),
                     ),
                   ],
+                ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              height: 90,
+                              decoration: BoxDecoration(
+                                color: Colors.green, // Set the background color
+                                borderRadius: BorderRadius.circular(12),
+                              ),// Set the radius
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 18),
+                                child: InfoTile(
+                                  color: ColorStrings.whiteColor,
+                                  label: widget.habit.habitType == HabitType.build ? 'Success ' : 'Quit ',
+                                  value: '${completionPercentage.toStringAsFixed(1)} %',
+                                  icon: Icons.done,
+                                ),
+                              ),
+                            ),
+                            widget.habit.habitType == HabitType.build ?
+                            Row(
+                              children: [
+                                const SizedBox(width: 10,),
+                                Container(
+                                  height: 85,
+                                  decoration: BoxDecoration(
+                                    color:Colors.redAccent, // Set the background color
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),// Set the radius
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                                    child: InfoTile(
+                                      color: ColorStrings.whiteColor,
+                                      label: 'Missed',
+                                      value:  '${missedPercentage.toStringAsFixed(1)} %',
+                                      icon: Icons.close,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10,),
+                              ],
+                            ) : const SizedBox(),
+                            Container(
+                              height: 85,
+                              decoration: BoxDecoration(
+                                color: Colors.amberAccent, // Set the background color
+                                borderRadius: BorderRadius.circular(12),
+                              ),// Set the radius
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                child: InfoTile(
+                                  color: ColorStrings.whiteColor,
+                                  label: 'Skipped',
+                                  value: '${skippedPercentage.toStringAsFixed(1)} %',
+                                  icon: Icons.last_page,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 15,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            StreakWidget(bestStreak: currentStreak, label: 'Current\nStreak', backgroundColor: Color(0xff8d8a8a)),
+                            StreakWidget(bestStreak: bestStreak, label: 'Best\nStreak', backgroundColor: Color(0xff8d8a8a)),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
                 ),
               ),
               Container(

@@ -333,6 +333,54 @@ class HabitProvider with ChangeNotifier {
     return totalDays;
   }
 
+  int getBestStreak(Habit habit) {
+    List<DateTime> completedDays = habit.progressJson.entries
+        .where((entry) => entry.value.status == TaskStatus.done)
+        .map((entry) => entry.key)
+        .toList();
+
+    if (completedDays.isEmpty) return 0;
+
+    completedDays.sort();
+    int bestStreak = 0;
+    int currentStreak = 1;
+
+    for (int i = 1; i < completedDays.length; i++) {
+      if (completedDays[i].difference(completedDays[i - 1]).inDays == 1) {
+        currentStreak++;
+      } else {
+        bestStreak = currentStreak > bestStreak ? currentStreak : bestStreak;
+        currentStreak = 1;
+      }
+    }
+
+    return currentStreak > bestStreak ? currentStreak : bestStreak;
+  }
+
+  int getCurrentStreak(Habit habit) {
+    List<DateTime> completedDays = habit.progressJson.entries
+        .where((entry) => entry.value.status == TaskStatus.done)
+        .map((entry) => entry.key)
+        .toList();
+
+    if (completedDays.isEmpty) return 0;
+
+    completedDays.sort();
+    int currentStreak = 0;
+
+    for (int i = completedDays.length - 1; i >= 0; i--) {
+      if (i == completedDays.length - 1 ||
+          completedDays[i + 1].difference(completedDays[i]).inDays == 1) {
+        currentStreak++;
+      } else {
+        break;
+      }
+    }
+
+    return currentStreak;
+  }
+
+
   int countTotalDaysTillToday(Habit habit) {
     int totalDays = 0;
     DateTime? startDate = setSelectedDate(habit.startDate);
@@ -560,18 +608,24 @@ class HabitProvider with ChangeNotifier {
   }
 
   double getOverallCompletionPercentage(String categoryName) {
-    if (_habits.isEmpty) return 0.0;
+    // Filter habits that match the given category
+    List<Habit> categoryHabits = _habits.where((habit) => habit.category == categoryName).toList();
+
+    if (categoryHabits.isEmpty) return 0.0;
 
     double totalPercentage = 0.0;
 
-    // Accumulate completion percentages across all habits in the category
-    for (Habit habit in _habits) {
+    // Accumulate completion percentages across all filtered habits
+    for (Habit habit in categoryHabits) {
       totalPercentage += getCompletionPercentageByCategory(habit, categoryName);
     }
 
-    log('Total percentage across habits: ${totalPercentage / _habits.length}');
-    return totalPercentage / _habits.length;
+    log('Total percentage across habits in category $categoryName: ${totalPercentage / categoryHabits.length}');
+
+    // Compute the average completion percentage for the category
+    return totalPercentage / categoryHabits.length;
   }
+
 
 
   double getOverallSkippedPercentage(String categoryName) {

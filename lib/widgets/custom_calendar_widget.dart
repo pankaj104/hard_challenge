@@ -37,6 +37,7 @@ class _CustomCalendarWidgetState extends State<CustomCalendarWidget> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: TableCalendar(
+          availableGestures: AvailableGestures.none,//this single code will solve
           firstDay: DateTime.utc(2000, 1, 1),
           lastDay: DateTime.utc(2100, 12, 31),
           focusedDay: focusedDate,

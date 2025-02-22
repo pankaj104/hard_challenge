@@ -38,30 +38,21 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
 
   void _loadSortedNotes() {
     sortedEntries = [];
-
     if (widget.habit.notesForReason != null) {
       sortedEntries.addAll(widget.habit.notesForReason!.entries);
     }
-
     sortedEntries.sort((a, b) => a.key.compareTo(b.key));
   }
 
   TaskStatus _getStatusForDate(DateTime date) {
-    // If the date is today or in the future, return TaskStatus.none if no progress is recorded.
-    if (date.isAfter(DateTime.now()) || date.isAtSameMomentAs(DateTime.now())) {
+    if (date.isAfter(setSelectedDate(DateTime.now())) || date.isAtSameMomentAs(setSelectedDate(DateTime.now()))) {
       return widget.habit.progressJson[date]?.status ?? TaskStatus.none;
     }
-
-    // For past dates without progress, return TaskStatus.missed
     if (widget.habit.progressJson[date] == null) {
       return TaskStatus.missed;
     }
-
-    // Otherwise, return the status from progressJson for past dates with progress.
     return widget.habit.progressJson[date]?.status ?? TaskStatus.none;
   }
-
-
 
   void _filterByStatus(TaskStatus status) {
     setState(() {
@@ -73,9 +64,7 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
     if (selectedStatus == TaskStatus.none) {
       return sortedEntries;
     }
-    return sortedEntries.where((entry) {
-      return _getStatusForDate(entry.key) == selectedStatus;
-    }).toList();
+    return sortedEntries.where((entry) => _getStatusForDate(setSelectedDate(entry.key)) == selectedStatus).toList();
   }
 
   @override
@@ -83,8 +72,7 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
     List<MapEntry<DateTime, String>> filteredNotes = _getFilteredNotes();
 
     return Scaffold(
-      backgroundColor:  Colors.grey[200],
-
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: const Text('Notes observation'),
         backgroundColor: Colors.grey[200],
@@ -93,32 +81,35 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-              decoration: BoxDecoration(
-                color: Colors.purpleAccent.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<TaskStatus>(
-                  value: selectedStatus,
-                  onChanged: (TaskStatus? newValue) {
-                    if (newValue != null) {
-                      _filterByStatus(newValue);
-                    }
-                  },
-                  items: TaskStatus.values.map((TaskStatus status) {
-                    return DropdownMenuItem(
-                      value: status,
-                      child: Row(
-                        children: [
-                          Icon(statusIcons[status], color: _getStatusColor(status)),
-                          const SizedBox(width: 8),
-                          Text(status.name),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.purpleAccent.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<TaskStatus>(
+                    value: selectedStatus,
+                    onChanged: (TaskStatus? newValue) {
+                      if (newValue != null) {
+                        _filterByStatus(newValue);
+                      }
+                    },
+                    items: TaskStatus.values.map((TaskStatus status) {
+                      return DropdownMenuItem(
+                        value: status,
+                        child: Row(
+                          children: [
+                            Icon(statusIcons[status], color: _getStatusColor(status)),
+                            const SizedBox(width: 8),
+                            Text(status == TaskStatus.none ? 'All' : status.name),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
               ),
             ),
@@ -130,8 +121,8 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
                 itemCount: filteredNotes.length,
                 itemBuilder: (context, index) {
                   final entry = filteredNotes[index];
-                  String formattedDate = DateFormat('dd-MM-yyyy').format(entry.key);
-                  TaskStatus status = _getStatusForDate(entry.key);
+                  String formattedDate = DateFormat('dd-MM-yyyy').format(setSelectedDate(entry.key));
+                  TaskStatus status = _getStatusForDate(setSelectedDate(entry.key));
 
                   log('test status $status');
 
@@ -141,7 +132,7 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
                       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        color: Colors.white, // Adjust the background color if needed
+                        color: Colors.white,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.grey.withOpacity(0.1),
@@ -154,7 +145,6 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // Leading Icon with Circle Background
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
@@ -163,9 +153,7 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
                             ),
                             child: Icon(statusIcons[status], color: _getStatusColor(status)),
                           ),
-                          const SizedBox(width: 12), // Spacing between icon and text
-
-                          // Title & Subtitle (Column)
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,15 +172,12 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
                               ],
                             ),
                           ),
-
-                          // Delete Button
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () {
                               setState(() {
                                 widget.habit.notesForReason?.remove(entry.key);
-                                DateTime date = entry.key;
-                                Provider.of<HabitProvider>(context, listen: false).deleteFeedbackFromHabit(widget.habit.id, date);
+                                Provider.of<HabitProvider>(context, listen: false).deleteFeedbackFromHabit(widget.habit.id, entry.key);
                                 _loadSortedNotes();
                               });
                             },
@@ -201,7 +186,6 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
                       ),
                     ),
                   );
-
                 },
               ),
             ),
@@ -227,4 +211,5 @@ class _HabitNotesReasonDateWiseState extends State<HabitNotesReasonDateWise> {
         return Colors.grey;
     }
   }
+
 }

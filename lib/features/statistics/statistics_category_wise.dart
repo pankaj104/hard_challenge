@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:hard_challenge/utils/app_utils.dart';
+import 'package:hard_challenge/widgets/all_habit_display_with_progress_widget.dart';
+import 'package:hard_challenge/widgets/headingH2_widget.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import '../../model/habit_model.dart';
@@ -69,10 +71,13 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
 
               // Get category-based statistics
               String currentCategory = filteredCategories[_currentPage];
-              log('currentCategory $currentCategory');
               double overallCompletionPercentage = habitProvider.getOverallCompletionPercentage(currentCategory) / 100;
               double overallMissedPercentage = habitProvider.getOverallMissedPercentage(currentCategory) / 100;
               double overallSkippedPercentage = habitProvider.getOverallSkippedPercentage(currentCategory) / 100;
+
+              log('currentCategory $currentCategory overallCompletionPercentage: $overallCompletionPercentage');
+
+
 
               return Column(
                 children: [
@@ -158,11 +163,36 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
                       ],
                     ),
                   ),
-                  CalendarCategoryWisePage(
-                    key: ValueKey(currentCategory), // Forces rebuild when category changes
-                    habit: allHabits,
-                    selectedCategory: currentCategory,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Container(
+                      height: 440,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 5,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: CalendarCategoryWisePage(
+                        key: ValueKey(currentCategory), // Forces rebuild when category changes
+                        habit: allHabits,
+                        selectedCategory: currentCategory,
+                      ),
+                    ),
                   ),
+                  SizedBox(height: 20,),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                      child: HeadingH2Widget('Habits in $currentCategory Category')),
+                  SizedBox(height: 20,),
+                  HabitTile (isForCategoryWiseStatistics: true, currentCategory: currentCategory ),
+
                 ],
               );
             },
@@ -229,4 +259,7 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
       ),
     );
   }
+
+
+
 }

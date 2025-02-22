@@ -5,34 +5,53 @@ import 'package:provider/provider.dart';
 
 class HabitTile extends StatelessWidget {
   final DateTime? selectedDateforSkip;
+  final bool isForCategoryWiseStatistics;
+  final String? currentCategory;
 
-  const HabitTile({Key? key, this.selectedDateforSkip}) : super(key: key);
+  HabitTile({
+    Key? key,
+    this.selectedDateforSkip,
+    required this.isForCategoryWiseStatistics,
+    this.currentCategory,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Consumer<HabitProvider>(
       builder: (context, habitProvider, child) {
         List<Habit> allHabits = habitProvider.getAllHabit();
-        return allHabits.isNotEmpty
+
+        // Apply filtering
+        List<Habit> filteredHabits = allHabits
+            .where((habit) => currentCategory == null || habit.category == currentCategory)
+            .toList();
+
+        // Decide which list to use based on `isForCategoryWiseStatistics`
+        List<Habit> habitsToDisplay = isForCategoryWiseStatistics ? filteredHabits : allHabits;
+        double listHeight = habitsToDisplay.length * 65.0; // Adjust 80.0 as per item height
+        double maxHeight = MediaQuery.of(context).size.height * 0.8;
+
+        return habitsToDisplay.isNotEmpty
             ? SizedBox(
-          height: MediaQuery.of(context).size.height * 0.8,
-          // Adjust height
+          height: isForCategoryWiseStatistics ? listHeight : MediaQuery.of(context).size.height * 0.8,
           child: ListView.builder(
-            shrinkWrap: true, // Ensures it takes only necessary space
-            itemCount: allHabits.length,
+            physics: PageScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: habitsToDisplay.length,
             itemBuilder: (context, index) {
-              Habit habit = allHabits[index];
-              double overallcompletionPercentage =  habitProvider.getOverallTaskCompletionPercentage(habit) / 100;
+              Habit habit = habitsToDisplay[index];
+              double overallcompletionPercentage =
+                  habitProvider.getOverallTaskCompletionPercentage(habit) / 100;
 
               return SingleChildScrollView(
                 child: Container(
                   margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                  padding: const EdgeInsets.symmetric(horizontal: 5,vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      const BoxShadow(
+                    boxShadow: const [
+                      BoxShadow(
                         color: Colors.black12,
                         blurRadius: 4,
                         spreadRadius: 1,
@@ -73,9 +92,9 @@ class HabitTile extends StatelessWidget {
                           ],
                         ),
                       ),
-                      SizedBox(width: 5,),
+                      const SizedBox(width: 5),
                       Text(
-                '${(overallcompletionPercentage * 100).toStringAsFixed(1)} %',
+                        '${(overallcompletionPercentage * 100).toStringAsFixed(1)} %',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
