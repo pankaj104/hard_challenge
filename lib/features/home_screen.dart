@@ -88,8 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
                            children: [
                              IconButton(onPressed: () {
                                showHabitBottomSheet(context);
-
-
                              },
                                  icon:  Icon(Icons.list_outlined, size: 30, color: Colors.black.withOpacity(0.85),)),
                              Center(
@@ -116,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Container(
                             clipBehavior: Clip.hardEdge,
+
                             margin: EdgeInsets.symmetric(horizontal: 14.w),
                             decoration: const BoxDecoration(
                               color: Colors.transparent,
@@ -124,108 +123,42 @@ class _HomeScreenState extends State<HomeScreen> {
                               builder: (context, habitProvider, child) {
                                 return Consumer<HabitProvider>(
                                   builder: (context, habitProvider, child) {
-                                    return TableCalendar(
-                                      rowHeight: 55,
-                                      firstDay: DateTime.utc(2020, 10, 16),
-                                      lastDay: DateTime.utc(2030, 3, 14),
-                                      focusedDay: _selectedDate,
-                                      calendarFormat: CalendarFormat.week,
-                                      daysOfWeekStyle: const DaysOfWeekStyle(
-                                        weekdayStyle: TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
-                                        weekendStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.w300, fontSize: 15),
-                                      ),
-                                      selectedDayPredicate: (day) {
-                                        return isSameDay(_selectedDate, day);
-                                      },
-                                      headerStyle: const HeaderStyle(
-                                        formatButtonVisible: false,
-                                        leftChevronVisible: false,
-                                        rightChevronVisible: false,
-                                        headerPadding: EdgeInsets.only(left: 10, bottom: 5, top: 5),
-                                        titleTextStyle: TextStyle(fontSize: 0),
-                                      ),
-                                      onDaySelected: (selectedDay, focusedDay) {
-                                        setState(() {
-                                          Provider.of<HabitProvider>(context, listen: false).loadHabits();
-                                          _selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
-                                          log('selected date from calender $_selectedDate');
-                                        });
-                                      },
-                                      calendarBuilders: CalendarBuilders(
-                                        defaultBuilder: (context, date, _) {
-                                          double completion = habitProvider.getAverageProgressForDate(setSelectedDate(date));
-                                          log("completion on main screen $completion on date $date");
-                                          return Center(
-                                            child: CircularPercentIndicator(
-                                              radius: 20.0,
-                                              lineWidth: 5.0,
-                                              percent: completion,
-                                              center: Text(
-                                                "${date.day}",
-                                                style: const TextStyle(fontSize: 16),
-                                              ),
-                                              progressColor: completion == 1.0 ? Colors.green : Colors.blue,
-                                              backgroundColor: Colors.grey.shade300,
-                                            ),
-                                          );
+                                    return Center(
+                                      child: TableCalendar(
+                                        rowHeight: 75,
+                                        firstDay: DateTime.utc(2020, 10, 16),
+                                        lastDay: DateTime.utc(2050, 3, 14),
+                                        focusedDay: _selectedDate,
+                                        calendarFormat: CalendarFormat.week,
+                                        daysOfWeekStyle: const DaysOfWeekStyle(
+                                          weekdayStyle: TextStyle(color: Colors.transparent, fontSize: 0), // Hide weekday labels
+                                          weekendStyle: TextStyle(color: Colors.transparent, fontSize: 0), // Hide weekend labels
+                                        ),
+                                        selectedDayPredicate: (day) {
+                                          return isSameDay(_selectedDate, day);
                                         },
-                                        todayBuilder: (context, date, _) {
-                                          double completion = habitProvider.getAverageProgressForDate(DateTime(date.year, date.month, date.day));
-                                          return Center(
-                                            child: CircularPercentIndicator(
-                                              radius: 20.0,
-                                              lineWidth: 5.0,
-                                              percent: completion,
-                                              center: Text(
-                                                "${date.day}",
-                                                style: const TextStyle(fontSize: 16),
-                                              ),
-                                              progressColor: completion == 1.0 ? Colors.green : Colors.blue,
-                                              backgroundColor: Colors.grey.shade300,
-                                            ),
-                                          );
+                                        headerStyle: const HeaderStyle(
+                                          formatButtonVisible: false,
+                                          leftChevronVisible: false,
+                                          rightChevronVisible: false,
+                                          headerPadding: EdgeInsets.only(left: 10, bottom: 2, top: 5),
+                                          titleTextStyle: TextStyle(fontSize: 0),
+                                        ),
+                                        onDaySelected: (selectedDay, focusedDay) {
+                                          setState(() {
+                                            Provider.of<HabitProvider>(context, listen: false).loadHabits();
+                                            _selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
+                                            log('selected date from calender $_selectedDate');
+                                          });
                                         },
-                                        selectedBuilder: (context, date, _) {
-                                          double completion = habitProvider.getAverageProgressForDate(DateTime(date.year, date.month, date.day));
-                                          return Container(
-                                            height: 50,
-                                            width: 50,
-                                            decoration: BoxDecoration(
-                                              color: Colors.blue,
-                                              borderRadius: BorderRadius.circular(100),
-                                            ),
-                                            child: Center(
-                                              child: CircularPercentIndicator(
-                                                radius: 20.0,
-                                                lineWidth: 5.0,
-                                                percent: completion,
-                                                center: Text(
-                                                  "${date.day}",
-                                                  style: const TextStyle(fontSize: 16, color: Colors.black),
-                                                ),
-                                                progressColor: completion == 1.0 ? Colors.green : Colors.red,
-                                                backgroundColor: Colors.white60,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        outsideBuilder: (context,date, _){
-                                          double completion = habitProvider.getAverageProgressForDate(setSelectedDate(date));
-                                          log("completion on main screen $completion on date $date");
-                                          return Center(
-                                            child: CircularPercentIndicator(
-                                              radius: 20.0,
-                                              lineWidth: 5.0,
-                                              percent: completion,
-                                              center: Text(
-                                                "${date.day}",
-                                                style: const TextStyle(fontSize: 16),
-                                              ),
-                                              progressColor: completion == 1.0 ? Colors.green : Colors.blue,
-                                              backgroundColor: Colors.grey.shade300,
-                                            ),
-                                          );
-                                        }
+
+                                        calendarBuilders: CalendarBuilders(
+                                          defaultBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider),
+                                          todayBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider),
+                                          selectedBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider, isSelected: true),
+                                          outsideBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider),
+                                        ),
+
                                       ),
                                     );
                                   },
@@ -235,6 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             )
 
                         ),
+                        SizedBox(height: 10,)
                       ],
                     ),
                 );
@@ -412,7 +346,49 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+  Widget _buildCalendarCell(BuildContext context, DateTime date, HabitProvider habitProvider, {bool isSelected = false}) {
+    // Ensure correct date format (year, month, day only)
+    final normalizedDate = DateTime(date.year, date.month, date.day);
 
+    // Fetch progress safely
+    double completion = habitProvider.getAverageProgressForDate(normalizedDate) ?? 0.0;
+
+    // Ensure percent is within valid range
+    completion = completion.clamp(0.0, 1.0);
+
+    return Container(
+      margin: isSelected ? const EdgeInsets.symmetric(horizontal: 3) : null,
+      decoration: isSelected
+          ? BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6)],
+      )
+          : null,
+      child: Column(
+        children: [
+          Text(
+            DateFormat('EE').format(date).substring(0, 2),
+            style: const TextStyle(fontSize: 14, color: Colors.black54),
+          ),
+          const SizedBox(height: 2),
+          Center(
+            child: CircularPercentIndicator(
+              radius: 20.0,
+              lineWidth: 5.0,
+              percent: completion,
+              center: Text(
+                "${date.day}",
+                style: const TextStyle(fontSize: 16, color: Colors.black),
+              ),
+              progressColor: completion == 1.0 ? Colors.green : Colors.blue,
+              backgroundColor: Colors.grey.shade300,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
   Widget _buildTrailingWidget(BuildContext context, Habit habit, double progress) {
     // Check if the task status is skipped
 
