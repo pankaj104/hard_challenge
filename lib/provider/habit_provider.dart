@@ -67,6 +67,14 @@ class HabitProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+  double getHabitProgress(Habit habit, DateTime selectedDate) {
+    return habit.progressJson[selectedDate]?.progress ?? 0.0;
+  }
+
+
+  TaskStatus getTaskStatus(Habit habit, DateTime selectedDate) {
+    return habit.progressJson[selectedDate]?.status ?? TaskStatus.none;
+  }
 
   void addFeedbackToHabit(String habitId, DateTime date, String feedback) async {
     int index = _habits.indexWhere((habit) => habit.id == habitId);
@@ -527,19 +535,29 @@ class HabitProvider with ChangeNotifier {
     return isSameDate(startOfWeek1, startOfWeek2);
   }
 
-  void updateHabitProgress(Habit habit, DateTime date, double progressValue,TaskStatus status, Duration? timerHabitDuration) async {
+  void updateHabitProgress(Habit habit, DateTime date, double progressValue, TaskStatus status, Duration? timerHabitDuration) async {
     int index = _habits.indexWhere((h) => h == habit);
     if (index != -1) {
-      // if (_habits[index].progressJson.containsKey(date)) {
-      //   _habits[index].progressJson[date]!.progress = progressValue;
-      // } else {
-        _habits[index].progressJson[date] = ProgressWithStatus(status: status, progress: progressValue, duration: timerHabitDuration ?? Duration());
-        await _habitBox?.putAt(index, _habits[index]); // Save the updated habit to Hive
+      ProgressWithStatus? currentProgress = _habits[index].progressJson[date];
 
-    // }
-      notifyListeners();
+      // Only update if progress or status is different to avoid unnecessary rebuilds
+      if (currentProgress == null ||
+          currentProgress.progress != progressValue ||
+          currentProgress.status != status) {
+
+        _habits[index].progressJson[date] = ProgressWithStatus(
+          status: status,
+          progress: progressValue,
+          duration: timerHabitDuration ?? Duration(),
+        );
+
+        await _habitBox?.putAt(index, _habits[index]); // Save to Hive
+        Future.microtask(() => notifyListeners());
+       notifyListeners();
+      }
     }
   }
+
 
   void markTaskStatus(Habit habit, DateTime date, TaskStatus status) {
     int index = _habits.indexWhere((h) => h == habit);

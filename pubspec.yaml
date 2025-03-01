@@ -63,6 +63,7 @@ dependencies:
   uuid: ^4.5.1
   emoji_picker_flutter: ^2.1.1
   auto_route: ^5.0.4
+  flutter_inset_box_shadow: ^1.0.8
 
 flutter_icons:
   android: "launcher_icon"
