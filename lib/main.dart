@@ -1,4 +1,3 @@
-// main.dart
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,14 +8,21 @@ import 'package:hard_challenge/service/notification_service.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'features/mainScreen/main_screen.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Hive.initFlutter();
-// Register the adapters
+
+  // Request Notification Permission
+  await _requestNotificationPermission();
+  await requestExactAlarmPermission();
+
+  // Initialize Notifications
+  await NotificationService().initNotifications();
+
+  // Initialize Hive
   final path = await getApplicationDocumentsDirectory();
   Hive.init(path.path);
   Hive.registerAdapter(ProgressWithStatusAdapter());
@@ -29,19 +35,33 @@ void main() async {
   Hive.registerAdapter(TaskStatusAdapter());
   Hive.registerAdapter(DurationAdapter());
   Hive.registerAdapter(ColorAdapter());
-  await NotificationService().init(); // Initialize the notification service
-  await Hive.openBox<String>('categoriesBox'); // Open a box for categories
+
+  // Open Hive Boxes
+  await Hive.openBox<String>('categoriesBox');
+
   runApp(MyApp());
 }
 
+Future<void> _requestNotificationPermission() async {
+  if (await Permission.notification.isDenied) {
+    await Permission.notification.request();
+  }
+}
+Future<void> requestExactAlarmPermission() async {
+  if (await Permission.scheduleExactAlarm.isDenied) {
+    await Permission.scheduleExactAlarm.request();
+  }
+}
+
+
 class MyApp extends StatelessWidget {
   final _appRouter = AppRoute();
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => HabitProvider(),
       child: ScreenUtilInit(
-        // designSize: const Size(375, 812),
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'Custom Challenge App',
@@ -54,7 +74,8 @@ class MyApp extends StatelessWidget {
               const PageRouteInfo<dynamic>('MainScreen', path: '/'),
             ],
           ),
-          routeInformationParser: _appRouter.defaultRouteParser(),        ),
+          routeInformationParser: _appRouter.defaultRouteParser(),
+        ),
       ),
     );
   }

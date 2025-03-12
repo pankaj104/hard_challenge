@@ -9,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/features/mainScreen/main_screen.dart';
+import 'package:hard_challenge/service/notification_service.dart';
 import 'package:hard_challenge/utils/app_utils.dart';
 import 'package:hard_challenge/utils/colors.dart';
 import 'package:hard_challenge/utils/helpers.dart';
@@ -94,6 +95,47 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
 
   List<String> categories = AppUtils.categories;
 
+  void scheduleHabitNotifications(Habit habit) {
+    final notificationService = NotificationService();
+    notificationService.scheduleFixedTimeNotification(
+      id: 45645645645645,
+      title: "Morning Reminder",
+      body: "Time for your morning habit!",
+      hour: 10, // 10 AM
+      minute: 55, // 50 minutes
+    );
+
+    for (var time in habit.notificationTime) {
+      // Parse time (assume format is `hh:mm a` e.g., "9:36 AM")
+      final now = DateTime.now();
+      log('notification time $time');
+      final parsedTime = _parseTime(time, now);
+
+      // Ensure notification is scheduled for future dates only
+      // if (parsedTime.isAfter(now)) {
+      //   notificationService.scheduleNotification(
+      //     id: habit.id.hashCode,
+      //     title: habit.title,
+      //     body: "Time for your habit: ${habit.title}",
+      //     scheduledTime: parsedTime,
+      //   );
+      // }
+    }
+  }
+
+  DateTime _parseTime(String time, DateTime now) {
+    final timeParts = time.split(RegExp(r'[:\s]'));
+    int hour = int.parse(timeParts[0]);
+    int minute = int.parse(timeParts[1]);
+    bool isPM = timeParts[2] == 'PM';
+
+    if (isPM && hour != 12) hour += 12;
+    if (!isPM && hour == 12) hour = 0;
+
+    return DateTime(now.year, now.month, now.day, hour, minute);
+  }
+
+
 
   @override
   void initState() {
@@ -131,7 +173,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   void _addReminder(String time) {
     setState(() {
       selectedTime.add(time);
-      _scheduleNotification(time);
+      // _scheduleNotification(time);
     });
   }
 
@@ -190,29 +232,29 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   }
 
 // Function to parse the time string and schedule a notification
-  void _scheduleNotification(String timeString) {
-    try {
-      // Trim the string to avoid any leading/trailing whitespace issues
-      timeString = timeString.trim();
-
-      DateFormat format = DateFormat('h:mm a');
-      DateTime parsedTime = format.parse(timeString);
-
-      // Assuming you're scheduling a notification for this time today
-      DateTime scheduledTime = DateTime(
-        DateTime.now().year,
-        DateTime.now().month,
-        DateTime.now().day,
-        parsedTime.hour,
-        parsedTime.minute,
-      );
-
-      // Schedule the notification (replace with your logic)
-      NotificationHelper.scheduleNotification(0, 'Reminder', 'It\'s time!', scheduledTime);
-    } catch (e) {
-      print("Error parsing time: $e");
-    }
-  }
+//   void _scheduleNotification(String timeString) {
+//     try {
+//       // Trim the string to avoid any leading/trailing whitespace issues
+//       timeString = timeString.trim();
+//
+//       DateFormat format = DateFormat('h:mm a');
+//       DateTime parsedTime = format.parse(timeString);
+//
+//       // Assuming you're scheduling a notification for this time today
+//       DateTime scheduledTime = DateTime(
+//         DateTime.now().year,
+//         DateTime.now().month,
+//         DateTime.now().day,
+//         parsedTime.hour,
+//         parsedTime.minute,
+//       );
+//
+//       // Schedule the notification (replace with your logic)
+//       NotificationHelper.scheduleNotification(0, 'Reminder', 'It\'s time!', scheduledTime);
+//     } catch (e) {
+//       print("Error parsing time: $e");
+//     }
+//   }
 
   DateTime selectedDate = DateTime.now();
 
@@ -721,36 +763,36 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     ),
                   ),
                 ),
-                //
-                // HeadingH1Widget("Reminder"),
-                //
-                // Column(
-                //   crossAxisAlignment: CrossAxisAlignment.start,
-                //   children: [
-                //     ...selectedTime.map((time) {
-                //       int index = selectedTime.indexOf(time);
-                //       return GestureDetector(
-                //         onTap: () {
-                //           // Open the time picker with the currently selected time for editing
-                //           CustomTimePickerBottomSheet.showTimePicker(context, (newTime) {
-                //             _editReminder(index, newTime);
-                //           });
-                //         },
-                //         child: NotificationItem(
-                //           time: time,
-                //           onRemove: () => _removeReminder(index),
-                //         ),
-                //       );
-                //     }).toList(),
-                //     AddReminderButton(
-                //       onAdd: () {
-                //         CustomTimePickerBottomSheet.showTimePicker(context, (selectedTime) {
-                //           _addReminder(selectedTime);
-                //         });
-                //       },
-                //     ),
-                //   ],
-                // ),
+
+                HeadingH1Widget("Reminder"),
+
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...selectedTime.map((time) {
+                      int index = selectedTime.indexOf(time);
+                      return GestureDetector(
+                        onTap: () {
+                          // Open the time picker with the currently selected time for editing
+                          CustomTimePickerBottomSheet.showTimePicker(context, (newTime) {
+                            _editReminder(index, newTime);
+                          });
+                        },
+                        child: NotificationItem(
+                          time: time,
+                          onRemove: () => _removeReminder(index),
+                        ),
+                      );
+                    }).toList(),
+                    AddReminderButton(
+                      onAdd: () {
+                        CustomTimePickerBottomSheet.showTimePicker(context, (selectedTime) {
+                          _addReminder(selectedTime);
+                        });
+                      },
+                    ),
+                  ],
+                ),
 
                 HeadingH1Widget("Goal"),
 
@@ -1439,6 +1481,18 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       else {
         Provider.of<HabitProvider>(context, listen: false).addHabit(newHabit);
       }
+
+      // NotificationService().showInstantNotification();
+
+      NotificationService().scheduleNotificationAtUTC(
+        id: 1,
+        title: "Habit Reminder",
+        body: "It's time for your habit!",
+        utcTime: DateTime.parse("2025-03-24 11:26:00.000Z"), // Corrected format
+      );
+
+
+      // scheduleHabitNotifications(newHabit);
 
       Navigator.push(
         context,
