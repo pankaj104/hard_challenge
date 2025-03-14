@@ -1,12 +1,13 @@
 import 'dart:developer';
 
 import 'package:auto_route/auto_route.dart';
-// import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/features/timer/timer_screen.dart';
 import 'package:hard_challenge/routers/app_routes.gr.dart';
+import 'package:hard_challenge/utils/colors.dart';
 import 'package:hard_challenge/utils/helpers.dart';
+import 'package:hard_challenge/widgets/habit_custom_button.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -26,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedDate = DateTime.now().toUtc();
+    _selectedDate = DateTime.now();
     _selectedDate = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     print('_selectedDate $_selectedDate'); // Output: 2024-11-10 00:00:00.000
   }
@@ -57,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-     toolbarHeight: 0,
+        toolbarHeight: 0,
       ),
       body: Column(
         children: [
@@ -69,93 +70,117 @@ class _HomeScreenState extends State<HomeScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: Column(
-                      children: [
-                         Row(
-                           mainAxisAlignment: MainAxisAlignment.spaceAround,
-                           crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
 
-                           children: [
-                             IconButton(onPressed: () {
-                               showHabitBottomSheet(context);
-                             },
-                                 icon:  Icon(Icons.list_outlined, size: 30, color: Colors.black.withOpacity(0.85),)),
-                             Center(
-                               child: SizedBox(
-                                 width: 150,
-                                 child: Text(
-                                        formatDate(_selectedDate),
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 20,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                   textAlign: TextAlign.center,
-                                      ),
-                               ),
-                             ),
-
-                            IconButton(onPressed: () {
-                              setState(() async {
-                                await habitProvider.clearHabits();
-                              });
-                            }, icon: const Icon(Icons.clear))
-                          ],
-                        ),
-                        Container(
-                            clipBehavior: Clip.hardEdge,
-                            margin: EdgeInsets.symmetric(horizontal: 14.w),
-                            decoration: const BoxDecoration(
-                              color: Colors.transparent,
+                        children: [
+                          IconButton(onPressed: () {
+                            showHabitBottomSheet(context);
+                          },
+                              icon:  Icon(Icons.list_outlined, size: 30, color: Colors.black.withOpacity(0.85),)),
+                          const SizedBox(width: 20,),
+                          Center(
+                            child: SizedBox(
+                              width: 150,
+                              child: Text(
+                                formatDate(_selectedDate),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
-                            child: Consumer<HabitProvider>(
-                              builder: (context, habitProvider, child) {
-                                return Consumer<HabitProvider>(
-                                  builder: (context, habitProvider, child) {
-                                    return Center(
-                                      child: TableCalendar(
-                                        rowHeight: 75,
-                                        firstDay: DateTime.utc(2020, 10, 16),
-                                        lastDay: DateTime.utc(2050, 3, 14),
-                                        focusedDay: _selectedDate,
-                                        calendarFormat: CalendarFormat.week,
-                                        daysOfWeekStyle: const DaysOfWeekStyle(
-                                          weekdayStyle: TextStyle(color: Colors.transparent, fontSize: 0), // Hide weekday labels
-                                          weekendStyle: TextStyle(color: Colors.transparent, fontSize: 0), // Hide weekend labels
-                                        ),
-                                        selectedDayPredicate: (day) {
-                                          return isSameDay(_selectedDate, day);
-                                        },
-                                        headerStyle: const HeaderStyle(
-                                          formatButtonVisible: false,
-                                          leftChevronVisible: false,
-                                          rightChevronVisible: false,
-                                          headerPadding: EdgeInsets.only(left: 10, bottom: 2, top: 5),
-                                          titleTextStyle: TextStyle(fontSize: 0),
-                                        ),
-                                        onDaySelected: (selectedDay, focusedDay) {
-                                          setState(() {
-                                            Provider.of<HabitProvider>(context, listen: false).loadHabits();
-                                            _selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
-                                            log('selected date from calender $_selectedDate');
-                                          });
-                                        },
+                          ),
 
-                                        calendarBuilders: CalendarBuilders(
-                                          defaultBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider),
-                                          todayBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider),
-                                          selectedBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider, isSelected: true),
-                                          outsideBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider),
-                                        ),
+                          const SizedBox(width: 20,),
+
+                          IconButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text("Coming Soon"),
+                                  content: const Text("This feature is under development."),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(),
+                                      child: const Text("OK"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.settings),
+                          ),
+                          //
+                          //
+                          //
+                          // IconButton(onPressed: () {
+                          //   setState(() async {
+                          //     await habitProvider.clearHabits();
+                          //   });
+                          // }, icon: const Icon(Icons.clear))
+                        ],
+                      ),
+                      Container(
+                          clipBehavior: Clip.hardEdge,
+                          margin: EdgeInsets.symmetric(horizontal: 14.w),
+                          decoration: const BoxDecoration(
+                            color: Colors.transparent,
+                          ),
+                          child: Consumer<HabitProvider>(
+                            builder: (context, habitProvider, child) {
+                              return Consumer<HabitProvider>(
+                                builder: (context, habitProvider, child) {
+                                  return Center(
+                                    child: TableCalendar(
+                                      rowHeight: 75,
+                                      firstDay: DateTime.utc(2000, 1, 1),
+                                      lastDay: DateTime.utc(2100, 1, 1),
+                                      focusedDay: _selectedDate,
+                                      calendarFormat: CalendarFormat.week,
+                                      daysOfWeekStyle: const DaysOfWeekStyle(
+                                        weekdayStyle: TextStyle(color: Colors.transparent, fontSize: 0), // Hide weekday labels
+                                        weekendStyle: TextStyle(color: Colors.transparent, fontSize: 0), // Hide weekend labels
                                       ),
-                                    );
-                                  },
-                                );
-                              },
-                            )
-                        ),
-                        const SizedBox(height: 10,)
-                      ],
-                    ),
+                                      selectedDayPredicate: (day) {
+                                        return isSameDay(_selectedDate, day);
+                                      },
+                                      headerStyle: const HeaderStyle(
+                                        formatButtonVisible: false,
+                                        leftChevronVisible: false,
+                                        rightChevronVisible: false,
+                                        headerPadding: EdgeInsets.only(left: 10, bottom: 2, top: 5),
+                                        titleTextStyle: TextStyle(fontSize: 0),
+                                      ),
+                                      onDaySelected: (selectedDay, focusedDay) {
+                                        setState(() {
+                                          Provider.of<HabitProvider>(context, listen: false).loadHabits();
+                                          _selectedDate = DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
+                                          log('selected date from calender $_selectedDate');
+                                        });
+                                      },
+
+                                      calendarBuilders: CalendarBuilders(
+                                        defaultBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider),
+                                        todayBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider),
+                                        selectedBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider, isSelected: true),
+                                        outsideBuilder: (context, date, _) => _buildCalendarCell(context, date, habitProvider),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          )
+                      ),
+                      const SizedBox(height: 10,)
+                    ],
+                  ),
                 );
               }
           ),
@@ -174,7 +199,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error: ${snapshot.error}'));
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No habits available'));
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'No Habit This Day!',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 20),
+                          HabitCustomButton(buttonText: 'Add Habit', onTap: (){
+                            context.router.push(
+                              const PageRouteInfo<dynamic>(
+                                'AddHabitScreen',
+                                path: '/add-habit-screen',
+                              ),
+                            );
+                          },
+                            color: ColorStrings.headingBlue, widthOfButton: 180, buttonTextColor: Colors.white,)
+                        ],
+                      );
                     } else {
                       // Get the habits list for the selected date
                       List<Habit> habitsForSelectedDate = snapshot.data!;
@@ -247,13 +290,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                           child: GestureDetector(
                                             onTap: () {
                                               context.router.push(
-                                                 PageRouteInfo<dynamic>(
-                                                  'StatisticsHabitWiseScreen',
-                                                  path: '/statistics-habit-wise-screen',
-                                                  args: StatisticsHabitWiseScreenArgs(
-                                                    habit: habit,
-                                                    selectedDateforSkip: _selectedDate,
-                                                  )
+                                                PageRouteInfo<dynamic>(
+                                                    'StatisticsHabitWiseScreen',
+                                                    path: '/statistics-habit-wise-screen',
+                                                    args: StatisticsHabitWiseScreenArgs(
+                                                      habit: habit,
+                                                      selectedDateforSkip: _selectedDate,
+                                                    )
                                                 ),
                                               );
                                             },
@@ -440,7 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.transparent,
                 child: Icon(
                   progress < 1.0 ? Icons.play_circle_outline_rounded : Icons.check_circle_rounded,
-                  color: progress < 1.0 ? Color(0xff2d2925) : Color(0xff749d49),
+                  color: progress < 1.0 ? const Color(0xff2d2925) : const Color(0xff749d49),
                 ),
               ),
             );
@@ -460,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (context, progress, _) {
                 return Icon(
                   progress < 1.0 ? Icons.add_circle_outline_rounded : Icons.check_circle_rounded,
-                  color: progress < 1.0 ? Color(0xff2d2925) : Color(0xff749d49),
+                  color: progress < 1.0 ? const Color(0xff2d2925) : const Color(0xff749d49),
                 );
               },
             ),
@@ -480,7 +523,7 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (context, status, _) {
                 return Icon(
                   status != TaskStatus.done ? Icons.circle_outlined : Icons.check_circle_rounded,
-                  color: status != TaskStatus.done ? Color(0xff2d2925) : Color(0xff749d49),
+                  color: status != TaskStatus.done ? const Color(0xff2d2925) : const Color(0xff749d49),
                 );
               },
             ),
@@ -541,7 +584,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       case TaskType.count:
         int multipliedProgress = ((habit.progressJson[_selectedDate]?.progress ?? 0.0) * (habit.value ?? 1.0)).toInt();
-        return '$multipliedProgress/${(habit.value!)}';
+        return '$multipliedProgress/${(habit.value!)} ${habit.goalCountLabel ?? ''}';
       case TaskType.task:
         return 'Task';
       default:
@@ -553,21 +596,21 @@ class _HomeScreenState extends State<HomeScreen> {
   void _completeValueTask(BuildContext context, Habit habit) {
     log('Specific habit: $habit');
     // setState(() {
-      // Get the current progress for the selected date or default to 0.0 if not set
-      double currentProgress = habit.progressJson[_selectedDate]?.progress ?? 0.0;
-      // Increment progress by 1.0 and divide by habit.value, but keep it within a max of 1.0
-      double newProgress = ((currentProgress * (habit.value ?? 1.0)) + 1.0) / (habit.value ?? 1.0);
-      // Ensure newProgress doesn't exceed 1.0
-      newProgress = newProgress.clamp(0.0, 1.0);
-      // Update the habit's progress in HabitProvider with newProgress and status 'done'
-      if (newProgress >= 1.0){
-        Provider.of<HabitProvider>(context, listen: false)
-            .updateHabitProgress(habit, _selectedDate, newProgress, TaskStatus.done, null);
-      }
-      else{
-        Provider.of<HabitProvider>(context, listen: false)
-            .updateHabitProgress(habit, _selectedDate, newProgress, TaskStatus.goingOn , null);
-      }
+    // Get the current progress for the selected date or default to 0.0 if not set
+    double currentProgress = habit.progressJson[_selectedDate]?.progress ?? 0.0;
+    // Increment progress by 1.0 and divide by habit.value, but keep it within a max of 1.0
+    double newProgress = ((currentProgress * (habit.value ?? 1.0)) + 1.0) / (habit.value ?? 1.0);
+    // Ensure newProgress doesn't exceed 1.0
+    newProgress = newProgress.clamp(0.0, 1.0);
+    // Update the habit's progress in HabitProvider with newProgress and status 'done'
+    if (newProgress >= 1.0){
+      Provider.of<HabitProvider>(context, listen: false)
+          .updateHabitProgress(habit, _selectedDate, newProgress, TaskStatus.done, null);
+    }
+    else{
+      Provider.of<HabitProvider>(context, listen: false)
+          .updateHabitProgress(habit, _selectedDate, newProgress, TaskStatus.goingOn , null);
+    }
     // });
   }
 
@@ -611,7 +654,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 40),
                     ],
                   ),
-                   HabitTile (isForCategoryWiseStatistics: false, ),
+                  HabitTile (isForCategoryWiseStatistics: false, ),
                 ],
               ),
             );

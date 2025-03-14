@@ -87,8 +87,7 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
                   children: categorizedHabits.entries.map((entry) {
                     log('test ${entry.key}');
                     return ExpansionTile(
-                      initiallyExpanded: true,
-                      // entry.key == 'Sport' ? true : false,
+                      initiallyExpanded: entry.key == 'Sport' ? true : false,
                       tilePadding: EdgeInsets.zero,
                       shape: const RoundedRectangleBorder(
                         side: BorderSide.none,

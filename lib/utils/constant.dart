@@ -71,20 +71,7 @@ class ConstantData {
 final Uuid uuid = Uuid();
 
 final List<Habit> preRecorededHabitList = [
-  Habit(
-    id: uuid.v4(),
-    title: 'Walk',
-    category: 'Sport',
-    habitEmoji: '🚶',
-    iconBgColor: const Color(0xFF4CAF50),
-    notificationTime: ["7:00 AM"],
-    taskType: TaskType.count,
-    value: 10, // Steps
-    habitType: HabitType.build,
-    repeatType: RepeatType.selectDays,
-    progressJson: {},
-    startDate: setSelectedDate(DateTime.now()),
-  ),
+
   Habit(
     id: uuid.v4(),
     title: 'Run',
@@ -129,20 +116,6 @@ final List<Habit> preRecorededHabitList = [
   ),
   Habit(
     id: uuid.v4(),
-    title: 'Stretch',
-    category: 'Sport',
-    habitEmoji: '🤸',
-    iconBgColor: const Color(0xFF00BCD4),
-    notificationTime: ["8:00 AM"],
-    taskType: TaskType.time,
-    value: 10, // Minutes
-    habitType: HabitType.build,
-    repeatType: RepeatType.selectDays,
-    progressJson: {},
-    startDate: setSelectedDate(DateTime.now()),
-  ),
-  Habit(
-    id: uuid.v4(),
     title: 'Swim',
     category: 'Sport',
     habitEmoji: '🏊',
@@ -169,49 +142,7 @@ final List<Habit> preRecorededHabitList = [
     progressJson: {},
     startDate: setSelectedDate(DateTime.now()),
   ),
-  Habit(
-    id: uuid.v4(),
-    title: 'Dance',
-    category: 'Sport',
-    habitEmoji: '💃',
-    iconBgColor: const Color(0xFFE91E63),
-    notificationTime: ["7:00 PM"],
-    taskType: TaskType.time,
-    timer: Duration(hours: 1),
-    // value: 30, // Minutes
-    habitType: HabitType.build,
-    repeatType: RepeatType.selectDays,
-    progressJson: {},
-    startDate: setSelectedDate(DateTime.now()),
-  ),
-  Habit(
-    id: uuid.v4(),
-    title: 'Jump Rope',
-    category: 'Sport',
-    habitEmoji: '🦘',
-    iconBgColor: const Color(0xFF795548),
-    notificationTime: ["6:15 AM"],
-    taskType: TaskType.count,
-    value: 500, // Jumps
-    habitType: HabitType.build,
-    repeatType: RepeatType.selectDays,
-    progressJson: {},
-    startDate: setSelectedDate(DateTime.now()),
-  ),
-  Habit(
-    id: uuid.v4(),
-    title: 'Push-Ups',
-    category: 'Sport',
-    habitEmoji: '🤸‍♂️',
-    iconBgColor: const Color(0xFF607D8B),
-    notificationTime: ["6:45 AM"],
-    taskType: TaskType.count,
-    value: 50, // Push-Ups
-    habitType: HabitType.build,
-    repeatType: RepeatType.selectDays,
-    progressJson: {},
-    startDate: setSelectedDate(DateTime.now()),
-  ),
+
 
 
   /// Health related
@@ -230,34 +161,7 @@ final List<Habit> preRecorededHabitList = [
     progressJson: {},
     startDate: setSelectedDate(DateTime.now()),
   ),
-  Habit(
-    id: uuid.v4(),
-    title: 'Eat Fruits',
-    category: 'Health',
-    habitEmoji: '🍎',
-    iconBgColor: const Color(0xFFFF9800),
-    notificationTime: ["10:00 AM"],
-    taskType: TaskType.count,
-    value: 2, // Servings
-    habitType: HabitType.build,
-    repeatType: RepeatType.selectDays,
-    progressJson: {},
-    startDate: setSelectedDate(DateTime.now()),
-  ),
-  Habit(
-    id: uuid.v4(),
-    title: 'Eat Vegetables',
-    category: 'Health',
-    habitEmoji: '🥦',
-    iconBgColor: const Color(0xFF4CAF50),
-    notificationTime: ["1:00 PM", "7:00 PM"],
-    taskType: TaskType.count,
-    value: 3, // Servings
-    habitType: HabitType.build,
-    repeatType: RepeatType.selectDays,
-    progressJson: {},
-    startDate: setSelectedDate(DateTime.now()),
-  ),
+
   Habit(
     id: uuid.v4(),
     title: 'No Sugar',
@@ -386,34 +290,7 @@ final List<Habit> preRecorededHabitList = [
     progressJson: {},
     startDate: setSelectedDate(DateTime.now()),
   ),
-  Habit(
-    id: uuid.v4(),
-    title: 'Prayer',
-    category: 'Spiritual',
-    habitEmoji: '🙏',
-    iconBgColor: const Color(0xFFE91E63),
-    notificationTime: ["6:30 AM", "9:00 PM"],
-    taskType: TaskType.task,
-    value: 1, // Mark as done
-    habitType: HabitType.build,
-    repeatType: RepeatType.selectDays,
-    progressJson: {},
-    startDate: setSelectedDate(DateTime.now()),
-  ),
-  Habit(
-    id: uuid.v4(),
-    title: 'Reading Spiritual Books',
-    category: 'Spiritual',
-    habitEmoji: '📚',
-    iconBgColor: const Color(0xFF009688),
-    notificationTime: ["8:00 PM"],
-    taskType: TaskType.task,
-    value: 15, // Minutes per session
-    habitType: HabitType.build,
-    repeatType: RepeatType.selectDays,
-    progressJson: {},
-    startDate: setSelectedDate(DateTime.now()),
-  ),
+
   Habit(
     id: uuid.v4(),
     title: 'Acts of Kindness',
@@ -428,19 +305,63 @@ final List<Habit> preRecorededHabitList = [
     progressJson: {},
     startDate: setSelectedDate(DateTime.now()),
   ),
+
   Habit(
     id: uuid.v4(),
-    title: 'Silent Reflection',
-    category: 'Spiritual',
-    habitEmoji: '🕊️',
-    iconBgColor: const Color(0xFF795548),
-    notificationTime: ["9:30 PM"],
+    title: 'Save Money Daily',
+    category: 'Finance',
+    habitEmoji: '💰',
+    iconBgColor: const Color(0xFF4CAF50),
+    notificationTime: ["8:00 AM"],
     taskType: TaskType.task,
-    value: 10, // Minutes per session
+    value: 1, // Mark as done
     habitType: HabitType.build,
     repeatType: RepeatType.selectDays,
     progressJson: {},
     startDate: setSelectedDate(DateTime.now()),
   ),
+  Habit(
+    id: uuid.v4(),
+    title: 'Track Expenses',
+    category: 'Finance',
+    habitEmoji: '📊',
+    iconBgColor: const Color(0xFF2196F3),
+    notificationTime: ["7:00 PM"],
+    taskType: TaskType.task,
+    value: 1, // Mark as done
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: uuid.v4(),
+    title: 'Invest Monthly',
+    category: 'Finance',
+    habitEmoji: '📈',
+    iconBgColor: const Color(0xFFFF5722),
+    notificationTime: ["1st of every month"],
+    taskType: TaskType.task,
+    value: 1, // Mark as done
+    habitType: HabitType.build,
+    repeatType: RepeatType.monthly,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+  Habit(
+    id: uuid.v4(),
+    title: 'Reduce Unnecessary Spending',
+    category: 'Finance',
+    habitEmoji: '✂️',
+    iconBgColor: const Color(0xFF9C27B0),
+    notificationTime: ["5:00 PM"],
+    taskType: TaskType.task,
+    value: 1, // Mark as done
+    habitType: HabitType.build,
+    repeatType: RepeatType.selectDays,
+    progressJson: {},
+    startDate: setSelectedDate(DateTime.now()),
+  ),
+
 
 ];

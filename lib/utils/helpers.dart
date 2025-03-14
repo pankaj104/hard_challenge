@@ -19,7 +19,7 @@ Flushbar showFlushBarHelper(
         ),
       ),
       // message: message,
-      backgroundColor: ColorStrings.redColor,
+      backgroundColor:const Color(0xFF644646), // Dark Grey with a slight blue tint
       duration: Duration(seconds: durationInSeconds),
       borderRadius: const BorderRadius.only(
         bottomLeft: Radius.circular(20),

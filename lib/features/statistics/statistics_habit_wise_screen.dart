@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:hard_challenge/routers/app_routes.gr.dart';
+import 'package:hard_challenge/widgets/headingH2_widget.dart';
 import 'package:hard_challenge/widgets/streak_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -58,6 +59,38 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
     // List<int> daysList = widget.habit?.days;
 
 
+    void _confirmDelete() {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Are you sure?"),
+            content: const Text("Once deleted, your data will be lost permanently."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    Provider.of<HabitProvider>(context, listen: false)
+                        .deleteHabit(widget.habit.id);
+                  });
+                  Navigator.of(context).pop(); // Close the dialog
+                  Navigator.pop(context); // Go back after deletion
+                },
+                child: const Text("Delete", style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6E9E6), // Light peach background
@@ -105,11 +138,10 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
 
                 });
 
-              } else if (value == 'delete') {
-                setState(() {
-                  Provider.of<HabitProvider>(context, listen: false).deleteHabit(widget.habit.id);
-                });
-                Navigator.pop(context);              }
+              }
+              else if (value == 'delete') {
+                _confirmDelete();
+              }
             },
             itemBuilder: (BuildContext context) => [
               const PopupMenuItem(
@@ -375,13 +407,13 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
                           ],
                         ),
 
-                        SizedBox(height: 15,),
+                        const SizedBox(height: 15,),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            StreakWidget(bestStreak: currentStreak, label: 'Current\nStreak', backgroundColor: Color(0xff8d8a8a)),
-                            StreakWidget(bestStreak: bestStreak, label: 'Best\nStreak', backgroundColor: Color(0xff8d8a8a)),
+                            StreakWidget(bestStreak: currentStreak, label: 'Current\nStreak', backgroundColor: const Color(0xff8d8a8a)),
+                            StreakWidget(bestStreak: bestStreak, label: 'Best\nStreak', backgroundColor: const Color(0xff8d8a8a)),
                           ],
                         )
                       ],
@@ -470,6 +502,45 @@ class _StatisticsHabitWiseScreenState extends State<StatisticsHabitWiseScreen> {
 
 
                   // HeadingH2Widget('Reason for missed habbit')),
+              const SizedBox(height: 20,),
+
+              (widget.habit.notes != null && widget.habit.notes!.isNotEmpty) ?
+              Container(
+                width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    color: ColorStrings.whiteColor,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFECF8FF).withOpacity(0.2), // Adjust the shadow color and opacity as needed
+                        offset: const Offset(0, 4), // x: 0, y: 4
+                        blurRadius: 4, // Blur radius
+                        spreadRadius: 0, // Spread radius
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(child: HeadingH2Widget('Notes')),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                        child: Text(
+                          "${widget.habit.notes}",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                          ),
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+
+
+                    ],
+                  )
+
+              ): SizedBox(),
               const SizedBox(height: 20,),
 
 

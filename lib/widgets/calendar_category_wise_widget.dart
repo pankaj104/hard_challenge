@@ -302,8 +302,8 @@ class _CalendarCategoryWisePageState extends State<CalendarCategoryWisePage> {
         headerVisible: true,
         sixWeekMonthsEnforced: true,
         availableGestures: AvailableGestures.none,//this single code will solve
-        firstDay: DateTime.utc(2022, 1, 1),
-        lastDay: DateTime.utc(2030, 12, 31),
+        firstDay: DateTime.utc(2000, 1, 1),
+        lastDay: DateTime.utc(2100, 12, 31),
         focusedDay: _focusedDay,
         calendarFormat: CalendarFormat.month,
         // selectedDayPredicate: (day) {

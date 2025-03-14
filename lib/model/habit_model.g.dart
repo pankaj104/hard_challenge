@@ -77,6 +77,7 @@ class HabitAdapter extends TypeAdapter<Habit> {
       endDate: fields[17] as DateTime?,
       notes: fields[18] as String?,
       notesForReason: (fields[19] as Map?)?.cast<DateTime, String>(),
+      goalCountLabel: fields[20] as String?,
     );
   }
 
@@ -123,7 +124,11 @@ class HabitAdapter extends TypeAdapter<Habit> {
       ..writeByte(18)
       ..write(obj.notes)
       ..writeByte(19)
-      ..write(obj.notesForReason);
+      ..write(obj.notesForReason)
+      ..writeByte(20)
+      ..write(obj.goalCountLabel)
+    
+    ;
   }
 
   @override

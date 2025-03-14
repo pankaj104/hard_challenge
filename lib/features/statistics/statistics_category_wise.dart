@@ -1,9 +1,11 @@
 import 'dart:developer';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:hard_challenge/utils/app_utils.dart';
 import 'package:hard_challenge/widgets/all_habit_display_with_progress_widget.dart';
+import 'package:hard_challenge/widgets/habit_custom_button.dart';
 import 'package:hard_challenge/widgets/headingH2_widget.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
@@ -63,7 +65,31 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
 
               // Handle empty categories case
               if (filteredCategories.isEmpty) {
-                return const Center(child: Text('No categories found'));
+                return Center(
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'No any Habit',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 20),
+                        // HabitCustomButton(buttonText: 'Add Habit', onTap: (){
+                        //   context.router.push(
+                        //     const PageRouteInfo<dynamic>(
+                        //       'AddHabitScreen',
+                        //       path: '/add-habit-screen',
+                        //     ),
+                        //   );
+                        // },
+                        //   color: ColorStrings.headingBlue, widthOfButton: 180, buttonTextColor: Colors.white,)
+                      ],
+                    ),
+                  ),
+                );
               }
 
               // Ensure _currentPage is within bounds
@@ -186,11 +212,11 @@ class _StatisticsCategoryWiseState extends State<StatisticsCategoryWise> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20,),
+                  const SizedBox(height: 20,),
                   Align(
                     alignment: Alignment.centerLeft,
                       child: HeadingH2Widget('Habits in $currentCategory Category')),
-                  SizedBox(height: 20,),
+                  const SizedBox(height: 20,),
                   HabitTile (isForCategoryWiseStatistics: true, currentCategory: currentCategory ),
 
                 ],

@@ -1,12 +1,13 @@
 import 'dart:developer';
+
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter_iconpicker/flutter_iconpicker.dart';
+import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:flutter_emoji/flutter_emoji.dart' as flutter_emoji;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/features/mainScreen/main_screen.dart';
 import 'package:hard_challenge/utils/app_utils.dart';
@@ -19,7 +20,6 @@ import 'package:hard_challenge/widgets/headingH1_widget.dart';
 import 'package:hard_challenge/widgets/headingH2_widget.dart';
 import 'package:hard_challenge/widgets/label_changer.dart';
 import 'package:hard_challenge/widgets/number_picker.dart';
-import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -65,9 +65,10 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
   Color selectedColor = Colors.orange;
   int selectedTimesPerWeek = 1;
   int selectedTimesPerMonth = 1;
-  final uuid = Uuid();
+  final uuid = const Uuid();
   String habitId = '';
-  String emojiSelected = '💻';
+  String emojiSelected = '😊';
+  String goalCountLabel = 'Times';
 
   List<String> repeatItems = [
     RepeatType.selectDays.toString(),
@@ -78,7 +79,8 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
 
   TextEditingController notecontroller = TextEditingController();
   final TextEditingController habitNameController = TextEditingController();
-
+  bool _isEditing = false;
+  TextEditingController goalCountLabelController = TextEditingController();
   String? habitNote ;
 
   List<String> selectedTime = [];
@@ -92,6 +94,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     {'S': 6},
   ];
 
+  final EmojiParser emojiParser = EmojiParser();
+
+
   List<String> categories = AppUtils.categories;
 
 
@@ -103,6 +108,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     categories = AppUtils.categories;
 
     log('tttt categories $categories');
+    habitNameController.addListener(_updateEmoji);
 
     if (widget.habit != null) {
       log('i am here');
@@ -123,7 +129,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
        _timerDuration= widget.habit?.timer ?? const Duration(minutes: 1);
        _formattedDuration= _formatDuration(widget.habit?.timer ?? const Duration(minutes: 1)) ;
        habitId = widget.habit?.id ?? habitId;
-      emojiSelected = widget.habit?.habitEmoji ?? '😁';
+      emojiSelected = widget.habit?.habitEmoji ?? '😊';
     }
     focusNode = FocusNode();
   }
@@ -228,12 +234,11 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
       _habitType = type;
     });
   }
-  // String selectedEmoji = '😀';
   void openPickerBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
       builder: (BuildContext context) {
@@ -253,28 +258,38 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.close),
+                            icon: const Icon(Icons.close),
                             onPressed: () {
-                              Navigator.pop(context); // Close the bottom sheet
+                              // Update main screen when closing bottom sheet
+                              Navigator.pop(context);
+                              setState(() {}); // Update the main screen instantly
                             },
                           ),
+                          // Emoji Preview with Dynamic Background Color
                           if (emojiSelected != null)
-                            Text(
-                              emojiSelected!,
-                              style: TextStyle(fontSize: 28),
+                            Container(
+                              padding: const EdgeInsets.only(left: 7, top: 7,right: 7, bottom: 7),
+                              decoration: BoxDecoration(
+                                color: selectedColor, // Use selected color here
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              child: Text(
+                                emojiSelected,
+                                style: const TextStyle(fontSize: 20),
+                              ),
                             ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      // TabBar with smaller width
+                      const SizedBox(height: 8),
+                      // TabBar with limited width
                       SizedBox(
                         width: 200, // Limit TabBar width
                         child: TabBar(
                           labelColor: Colors.black,
                           indicatorColor: Theme.of(context).primaryColor,
-                          tabs: [
-                            Tab(text: 'Pick an Emoji'),
-                            Tab(text: 'Pick a Color'),
+                          tabs: const [
+                            Tab(text: 'Emoji'),
+                            Tab(text: 'Color'),
                           ],
                         ),
                       ),
@@ -288,10 +303,10 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                               child: EmojiPicker(
                                 textEditingController: emojiController,
                                 onEmojiSelected: (category, emoji) {
-                                  setState(() {
-                                    emojiController.text += emoji.emoji;
-                                    emojiSelected = emoji.emoji;
+                                  setStateBottomSheet(() {
+                                    emojiSelected = emoji.emoji; // Update inside bottom sheet
                                   });
+                                  setState(() {}); // Update main screen instantly
                                 },
                               ),
                             ),
@@ -303,11 +318,13 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                   child: ColorPicker(
                                     pickerColor: selectedColor,
                                     onColorChanged: (Color color) {
-                                      setState(() {
-                                        selectedColor = color;
+                                      setStateBottomSheet(() {
+                                        selectedColor = color; // Update inside bottom sheet
                                       });
+                                      setState(() {}); // Update main screen instantly
                                     },
-                                    showLabel: true,
+                                    showLabel: false,
+                                    displayThumbColor: false,
                                     pickerAreaHeightPercent: 0.8,
                                   ),
                                 ),
@@ -327,33 +344,35 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     );
   }
 
-  void _showEmojiKeyboard(BuildContext context) {
-    TextEditingController emojiController = TextEditingController();
-    FocusScope.of(context).requestFocus(FocusNode());
+  void _updateEmoji() {
+    String text = habitNameController.text.toLowerCase().trim();
+    if (text.isEmpty) return;
+    String emojifiedText = emojiParser.emojify(':$text:');
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return SizedBox(
-          height: 300,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            child: Column(
-              children: [
-                // Emoji picker
-                EmojiPicker(
-                  textEditingController: emojiController,
-                  onEmojiSelected: (category, emoji) {
-                    emojiController.text += emoji.emoji;
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+    if (emojifiedText == ':$text:') {
+      setState(() {
+        emojiSelected = '😊';
+      });
+    } else {
+      setState(() {
+        emojiSelected = emojifiedText;
+      });
+    }
+  }
+
+  void _toggleEditing() {
+    setState(() {
+      _isEditing = true;
+      goalCountLabelController.text = goalCountLabel.isNotEmpty ? goalCountLabel : "";
+      goalCountLabel = goalCountLabelController.text;
+    });
+  }
+
+  void _saveLabel() {
+    setState(() {
+      goalCountLabel = goalCountLabelController.text;
+      _isEditing = false;
+    });
   }
 
 
@@ -375,7 +394,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
             
-                    IconButton(icon: Icon(Icons.close), onPressed: (){
+                    IconButton(icon: const Icon(Icons.close), onPressed: (){
                       Navigator.pop(context);
                     },),
             
@@ -437,7 +456,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
 
-                  IconButton(icon: Icon(Icons.close), onPressed: (){
+                  IconButton(icon: const Icon(Icons.close), onPressed: (){
                     Navigator.pop(context);
                   },),
 
@@ -481,7 +500,6 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     );
   }
 
-  String _label = 'Times';
   List<int> daysInMonth = List.generate(31, (index) => index + 1); // Days from 1 to 31
 
   final List<DateTime> selectedDates = [];
@@ -504,14 +522,14 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
       ),
       builder: (_) => LabelChanger(
-        initialLabel: _label,
+        initialLabel: goalCountLabel,
         onLabelChanged: (newLabel) {
           setState(() {
-            _label = newLabel;
+            goalCountLabel = newLabel;
           });
         },
       ),
@@ -539,9 +557,11 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
 
   @override
   void dispose() {
+    habitNameController.removeListener(_updateEmoji);
     focusNode?.dispose();
     notecontroller.dispose();
     habitNameController.dispose();
+    goalCountLabelController.dispose();
     super.dispose();
   }
 
@@ -668,12 +688,14 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        SizedBox(width: 10,),
+                        const SizedBox(width: 10,),
                         GestureDetector(
                           onTap: (){
                             openPickerBottomSheet(context);
                           },
                           child: Container(
+                            height: 35,
+                            width: 35,
                             padding: const EdgeInsets.all(5.0),
                             decoration: BoxDecoration(
                                 color: selectedColor, // Background color for the icon
@@ -681,10 +703,10 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                                 borderRadius: BorderRadius.circular(8)
                             ),
 
-                            child: Center(child: Text(emojiSelected, style: TextStyle(fontSize: 18),)),
+                            child: Center(child: Text(emojiSelected, style: const TextStyle(fontSize: 18),)),
                           ),
                         ),
-                        SizedBox(width: 10,),
+                        const SizedBox(width: 10,),
                         Expanded(
                           child: Container(
                             alignment: Alignment.centerLeft,  // Aligns text to the left
@@ -692,7 +714,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             child: TextFormField(
                               focusNode: focusNode,
                               controller: habitNameController,
-                              decoration:   InputDecoration(
+                              decoration:   const InputDecoration(
                                 hintText: 'Habit Name',
                                 border: InputBorder.none,  // Removes the default underline
                               ),
@@ -769,9 +791,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
             onTap: () => _changeDuration(context), // On tap, open the duration picker
               child: Container(
                 width: 120.w,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Color(0xFF1A3D89), // Blue color to match the design
+                  color: const Color(0xFF1A3D89), // Blue color to match the design
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
@@ -784,16 +806,16 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                 ),
               ),
             ),
-            SizedBox(width: 16), // Space between the two buttons
+            const SizedBox(width: 16), // Space between the two buttons
 
             // Change Button
             GestureDetector(
               onTap: () => _changeDuration(context), // On tap, open the duration picker
               child: Container(
                 width: 120.w,
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Color(0xFF1A3D89), // Blue color to match the design
+                  color: const Color(0xFF1A3D89), // Blue color to match the design
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
@@ -826,36 +848,89 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             });
                           },
                         ),
-                        SizedBox(width: 45),
-                        GestureDetector(
-                          onTap: _changeLabel,
-                          child: Container(
-                            width: 110,
-                            decoration: BoxDecoration(
-                              color: ColorStrings.headingBlue,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: const [
-                                BoxShadow(
-                                  spreadRadius: 1,
-                                  offset: Offset(1, 1),
-                                  blurRadius: 1,
-                                  color: Colors.black12,
-                                ),
-                              ],
+                        const SizedBox(width: 30),
+                        // GestureDetector(
+                        //   onTap: _changeLabel,
+                        //   child: Container(
+                        //     width: 110,
+                        //     decoration: BoxDecoration(
+                        //       color: ColorStrings.headingBlue,
+                        //       borderRadius: BorderRadius.circular(10),
+                        //       boxShadow: const [
+                        //         BoxShadow(
+                        //           spreadRadius: 1,
+                        //           offset: Offset(1, 1),
+                        //           blurRadius: 1,
+                        //           color: Colors.black12,
+                        //         ),
+                        //       ],
+                        //     ),
+                        //     child: Center(
+                        //       child: Padding(
+                        //         padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 8.0),
+                        //         child: Text(
+                        //           _label,
+                        //           style: GoogleFonts.poppins(fontSize: 17,
+                        //             color: Colors.white,
+                        //             fontWeight: FontWeight.w400,),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+
+                    GestureDetector(
+                      onTap: _toggleEditing,
+                      child: Container(
+                        width: 130,
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: ColorStrings.headingBlue,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: const [
+                            BoxShadow(
+                              spreadRadius: 1,
+                              offset: Offset(1, 1),
+                              blurRadius: 1,
+                              color: Colors.black12,
                             ),
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 8.0),
-                                child: Text(
-                                  _label,
-                                  style: GoogleFonts.poppins(fontSize: 17,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w400,),
-                                ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 1.0, vertical: 0.0),
+                            child: _isEditing
+                                ? TextField(
+                              controller: goalCountLabelController,
+                              autofocus: true,
+                              onSubmitted: (_) => _saveLabel(),
+                              onEditingComplete: _saveLabel,
+                              style: GoogleFonts.poppins(fontSize: 17, color: Colors.white, fontWeight: FontWeight.w400),
+                              maxLength: 10,
+                              onChanged: (value) {
+                                setState(() {
+                                  goalCountLabel = value;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: goalCountLabel.isNotEmpty ? goalCountLabel : "Enter label",
+                                hintStyle: GoogleFonts.poppins(color: Colors.white70),
+                                contentPadding: EdgeInsets.zero
                               ),
-                            ),
+                              textAlign: TextAlign.center,
+                            )
+                                : Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
+                                  child: Text(
+                                 goalCountLabel,
+                                  style: GoogleFonts.poppins(fontSize: 17, color: Colors.white, fontWeight: FontWeight.w400),
+                                  ),
+                                ),
                           ),
                         ),
+                      ),
+                    ),
                       ],
                     ),
                   ),
@@ -965,9 +1040,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                           },
                           child: Container(
                             width: 120.w,
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Color(0xFF1A3D89), // Blue color to match the design
+                              color: const Color(0xFF1A3D89), // Blue color to match the design
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Center(
@@ -980,7 +1055,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 16), // Space between the two buttons
+                        const SizedBox(width: 16), // Space between the two buttons
 
                         // Change Button
                         GestureDetector(
@@ -1001,9 +1076,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                           },
                           child: Container(
                             width: 120.w,
-                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Color(0xFF1A3D89), // Blue color to match the design
+                              color: const Color(0xFF1A3D89), // Blue color to match the design
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Center(
@@ -1043,9 +1118,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                           },
                           child: Container(
                             width: 120.w,
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Color(0xFF1A3D89), // Blue color to match the design
+                              color: const Color(0xFF1A3D89), // Blue color to match the design
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Center(
@@ -1058,7 +1133,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 16), // Space between the two buttons
+                        const SizedBox(width: 16), // Space between the two buttons
 
                         // Change Button
                         GestureDetector(
@@ -1077,9 +1152,9 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                           },
                           child: Container(
                             width: 120.w,
-                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Color(0xFF1A3D89), // Blue color to match the design
+                              color: const Color(0xFF1A3D89), // Blue color to match the design
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Center(
@@ -1102,7 +1177,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                     child: Container(
                       height: 280,
                       child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 7, // 7 days in a week
                           mainAxisSpacing: 8,
                           crossAxisSpacing: 8,
@@ -1119,7 +1194,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
                               height: 25,
                               width: 25,
                               decoration: isSelected? BoxDecoration(
-                                color: Color(0xff079455),
+                                color: const Color(0xff079455),
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow:  [
                                   BoxShadow(
@@ -1425,6 +1500,7 @@ class _AddChallengeScreenState extends State<AddChallengeScreen> {
         selectedTimesPerWeek: _repeatSelectedItem == RepeatType.weekly ? selectedTimesPerWeek : null,
         selectedTimesPerMonth: _repeatSelectedItem == RepeatType.monthly ? selectedTimesPerMonth : null,
         notes: habitNote,
+        goalCountLabel: goalCountLabel,
       );
 
       log('${widget.habit != null ? "Updated" : "New"} habit added: $newHabit');
