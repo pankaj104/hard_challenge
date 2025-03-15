@@ -2,7 +2,9 @@
     <application
         android:label="Habit Aura"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round">
+    >
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

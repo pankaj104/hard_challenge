@@ -23,8 +23,8 @@ class _MainScreenState extends State<MainScreen> {
   int currentIndex = 0;
    List<Widget> screens = [
     HomeScreen(),
-     AddHabitScreen(),
-    StatisticsCategoryWise(habit: [],),
+     const AddHabitScreen(),
+    const StatisticsCategoryWise(habit: [],),
   ];
 
   final List<String> defaultCategories = ['Universal','Sport', 'Health', 'Spiritual','Self-Care', 'Finance', 'Learning'];
@@ -49,8 +49,11 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    DateTime cutoffDate = DateTime(2026, 1, 1);
+    DateTime today = DateTime.now();
     return Scaffold(
-      body: screens[currentIndex],
+      body: today.isAfter(cutoffDate) ? const Center(child: Text('Please update to the latest version',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold))) : screens[currentIndex],
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -68,7 +71,7 @@ class _MainScreenState extends State<MainScreen> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24.0),
             topRight: Radius.circular(24.0),
           ),
