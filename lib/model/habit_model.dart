@@ -1,11 +1,12 @@
-import 'dart:developer';
-
+import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 
+part 'habit_model.g.dart'; // Add this import for generated code
+
 enum TaskType {
-  normal,
-  timer,
-  value,
+  task,
+  count,
+  time,
 }
 
 enum RepeatType {
@@ -15,17 +16,52 @@ enum RepeatType {
   selectedDate,
 }
 
+enum HabitType {
+  build,
+  quit
+}
+
 enum TaskStatus {
+  none,
   done,
   missed,
   skipped,
+  goingOn,
+  reOpen,
 }
 
+@HiveType(typeId: 0)
 class ProgressWithStatus {
+  @HiveField(0)
   TaskStatus status;
+
+  @HiveField(1)
   double progress;
 
-  ProgressWithStatus({required this.status, required this.progress});
+  @HiveField(2)
+  Duration? duration;
+
+  ProgressWithStatus({
+    required this.status,
+    required this.progress,
+    this.duration,
+  });
+
+  factory ProgressWithStatus.fromMap(Map<String, dynamic> map) {
+    return ProgressWithStatus(
+      status: TaskStatus.values[map['status']],
+      progress: map['progress'],
+      duration: map['duration'] != null ? Duration(seconds: map['duration']) : null,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'status': status.index,
+      'progress': progress,
+      'duration': duration?.inSeconds,
+    };
+  }
 
   @override
   String toString() {
@@ -33,32 +69,81 @@ class ProgressWithStatus {
   }
 }
 
+@HiveType(typeId: 1)
 class Habit {
+
+  @HiveField(0)
+  String id; // Unique identifier for the habit
+
+  @HiveField(1)
   String title;
+
+  @HiveField(2)
   String category;
-  IconData habitIcon;
+
+  @HiveField(3)
+  String habitEmoji;
+
+  @HiveField(4)
   Color iconBgColor;
-  TimeOfDay notificationTime;
+
+  @HiveField(5)
+  List<String> notificationTime;
+
+  @HiveField(6)
   TaskType taskType;
+
+  @HiveField(7)
   RepeatType repeatType;
+
+  @HiveField(8)
+  HabitType habitType;
+
+  @HiveField(9)
   Duration? timer;
+
+  @HiveField(10)
   int? value;
+
+  @HiveField(11)
   Map<DateTime, ProgressWithStatus> progressJson;
+
+  @HiveField(12)
   List<int>? days;
+
+  @HiveField(13)
   List<DateTime>? selectedDates;
+
+  @HiveField(14)
   int? selectedTimesPerWeek;
+
+  @HiveField(15)
   int? selectedTimesPerMonth;
-  DateTime? startDate;
+
+  @HiveField(16)
+  DateTime startDate;
+
+  @HiveField(17)
   DateTime? endDate;
+
+  @HiveField(18)
   String? notes;
 
+  @HiveField(19)
+  Map<DateTime, String>? notesForReason; // Optional date-specific feedback
+
+  @HiveField(20)
+  String? goalCountLabel;
+
   Habit({
+    required this.id,
     required this.title,
     required this.category,
-    required this.habitIcon,
+    required this.habitEmoji,
     required this.iconBgColor,
     required this.notificationTime,
     required this.taskType,
+    required this.habitType,
     required this.repeatType,
     this.timer,
     this.value,
@@ -67,144 +152,18 @@ class Habit {
     this.selectedDates,
     this.selectedTimesPerWeek,
     this.selectedTimesPerMonth,
-    this.startDate,
+    required this.startDate,
     this.endDate,
     this.notes,
+    this.notesForReason,
+    this.goalCountLabel,
   });
 
   @override
   String toString() {
-    return 'Habit(title: $title, category: $category,  habitIcon: $habitIcon, IconBgColor: $iconBgColor notificationTime: $notificationTime, '
-        'taskType: $taskType, repeatType: $repeatType, timer: $timer, value: $value, '
+    return 'Habit(id: $id title: $title, category: $category,  habitIcon: $habitEmoji, IconBgColor: $iconBgColor notificationTime: $notificationTime, '
+        'taskType: $taskType, habitType: $habitType, repeatType: $repeatType, timer: $timer, value: $value, '
         'progress: $progressJson, days: $days, startDate: $startDate, endDate: $endDate, selectedDates: $selectedDates, '
-        'selectedTimesPerWeek: $selectedTimesPerWeek, selectedTimesPerMonth: $selectedTimesPerMonth, notes: $notes)';
+        'selectedTimesPerWeek: $selectedTimesPerWeek, selectedTimesPerMonth: $selectedTimesPerMonth, notes: $notes, notesForReason: $notesForReason goalCountLabel : $goalCountLabel)';
   }
-
-  double getCompletionPercentage() {
-    int totalDays = 0;
-    int completedDays = progressJson.values.where((p) => p.status == TaskStatus.done).length;
-
-    if (repeatType == RepeatType.selectDays) {
-      DateTime? loopDate = startDate;
-
-      while (loopDate!.isBefore(endDate!) || loopDate.isAtSameMomentAs(endDate!)) {
-        if (days!.contains(loopDate.weekday % 7)) {
-          totalDays++;
-        }
-        loopDate = loopDate.add(Duration(days: 1));
-      }
-    } else if (repeatType == RepeatType.selectedDate) {
-      totalDays = selectedDates?.length ?? 1;
-    } else if (repeatType == RepeatType.weekly) {
-      totalDays = countTaskDays(startDate!, endDate!, selectedTimesPerWeek!);
-    } else if (repeatType == RepeatType.monthly) {
-      totalDays = selectedDates?.length ?? 1;
-    }
-
-    return totalDays > 0 ? (completedDays / totalDays) * 100 : 0.0;
-  }
-
-  int countTaskDays(DateTime startDate, DateTime endDate, int taskDays) {
-    if (startDate.isAfter(endDate)) {
-      throw ArgumentError('Start date must be before end date');
-    }
-
-    int totalDays = endDate.difference(startDate).inDays + 1;
-    int fullWeeks = totalDays ~/ 7;
-    int totalTaskDays = fullWeeks * taskDays;
-
-    int remainingDays = totalDays % 7;
-    if (remainingDays > 0) {
-      totalTaskDays += (remainingDays >= taskDays) ? taskDays : remainingDays;
-    }
-    log("selectedTimesPerWeek:  $selectedTimesPerWeek");
-
-    return totalTaskDays;
-  }
-
-  void markTaskAsDone(DateTime date) {
-    progressJson[date] = ProgressWithStatus(status: TaskStatus.done, progress: 1.0);
-  }
-
-  void markTaskAsMissed(DateTime date) {
-    progressJson[date] = ProgressWithStatus(status: TaskStatus.missed, progress: 0.0);
-  }
-
-  void markTaskAsSkipped(DateTime date) {
-    progressJson[date] = ProgressWithStatus(status: TaskStatus.skipped, progress: 0.0);
-  }
-
-  void updateProgress(DateTime date, double progressValue) {
-    if (progressJson.containsKey(date)) {
-      progressJson[date]!.progress = progressValue;
-    } else {
-      progressJson[date] = ProgressWithStatus(status: TaskStatus.done, progress: progressValue);
-    }
-  }
-  
-
-  double getSkippedPercentage() {
-    int totalDays = 0;
-    int skippedCount = 0;
-
-
-    progressJson.values.forEach((progress) {
-      if (progress.status == TaskStatus.skipped) {
-        skippedCount++;
-      }
-    });
-
-    if (repeatType == RepeatType.selectDays) {
-      DateTime? loopDate = startDate;
-
-      while (loopDate!.isBefore(endDate!) || loopDate.isAtSameMomentAs(endDate!)) {
-        if (days!.contains(loopDate.weekday % 7)) {
-          totalDays++;
-        }
-        loopDate = loopDate.add(const Duration(days: 1));
-      }
-    } else if (repeatType == RepeatType.selectedDate) {
-      totalDays = selectedDates?.length ?? 1;
-    } else if (repeatType == RepeatType.weekly) {
-      totalDays = countTaskDays(startDate!, endDate!, selectedTimesPerWeek!);
-    } else if (repeatType == RepeatType.monthly) {
-      totalDays = selectedDates?.length ?? 1;
-    }
-
-    return  totalDays > 0 ? (skippedCount / totalDays) * 100 : 0.0;
-  }
-  double getMissedPercentage() {
-    int totalDays = 0;
-    int MissedCount = 0;
-
-
-    progressJson.values.forEach((progress) {
-      if (progress.status == TaskStatus.missed) {
-        MissedCount++;
-      }
-    });
-
-    if (repeatType == RepeatType.selectDays) {
-      DateTime? loopDate = startDate;
-
-      while (loopDate!.isBefore(endDate!) || loopDate.isAtSameMomentAs(endDate!)) {
-        if (days!.contains(loopDate.weekday % 7)) {
-          totalDays++;
-        }
-        loopDate = loopDate.add(const Duration(days: 1));
-      }
-    } else if (repeatType == RepeatType.selectedDate) {
-      totalDays = selectedDates?.length ?? 1;
-    } else if (repeatType == RepeatType.weekly) {
-      totalDays = countTaskDays(startDate!, endDate!, selectedTimesPerWeek!);
-    } else if (repeatType == RepeatType.monthly) {
-      totalDays = selectedDates?.length ?? 1;
-    }
-
-    return  totalDays > 0 ? (MissedCount / totalDays) * 100 : 0.0;
-  }
-
-
-
-
 }

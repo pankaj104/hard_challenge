@@ -1,4 +1,4 @@
-package com.example.hard_challenge
+package app.habitaura.habit.tracker
 
 import io.flutter.embedding.android.FlutterActivity
 
