@@ -6,6 +6,7 @@ import 'package:hard_challenge/model/habit_model.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:hard_challenge/routers/app_routes.gr.dart';
 import 'package:hard_challenge/service/notification_service.dart';
+import 'package:hard_challenge/themes/theme_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -38,24 +39,33 @@ class MyApp extends StatelessWidget {
   final _appRouter = AppRoute();
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => HabitProvider(),
-      child: ScreenUtilInit(
-        // designSize: const Size(375, 812),
-        child: MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          title: 'Custom Challenge App',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          routerDelegate: _appRouter.delegate(
-            navigatorObservers: () => [AutoRouteObserver()],
-            initialRoutes: [
-              const PageRouteInfo<dynamic>('MainScreen', path: '/'),
-            ],
-          ),
-          routeInformationParser: _appRouter.defaultRouteParser(),        ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => HabitProvider()), // Keeping HabitProvider
+        ChangeNotifierProvider(create: (context) => ThemeProvider()), // Adding ThemeProvider
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return ScreenUtilInit(
+            // designSize: const Size(375, 812),
+            child: MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              title: 'Custom Challenge App',
+              theme: themeProvider.lightTheme, // Light Theme
+              darkTheme: themeProvider.darkTheme, // Dark Theme
+              themeMode: themeProvider.themeMode, // Apply User Selected Mode
+              routerDelegate: _appRouter.delegate(
+                navigatorObservers: () => [AutoRouteObserver()],
+                initialRoutes: [
+                  const PageRouteInfo<dynamic>('MainScreen', path: '/'),
+                ],
+              ),
+              routeInformationParser: _appRouter.defaultRouteParser(),
+            ),
+          );
+        },
       ),
     );
+
   }
 }
