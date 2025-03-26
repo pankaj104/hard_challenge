@@ -1,8 +1,12 @@
 // main.dart
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:hard_challenge/l10n/messages.dart';
 import 'package:hard_challenge/model/habit_model.dart';
+import 'package:hard_challenge/pages/settings/controller/language_controller.dart';
 import 'package:hard_challenge/provider/habit_provider.dart';
 import 'package:hard_challenge/routers/app_routes.gr.dart';
 import 'package:hard_challenge/service/notification_service.dart';
@@ -30,7 +34,9 @@ void main() async {
   Hive.registerAdapter(TaskStatusAdapter());
   Hive.registerAdapter(DurationAdapter());
   Hive.registerAdapter(ColorAdapter());
+  Get.put(LanguageController());
   await NotificationService().init(); // Initialize the notification service
+  await Hive.openBox('settingsBox');
   await Hive.openBox<String>('categoriesBox'); // Open a box for categories
   runApp(MyApp());
 }
@@ -47,13 +53,35 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return ScreenUtilInit(
-            // designSize: const Size(375, 812),
-            child: MaterialApp.router(
-              debugShowCheckedModeBanner: false,
+            builder: (context, child) => GetMaterialApp.router(
+              scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(), // To show snackbars/toasts
               title: 'Custom Challenge App',
-              theme: themeProvider.lightTheme, // Light Theme
-              darkTheme: themeProvider.darkTheme, // Dark Theme
-              themeMode: themeProvider.themeMode, // Apply User Selected Mode
+              translations: Messages(), // GetX localization
+              locale: LanguageController().getSavedLocale(),
+              fallbackLocale: const Locale('en'),
+              supportedLocales: const [
+                Locale('en'), // ✅ English
+                Locale('es'), // ✅ Spanish (without 'ES')
+                Locale('fr'), // ✅ French (without 'FR')
+                Locale('de'), // ✅ German (without 'DE')
+                Locale('ja'), // ✅ Japanese (without 'JP')
+                Locale('ar'), // ✅ Arabic (without 'SA')
+              ],
+
+              // ✅ Flutter's Built-in Localization Support
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate, // Material Widgets Localization
+                GlobalWidgetsLocalizations.delegate, // Basic Widgets Localization
+                GlobalCupertinoLocalizations.delegate, // Cupertino (iOS) Localization
+              ],
+              theme: themeProvider.lightTheme,
+              darkTheme: themeProvider.darkTheme,
+              // highContrastTheme: themeProvider.lightTheme,
+              // highContrastDarkTheme: themeProvider.darkTheme,
+              themeMode: themeProvider.themeMode, // User's selected theme mode
+              // themeAnimationDuration: const Duration(milliseconds: 300), // Smooth transition
+              // themeAnimationCurve: Curves.easeInOut,
+              debugShowCheckedModeBanner: false, // Hide debug banner
               routerDelegate: _appRouter.delegate(
                 navigatorObservers: () => [AutoRouteObserver()],
                 initialRoutes: [
@@ -61,6 +89,16 @@ class MyApp extends StatelessWidget {
                 ],
               ),
               routeInformationParser: _appRouter.defaultRouteParser(),
+              routeInformationProvider: _appRouter.routeInfoProvider(),
+              backButtonDispatcher: RootBackButtonDispatcher(), // Handle back button navigation
+              builder: (context, child) {
+                return GestureDetector(
+                  onTap: () {
+                    FocusScope.of(context).requestFocus(FocusNode()); // Hide keyboard on tap
+                  },
+                  child: child!,
+                );
+              },
             ),
           );
         },

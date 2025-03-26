@@ -11,38 +11,40 @@
 // ignore_for_file: type=lint
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i7;
-import 'package:flutter/material.dart' as _i8;
+import 'package:auto_route/auto_route.dart' as _i9;
+import 'package:flutter/material.dart' as _i10;
 
 import '../features/addChallenge/add_challenge_screen.dart' as _i5;
 import '../features/mainScreen/main_screen.dart' as _i1;
 import '../features/statistics/statistics_category_wise.dart' as _i4;
 import '../features/statistics/statistics_habit_wise_screen.dart' as _i3;
-import '../model/habit_model.dart' as _i9;
+import '../model/habit_model.dart' as _i11;
 import '../pages/add_habit_screen.dart' as _i2;
 import '../pages/habit_notes_reason_date_wise.dart' as _i6;
+import '../pages/settings/language_selection_screen.dart' as _i8;
+import '../pages/settings/settings_screen.dart' as _i7;
 
-class AppRoute extends _i7.RootStackRouter {
-  AppRoute([_i8.GlobalKey<_i8.NavigatorState>? navigatorKey])
+class AppRoute extends _i9.RootStackRouter {
+  AppRoute([_i10.GlobalKey<_i10.NavigatorState>? navigatorKey])
       : super(navigatorKey);
 
   @override
-  final Map<String, _i7.PageFactory> pagesMap = {
+  final Map<String, _i9.PageFactory> pagesMap = {
     MainScreen.name: (routeData) {
-      return _i7.CupertinoPageX<dynamic>(
+      return _i9.CupertinoPageX<dynamic>(
         routeData: routeData,
         child: _i1.MainScreen(),
       );
     },
     AddHabitScreen.name: (routeData) {
-      return _i7.CupertinoPageX<dynamic>(
+      return _i9.CupertinoPageX<dynamic>(
         routeData: routeData,
         child: const _i2.AddHabitScreen(),
       );
     },
     StatisticsHabitWiseScreen.name: (routeData) {
       final args = routeData.argsAs<StatisticsHabitWiseScreenArgs>();
-      return _i7.CupertinoPageX<dynamic>(
+      return _i9.CupertinoPageX<dynamic>(
         routeData: routeData,
         child: _i3.StatisticsHabitWiseScreen(
           habit: args.habit,
@@ -52,7 +54,7 @@ class AppRoute extends _i7.RootStackRouter {
     },
     StatisticsCategoryWise.name: (routeData) {
       final args = routeData.argsAs<StatisticsCategoryWiseArgs>();
-      return _i7.CupertinoPageX<dynamic>(
+      return _i9.CupertinoPageX<dynamic>(
         routeData: routeData,
         child: _i4.StatisticsCategoryWise(
           key: args.key,
@@ -62,7 +64,7 @@ class AppRoute extends _i7.RootStackRouter {
     },
     AddChallengeScreen.name: (routeData) {
       final args = routeData.argsAs<AddChallengeScreenArgs>();
-      return _i7.CupertinoPageX<dynamic>(
+      return _i9.CupertinoPageX<dynamic>(
         routeData: routeData,
         child: _i5.AddChallengeScreen(
           key: args.key,
@@ -74,7 +76,7 @@ class AppRoute extends _i7.RootStackRouter {
     },
     HabitNotesReasonDateWise.name: (routeData) {
       final args = routeData.argsAs<HabitNotesReasonDateWiseArgs>();
-      return _i7.CupertinoPageX<dynamic>(
+      return _i9.CupertinoPageX<dynamic>(
         routeData: routeData,
         child: _i6.HabitNotesReasonDateWise(
           key: args.key,
@@ -82,40 +84,60 @@ class AppRoute extends _i7.RootStackRouter {
         ),
       );
     },
+    SettingsScreen.name: (routeData) {
+      return _i9.CupertinoPageX<dynamic>(
+        routeData: routeData,
+        child: const _i7.SettingsScreen(),
+      );
+    },
+    LanguageSelectionScreen.name: (routeData) {
+      return _i9.CupertinoPageX<dynamic>(
+        routeData: routeData,
+        child: const _i8.LanguageSelectionScreen(),
+      );
+    },
   };
 
   @override
-  List<_i7.RouteConfig> get routes => [
-        _i7.RouteConfig(
+  List<_i9.RouteConfig> get routes => [
+        _i9.RouteConfig(
           MainScreen.name,
           path: '/',
         ),
-        _i7.RouteConfig(
+        _i9.RouteConfig(
           AddHabitScreen.name,
           path: '/add-habit-screen',
         ),
-        _i7.RouteConfig(
+        _i9.RouteConfig(
           StatisticsHabitWiseScreen.name,
           path: '/statistics-habit-wise-screen',
         ),
-        _i7.RouteConfig(
+        _i9.RouteConfig(
           StatisticsCategoryWise.name,
           path: '/statistics-category-wise',
         ),
-        _i7.RouteConfig(
+        _i9.RouteConfig(
           AddChallengeScreen.name,
           path: '/add-challenge-screen',
         ),
-        _i7.RouteConfig(
+        _i9.RouteConfig(
           HabitNotesReasonDateWise.name,
           path: '/habit-notes-reason-date-wise',
+        ),
+        _i9.RouteConfig(
+          SettingsScreen.name,
+          path: '/settings-screen',
+        ),
+        _i9.RouteConfig(
+          LanguageSelectionScreen.name,
+          path: '/language-selection-screen',
         ),
       ];
 }
 
 /// generated route for
 /// [_i1.MainScreen]
-class MainScreen extends _i7.PageRouteInfo<void> {
+class MainScreen extends _i9.PageRouteInfo<void> {
   const MainScreen()
       : super(
           MainScreen.name,
@@ -127,7 +149,7 @@ class MainScreen extends _i7.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.AddHabitScreen]
-class AddHabitScreen extends _i7.PageRouteInfo<void> {
+class AddHabitScreen extends _i9.PageRouteInfo<void> {
   const AddHabitScreen()
       : super(
           AddHabitScreen.name,
@@ -140,9 +162,9 @@ class AddHabitScreen extends _i7.PageRouteInfo<void> {
 /// generated route for
 /// [_i3.StatisticsHabitWiseScreen]
 class StatisticsHabitWiseScreen
-    extends _i7.PageRouteInfo<StatisticsHabitWiseScreenArgs> {
+    extends _i9.PageRouteInfo<StatisticsHabitWiseScreenArgs> {
   StatisticsHabitWiseScreen({
-    required _i9.Habit habit,
+    required _i11.Habit habit,
     required DateTime selectedDateforSkip,
   }) : super(
           StatisticsHabitWiseScreen.name,
@@ -162,7 +184,7 @@ class StatisticsHabitWiseScreenArgs {
     required this.selectedDateforSkip,
   });
 
-  final _i9.Habit habit;
+  final _i11.Habit habit;
 
   final DateTime selectedDateforSkip;
 
@@ -175,10 +197,10 @@ class StatisticsHabitWiseScreenArgs {
 /// generated route for
 /// [_i4.StatisticsCategoryWise]
 class StatisticsCategoryWise
-    extends _i7.PageRouteInfo<StatisticsCategoryWiseArgs> {
+    extends _i9.PageRouteInfo<StatisticsCategoryWiseArgs> {
   StatisticsCategoryWise({
-    _i8.Key? key,
-    required List<_i9.Habit> habit,
+    _i10.Key? key,
+    required List<_i11.Habit> habit,
   }) : super(
           StatisticsCategoryWise.name,
           path: '/statistics-category-wise',
@@ -197,9 +219,9 @@ class StatisticsCategoryWiseArgs {
     required this.habit,
   });
 
-  final _i8.Key? key;
+  final _i10.Key? key;
 
-  final List<_i9.Habit> habit;
+  final List<_i11.Habit> habit;
 
   @override
   String toString() {
@@ -209,10 +231,10 @@ class StatisticsCategoryWiseArgs {
 
 /// generated route for
 /// [_i5.AddChallengeScreen]
-class AddChallengeScreen extends _i7.PageRouteInfo<AddChallengeScreenArgs> {
+class AddChallengeScreen extends _i9.PageRouteInfo<AddChallengeScreenArgs> {
   AddChallengeScreen({
-    _i8.Key? key,
-    _i9.Habit? habit,
+    _i10.Key? key,
+    _i11.Habit? habit,
     required bool isFromEdit,
     required bool isFromFilledHabbit,
   }) : super(
@@ -237,9 +259,9 @@ class AddChallengeScreenArgs {
     required this.isFromFilledHabbit,
   });
 
-  final _i8.Key? key;
+  final _i10.Key? key;
 
-  final _i9.Habit? habit;
+  final _i11.Habit? habit;
 
   final bool isFromEdit;
 
@@ -254,10 +276,10 @@ class AddChallengeScreenArgs {
 /// generated route for
 /// [_i6.HabitNotesReasonDateWise]
 class HabitNotesReasonDateWise
-    extends _i7.PageRouteInfo<HabitNotesReasonDateWiseArgs> {
+    extends _i9.PageRouteInfo<HabitNotesReasonDateWiseArgs> {
   HabitNotesReasonDateWise({
-    _i8.Key? key,
-    required _i9.Habit habit,
+    _i10.Key? key,
+    required _i11.Habit habit,
   }) : super(
           HabitNotesReasonDateWise.name,
           path: '/habit-notes-reason-date-wise',
@@ -276,12 +298,36 @@ class HabitNotesReasonDateWiseArgs {
     required this.habit,
   });
 
-  final _i8.Key? key;
+  final _i10.Key? key;
 
-  final _i9.Habit habit;
+  final _i11.Habit habit;
 
   @override
   String toString() {
     return 'HabitNotesReasonDateWiseArgs{key: $key, habit: $habit}';
   }
+}
+
+/// generated route for
+/// [_i7.SettingsScreen]
+class SettingsScreen extends _i9.PageRouteInfo<void> {
+  const SettingsScreen()
+      : super(
+          SettingsScreen.name,
+          path: '/settings-screen',
+        );
+
+  static const String name = 'SettingsScreen';
+}
+
+/// generated route for
+/// [_i8.LanguageSelectionScreen]
+class LanguageSelectionScreen extends _i9.PageRouteInfo<void> {
+  const LanguageSelectionScreen()
+      : super(
+          LanguageSelectionScreen.name,
+          path: '/language-selection-screen',
+        );
+
+  static const String name = 'LanguageSelectionScreen';
 }

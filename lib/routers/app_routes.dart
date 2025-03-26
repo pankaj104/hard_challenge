@@ -6,6 +6,8 @@ import 'package:hard_challenge/features/statistics/statistics_category_wise.dart
 import 'package:hard_challenge/features/statistics/statistics_habit_wise_screen.dart';
 import 'package:hard_challenge/pages/add_habit_screen.dart';
 import 'package:hard_challenge/pages/habit_notes_reason_date_wise.dart';
+import 'package:hard_challenge/pages/settings/language_selection_screen.dart';
+import 'package:hard_challenge/pages/settings/settings_screen.dart';
 
 
 @CupertinoAutoRouter(
@@ -17,6 +19,8 @@ import 'package:hard_challenge/pages/habit_notes_reason_date_wise.dart';
     AutoRoute<dynamic>(page: StatisticsCategoryWise),
     AutoRoute<dynamic>(page: AddChallengeScreen),
     AutoRoute<dynamic>(page: HabitNotesReasonDateWise),
+    AutoRoute<dynamic>(page: SettingsScreen),
+    AutoRoute<dynamic>(page: LanguageSelectionScreen),
 
   ],
 )

@@ -2,10 +2,12 @@ import 'dart:developer';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hard_challenge/features/timer/timer_screen.dart';
 import 'package:hard_challenge/routers/app_routes.gr.dart';
 import 'package:hard_challenge/themes/theme_provider.dart';
+import 'package:hard_challenge/utils/app_strings.dart';
 import 'package:hard_challenge/utils/colors.dart';
 import 'package:hard_challenge/utils/helpers.dart';
 import 'package:hard_challenge/widgets/habit_custom_button.dart';
@@ -99,64 +101,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
 
                           const SizedBox(width: 20,),
+                          IconButton(
+                            onPressed: () {
+                              context.pushRoute(const SettingsScreen()); // Navigates to ProfileScreen
 
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text("Select Theme", style: TextStyle(fontSize: 18)),
-                              const SizedBox(height: 10),
-                              DropdownButton<ThemeMode>(
-                                value: themeProvider.themeMode,
-                                items: const [
-                                  DropdownMenuItem(
-                                    value: ThemeMode.system,
-                                    child: Text("System Mode"),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: ThemeMode.light,
-                                    child: Text("Light Mode"),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: ThemeMode.dark,
-                                    child: Text("Dark Mode"),
-                                  ),
-                                ],
-                                onChanged: (ThemeMode? mode) {
-                                  if (mode != null) {
-                                    themeProvider.setTheme(mode);
-                                  }
-                                },
-                              ),
-                            ],
+                              // context.router.push(
+                              //   const PageRouteInfo<dynamic>(
+                              //     'SettingsScreen',
+                              //     path: '/settings-screen',
+                              //   ),
+                              // );
+                            },
+                            icon: const Icon(Icons.settings),
                           ),
-
-
-                          // IconButton(
-                          //   onPressed: () {
-                          //     showDialog(
-                          //       context: context,
-                          //       builder: (context) => AlertDialog(
-                          //         title: const Text("Coming Soon"),
-                          //         content: const Text("This feature is under development."),
-                          //         actions: [
-                          //           TextButton(
-                          //             onPressed: () => Navigator.of(context).pop(),
-                          //             child: const Text("OK"),
-                          //           ),
-                          //         ],
-                          //       ),
-                          //     );
-                          //   },
-                          //   icon: const Icon(Icons.settings),
-                          // ),
-                          //
-                          //
-                          //
-                          // IconButton(onPressed: () {
-                          //   setState(() async {
-                          //     await habitProvider.clearHabits();
-                          //   });
-                          // }, icon: const Icon(Icons.clear))
+                          IconButton(onPressed: () {
+                            setState(() async {
+                              await habitProvider.clearHabits();
+                            });
+                          }, icon: const Icon(Icons.clear))
                         ],
                       ),
                       Container(
@@ -235,9 +197,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            'No Habit This Day!',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                           Text(
+                            AppStrings.noHabitThisDay.tr,
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 20),
                           HabitCustomButton(buttonText: 'Add Habit', onTap: (){

@@ -166,4 +166,69 @@ class Habit {
         'progress: $progressJson, days: $days, startDate: $startDate, endDate: $endDate, selectedDates: $selectedDates, '
         'selectedTimesPerWeek: $selectedTimesPerWeek, selectedTimesPerMonth: $selectedTimesPerMonth, notes: $notes, notesForReason: $notesForReason goalCountLabel : $goalCountLabel)';
   }
+
+  // ✅ Convert Habit object to JSON for exporting
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "title": title,
+      "category": category,
+      "habitEmoji": habitEmoji,
+      "iconBgColor": iconBgColor.value, // Convert Color to int
+      "notificationTime": notificationTime,
+      "taskType": taskType.index, // Convert Enum to int
+      "repeatType": repeatType.index,
+      "habitType": habitType.index,
+      "timer": timer?.inSeconds,
+      "value": value,
+      "progressJson": progressJson.map((key, value) =>
+          MapEntry(key.toIso8601String(), value.toMap())), // Convert DateTime keys
+      "days": days,
+      "selectedDates": selectedDates?.map((date) => date.toIso8601String()).toList(),
+      "selectedTimesPerWeek": selectedTimesPerWeek,
+      "selectedTimesPerMonth": selectedTimesPerMonth,
+      "startDate": startDate.toIso8601String(),
+      "endDate": endDate?.toIso8601String(),
+      "notes": notes,
+      "notesForReason": notesForReason?.map((key, value) =>
+          MapEntry(key.toIso8601String(), value)), // Convert DateTime keys
+      "goalCountLabel": goalCountLabel,
+    };
+  }
+
+  // ✅ Convert JSON back to Habit object for importing
+  factory Habit.fromJson(Map<String, dynamic> json) {
+    return Habit(
+      id: json["id"],
+      title: json["title"],
+      category: json["category"],
+      habitEmoji: json["habitEmoji"],
+      iconBgColor: Color(json["iconBgColor"]), // Convert int to Color
+      notificationTime: List<String>.from(json["notificationTime"]),
+      taskType: TaskType.values[json["taskType"]], // Convert int back to Enum
+      repeatType: RepeatType.values[json["repeatType"]],
+      habitType: HabitType.values[json["habitType"]],
+      timer: json["timer"] != null ? Duration(seconds: json["timer"]) : null,
+      value: json["value"],
+      progressJson: (json["progressJson"] as Map<String, dynamic>).map(
+            (key, value) => MapEntry(DateTime.parse(key), ProgressWithStatus.fromMap(value)),
+      ),
+      days: json["days"] != null ? List<int>.from(json["days"]) : null,
+      selectedDates: json["selectedDates"] != null
+          ? (json["selectedDates"] as List).map((date) => DateTime.parse(date)).toList()
+          : null,
+      selectedTimesPerWeek: json["selectedTimesPerWeek"],
+      selectedTimesPerMonth: json["selectedTimesPerMonth"],
+      startDate: DateTime.parse(json["startDate"]),
+      endDate: json["endDate"] != null ? DateTime.parse(json["endDate"]) : null,
+      notes: json["notes"],
+      notesForReason: json["notesForReason"] != null
+          ? (json["notesForReason"] as Map<String, dynamic>).map(
+            (key, value) => MapEntry(DateTime.parse(key), value),
+      )
+          : null,
+      goalCountLabel: json["goalCountLabel"],
+    );
+  }
+
 }
